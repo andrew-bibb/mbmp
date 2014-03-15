@@ -4,13 +4,11 @@ CONFIG += qt warn_on release
 
 #  Widgets needed for QT5, 
 QT += widgets
-#QT += dbus
 
-# dbus
-#DBUS_ADAPTORS 	+= ./code/agent/org.monkey_business_enterprises.agent.xml
-#DBUS_INTERFACES	+= ./code/agent/org.monkey_business_enterprises.agent.xml
-#DBUS_ADAPTORS 	+= ./code/counter/org.monkey_business_enterprises.counter.xml
-#DBUS_INTERFACES	+= ./code/counter/org.monkey_business_enterprises.counter.xml
+TARGET = mbmp
+TEMPLATE = app
+target.path = /usr/bin/
+INSTALLS += target
 
 #	header files
 HEADERS		+= ./code/resource.h
@@ -58,5 +56,5 @@ PKGCONFIG += gstreamer-video-1.0
 OBJECTS_DIR = ./object_files
 MOC_DIR = ./moc_files
 
-#$sources.files = $$SOURCES $$HEADERS $$RESOURCES $$FORMS *.pro
-#sources.files = $$SOURCES  *.pro
+sources.files = $$SOURCES $$HEADERS $$RESOURCES $$FORMS *.pro
+
