@@ -1,0 +1,44 @@
+<RCC>
+  <qresource prefix="text">
+    <file>text/changelog.txt</file>
+    <file>text/license.txt</file>
+    <file>text/mbmp.conf</file>
+  </qresource>
+  <qresource prefix="images">
+    <file>images/16x16/cdaudio_mount.png</file>
+    <file>images/16x16/blend.png</file>
+    <file>images/16x16/noatunloopsong.png</file>
+    <file>images/16x16/1leftarrow.png</file>
+    <file>images/16x16/1rightarrow.png</file>
+    <file>images/16x16/2leftarrow.png</file>
+    <file>images/16x16/2rightarrow.png</file>
+    <file>images/16x16/view_choose.png</file>
+    <file>images/16x16/player_stop.png</file>
+    <file>images/16x16/kwikdisk.png</file>
+    <file>images/16x16/2downarrow.png</file>
+    <file>images/16x16/2uparrow.png</file>
+    <file>images/16x16/kmixdocked.png</file>
+    <file>images/16x16/kmixdocked_error.png</file>
+    <file>images/16x16/editdelete.png</file>
+    <file>images/16x16/start.png</file>
+    <file>images/16x16/finish.png</file>
+    <file>images/16x16/folder_sound.png</file>
+    <file>images/16x16/folder_video.png</file>
+    <file>images/16x16/network.png</file>
+    <file>images/16x16/folder.png</file>
+    <file>images/16x16/view_fullscreen.png</file>
+    <file>images/16x16/folder_inbox.png</file>
+    <file>images/16x16/player_pause.png</file>
+    <file>images/16x16/sound.png</file>
+    <file>images/16x16/player_play.png</file>
+    <file>images/16x16/player_fwd.png</file>
+    <file>images/16x16/back.png</file>
+    <file>images/16x16/forward.png</file>
+    <file>images/16x16/player_rev.png</file>
+    <file>images/16x16/exit.png</file>
+    <file>images/16x16/1downarrow.png</file>
+    <file>images/16x16/1uparrow.png</file>
+    <file>images/16x16/edit_add.png</file>
+    <file>images/16x16/edit_remove.png</file>
+  </qresource>
+</RCC>

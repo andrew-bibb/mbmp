@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Playlist</class>
+ <widget class="QDialog" name="Playlist">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>312</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Playlist</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QListWidget" name="listWidget_playlist">
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="dragDropMode">
+        <enum>QAbstractItemView::InternalMove</enum>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="textElideMode">
+        <enum>Qt::ElideMiddle</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QCheckBox" name="checkBox_wrap">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;At the last item wrap to the beginning&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Wrap</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_consume">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove items from list after playing&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>&amp;Consume</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_random">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play entries in a random order&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>&amp;Random</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QToolButton" name="toolButton_moveup">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_movedown"/>
+     </item>
+     <item>
+      <widget class="Line" name="line_1">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_add"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_remove"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_removeall"/>
+     </item>
+     <item>
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_exit"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
+  <action name="actionMoveUp">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/1uparrow.png</normaloff>:/images/images/16x16/1uparrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Up</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Selected Item Up</string>
+   </property>
+  </action>
+  <action name="actionMoveDown">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/1downarrow.png</normaloff>:/images/images/16x16/1downarrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move Down</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Selectes Item Down</string>
+   </property>
+  </action>
+  <action name="actionAddMedia">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/edit_add.png</normaloff>:/images/images/16x16/edit_add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Media</string>
+   </property>
+  </action>
+  <action name="actionRemoveItem">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/edit_remove.png</normaloff>:/images/images/16x16/edit_remove.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove Selected Item</string>
+   </property>
+  </action>
+  <action name="actionHidePlaylist">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/exit.png</normaloff>:/images/images/16x16/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Hide Playlist</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WidgetShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAddFiles">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/folder.png</normaloff>:/images/images/16x16/folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Files</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Files</string>
+   </property>
+  </action>
+  <action name="actionAddURL">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/network.png</normaloff>:/images/images/16x16/network.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add URL</string>
+   </property>
+  </action>
+  <action name="actionAddAudio">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/folder_sound.png</normaloff>:/images/images/16x16/folder_sound.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Audio</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Audio File</string>
+   </property>
+  </action>
+  <action name="actionAddVideo">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/folder_video.png</normaloff>:/images/images/16x16/folder_video.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Video</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Video File</string>
+   </property>
+  </action>
+  <action name="actionRemoveAll">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/editdelete.png</normaloff>:/images/images/16x16/editdelete.png</iconset>
+   </property>
+   <property name="text">
+    <string>Remove All</string>
+   </property>
+   <property name="toolTip">
+    <string>Remove All Items</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../../mbmp.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>checkBox_consume</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>checkBox_wrap</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>290</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>38</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_wrap</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>checkBox_consume</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>38</x>
+     <y>290</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>114</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

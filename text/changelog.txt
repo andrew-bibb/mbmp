@@ -1,0 +1,28 @@
+<b><center>Monkey Business Media Player (MBMP)</center></b>
+<b><center>Change Log</center></b>
+<br>
+<b>No Date</b>
+<ul>
+<li>Added command line option to specify network connection speed</li>
+</ul>
+<br>
+<b>9 March 2014 - </b>Initial Version
+<ul>
+<li>Basic media playback and controls are functional</li>
+<li>Playlist is functional</li>
+<li>Visualizers and visualizer menus are functional</li>
+<li>StreamInfo to select audio, video and subtitle streams is functional</li>
+</ul>
+<br>
+<b>To Do</b>
+<ul>
+<li>DVD navigation and playback</li>
+<li>CD playback</li>
+<li>Add libquvi support to parse YouTube and similar URL's</li>
+<li>Need a proper man page</li>
+<li>Need to have config file in the user's home directory</li>
+<li>Improve buffering from real bad internet connections</li>
+<li>Color balance adjustments</li>
+<li>Modifiy playback speed<li>
+<li>Read subtitles from external file<li>
+</ul> 

@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PlayerControl</class>
+ <widget class="QDialog" name="PlayerControl">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>729</width>
+    <height>448</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MBMP Player</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
+   <property name="leftMargin">
+    <number>1</number>
+   </property>
+   <property name="topMargin">
+    <number>1</number>
+   </property>
+   <property name="rightMargin">
+    <number>1</number>
+   </property>
+   <property name="bottomMargin">
+    <number>1</number>
+   </property>
+   <property name="spacing">
+    <number>1</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QFrame" name="frame_player">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Window">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Window">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Base">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="Window">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QProgressBar" name="progressBar_buffering">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream buffering percentage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="format">
+      <string>Buffering %p%</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QWidget" name="widget_control" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>67</height>
+      </size>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_position">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream position&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>00:00:00</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QToolButton" name="toolButton_playlistfirst"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_playlistback"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_toggleplaylist">
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_playlistnext"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_playlistlast"/>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>11</width>
+            <height>19</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_back600"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_back60"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_back10"/>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_stop"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_playpause">
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_frwd10"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_frwd60"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_frwd600"/>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>11</width>
+            <height>19</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_togglegui">
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_fullscreen">
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_mute">
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_quit">
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QSlider" name="horizontalSlider_position">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream position slider&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="tracking">
+         <bool>false</bool>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_duration">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream duration&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>00:00:00</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" rowspan="2">
+       <widget class="QDial" name="dial_volume">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>62</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume control&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="maximum">
+         <number>20</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="pageStep">
+         <number>5</number>
+        </property>
+        <property name="value">
+         <number>10</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>false</bool>
+        </property>
+        <property name="invertedControls">
+         <bool>false</bool>
+        </property>
+        <property name="wrapping">
+         <bool>false</bool>
+        </property>
+        <property name="notchesVisible">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionTogglePlaylist">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/sound.png</normaloff>:/images/images/16x16/sound.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Playlist</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Playlist</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/exit.png</normaloff>:/images/images/16x16/exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionToggleGUI">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/folder_inbox.png</normaloff>:/images/images/16x16/folder_inbox.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle GUI</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle GUI</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionToggleFullscreen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normalon>:/images/images/16x16/view_fullscreen.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Fullscreen</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Fullscreen</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionShowCheatsheet">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Cheatsheet</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Cheatsheet</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAboutMBMP">
+   <property name="text">
+    <string>About MBMP</string>
+   </property>
+   <property name="toolTip">
+    <string>About MBMP</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAboutNuvola">
+   <property name="text">
+    <string>About Nuvola</string>
+   </property>
+   <property name="toolTip">
+    <string>About Nuvola</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAboutQT">
+   <property name="text">
+    <string>About QT</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionShowLicense">
+   <property name="text">
+    <string>Show License</string>
+   </property>
+   <property name="toolTip">
+    <string>Show License</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionShowChangeLog">
+   <property name="text">
+    <string>ShowChangeLog</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPlayPause">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/player_play.png</normaloff>
+     <normalon>:/images/images/16x16/player_pause.png</normalon>:/images/images/16x16/player_play.png</iconset>
+   </property>
+   <property name="text">
+    <string>Play/Pause</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPlaylistNext">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/forward.png</normaloff>:/images/images/16x16/forward.png</iconset>
+   </property>
+   <property name="text">
+    <string>Next Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Next Playlist Item</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPlaylistBack">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/back.png</normaloff>:/images/images/16x16/back.png</iconset>
+   </property>
+   <property name="text">
+    <string>Previous Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Previous Playlist Item</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPlaylistFirst">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/start.png</normaloff>:/images/images/16x16/start.png</iconset>
+   </property>
+   <property name="text">
+    <string>First Item </string>
+   </property>
+   <property name="toolTip">
+    <string>First Playlist Item</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPlaylistLast">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/finish.png</normaloff>:/images/images/16x16/finish.png</iconset>
+   </property>
+   <property name="text">
+    <string>Last Item</string>
+   </property>
+   <property name="toolTip">
+    <string>Last Playlist Item</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAddMedia">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/edit_add.png</normaloff>:/images/images/16x16/edit_add.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Media</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Media to the Playlist</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionToggleMute">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/kmixdocked.png</normaloff>
+     <normalon>:/images/images/16x16/kmixdocked_error.png</normalon>:/images/images/16x16/kmixdocked.png</iconset>
+   </property>
+   <property name="text">
+    <string>Mute</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle mute on and off</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionVolumeDecreaseStep">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/2downarrow.png</normaloff>:/images/images/16x16/2downarrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Volume Decrease</string>
+   </property>
+   <property name="toolTip">
+    <string>Decrease volume one step</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionVolumeIncreaseStep">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/2uparrow.png</normaloff>:/images/images/16x16/2uparrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Volume Increase</string>
+   </property>
+   <property name="toolTip">
+    <string>Increase volume one step</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionVisualizer">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/kwikdisk.png</normaloff>:/images/images/16x16/kwikdisk.png</iconset>
+   </property>
+   <property name="text">
+    <string>Visualizer</string>
+   </property>
+   <property name="toolTip">
+    <string>Select an audio visualizer</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionPlayerStop">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/player_stop.png</normaloff>:/images/images/16x16/player_stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stop</string>
+   </property>
+   <property name="toolTip">
+    <string>Stop the player</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionToggleStreamInfo">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/view_choose.png</normaloff>:/images/images/16x16/view_choose.png</iconset>
+   </property>
+   <property name="text">
+    <string>Stream Information</string>
+   </property>
+   <property name="toolTip">
+    <string>Audio, Video and Subtitle Streams</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionSeekBack10">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/1leftarrow.png</normaloff>:/images/images/16x16/1leftarrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Back 10 sec</string>
+   </property>
+   <property name="toolTip">
+    <string>Seek Backwards 10 Seconds</string>
+   </property>
+  </action>
+  <action name="actionSeekFrwd10">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/1rightarrow.png</normaloff>:/images/images/16x16/1rightarrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ahead 10 sec</string>
+   </property>
+   <property name="toolTip">
+    <string>Seek Forwards 10 Seconds</string>
+   </property>
+  </action>
+  <action name="actionSeekBack60">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/2leftarrow.png</normaloff>:/images/images/16x16/2leftarrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Back 1 min</string>
+   </property>
+   <property name="toolTip">
+    <string>Seek Backwards 1 Minute</string>
+   </property>
+  </action>
+  <action name="actionSeekFrwd60">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/2rightarrow.png</normaloff>:/images/images/16x16/2rightarrow.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ahead 1 min</string>
+   </property>
+   <property name="toolTip">
+    <string>Seek Forwards 1 Minute</string>
+   </property>
+  </action>
+  <action name="actionSeekBack600">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/player_rev.png</normaloff>:/images/images/16x16/player_rev.png</iconset>
+   </property>
+   <property name="text">
+    <string>Back 10 min</string>
+   </property>
+   <property name="toolTip">
+    <string>Seek Backwards 10 Minutes</string>
+   </property>
+  </action>
+  <action name="actionSeekFrwd600">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/player_fwd.png</normaloff>:/images/images/16x16/player_fwd.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ahead 10 min</string>
+   </property>
+   <property name="toolTip">
+    <string>Seek Forwards 10 Minutes</string>
+   </property>
+  </action>
+  <action name="actionAVSync">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/noatunloopsong.png</normaloff>:/images/images/16x16/noatunloopsong.png</iconset>
+   </property>
+   <property name="text">
+    <string>A/V Sync</string>
+   </property>
+   <property name="toolTip">
+    <string>Sync the A/V streams</string>
+   </property>
+  </action>
+  <action name="actionColorBalance">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/blend.png</normaloff>:/images/images/16x16/blend.png</iconset>
+   </property>
+   <property name="text">
+    <string>Color Balance</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust the Color Balance</string>
+   </property>
+  </action>
+  <action name="actionAdvancedMenu">
+   <property name="text">
+    <string>Advanced Menu</string>
+   </property>
+   <property name="toolTip">
+    <string>Advanced Options</string>
+   </property>
+  </action>
+  <action name="actionPlayCD">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/cdaudio_mount.png</normaloff>:/images/images/16x16/cdaudio_mount.png</iconset>
+   </property>
+   <property name="text">
+    <string>Play CD</string>
+   </property>
+   <property name="toolTip">
+    <string>Play an Audio CD</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../../mbmp.qrc"/>
+ </resources>
+ <connections/>
+</ui>

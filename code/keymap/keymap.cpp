@@ -1,0 +1,122 @@
+/**************************** keymap.cpp *****************************
+
+Code to manage the mappings from key presses to commands.
+
+Copyright (C) 2014
+by: Andrew J. Bibb
+License: MIT 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"),to deal 
+in the Software without restriction, including without limitation the rights 
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions: 
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+***********************************************************************/ 
+
+# include "./code/keymap/keymap.h"	
+
+# include <QtCore/QDebug>
+# include <QTextStream>
+# include <QFile>
+# include <QRegExp>
+
+
+KeyMap::KeyMap(QObject* parent) : QObject(parent)
+{
+	// setup the user key map
+	usermap.clear();
+	
+	// set up the user map.  Default mapping is from the resource file
+	QStringList sl_rawdata = readTextFile(":/text/text/mbmp.conf");
+	for (int i =0; i < sl_rawdata.size(); ++i) {
+		QString s = sl_rawdata.at(i);
+		s = s.simplified();
+		s = s.left(s.indexOf('#'));
+		if (s.size() > 0 ) {	
+			QString cmd = s.section(' ', 0, 0);
+			QStringList sl_shortcuts = s.section(' ', 1, 1).split(',');	
+			QList<QKeySequence> keyseq;
+			keyseq.clear();
+			for (int j = 0; j < sl_shortcuts.size(); ++j) {	
+				keyseq.append(QKeySequence::fromString(sl_shortcuts.at(j)) );		
+			}	// j loop
+			usermap[cmd] = keyseq;
+		} // if size > 0			
+	}	// i loop
+}
+
+////////////////////////////// Public Slots ////////////////////////////
+//
+//	Slot to return the QKeySequence associated with a command.  
+//	The argument "cmd" is a text string starting with the: "cmd_" as
+// 	defined in the configuration file.  
+QList<QKeySequence> KeyMap::getKeySequence(const QString& cmd)
+{	
+	if (usermap.contains(cmd) ) return usermap.value(cmd);
+	
+	QList<QKeySequence> list;
+	list.clear();	
+	return list;
+}
+
+//
+//	Slot to return a cheatsheet of key bindings
+QString KeyMap::getCheatSheet()
+{
+	QString s = QString("<code>");
+	const int pad = 12;
+	s.append(QString("%1%2<br>").arg(tr("KEY(S)").leftJustified(pad, '.')).arg(tr("COMMAND")) );
+			
+	QMap<QString, QList<QKeySequence> >::const_iterator itr = usermap.constBegin();
+	while (itr != usermap.constEnd()) {
+		QStringList sl;
+		for (int i = 0; i < itr.value().size(); ++i) {
+			sl.append(itr.value().at(i).toString() );
+		}	// for
+		if (! sl.at(0).isEmpty() ) {
+			s.append(QString("%1%2").arg(sl.join(',').leftJustified(pad, '.')).arg(itr.key()) );
+			s.append("<br>");
+		}	// if
+    ++itr;
+	}
+	s.append("</code>");
+	
+	return s;
+}
+  
+////////////////////////////// Private Functions ////////////////////////////
+//
+// Function to read text contained in a text or resource file.  Input is a 
+// const char* to the file. Return value is a QStringList where each entry 
+// is a single line from the source file
+QStringList KeyMap::readTextFile(const char* textfile)
+{
+	QStringList sl = QStringList();
+		
+	QFile file(textfile);
+  if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QTextStream in(&file);
+		while (!in.atEnd()) {
+			QString s = in.readLine();
+			sl << s.trimmed();
+		}	// while
+	}	// if
+	
+	return sl;
+}   
+
+
+
+	
