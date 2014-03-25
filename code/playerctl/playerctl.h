@@ -31,6 +31,7 @@ class PlayerControl : public QDialog
     
   public slots:
 		void changeVolume(int);
+		void initializeCD();
 		void playMedia(QAction* act = 0);
 		void seekToPosition(QAction*);
 		void playPause();
@@ -70,7 +71,8 @@ class PlayerControl : public QDialog
 		QMessageBox* chtsht;
   
   // functions
-		QString readTextFile(const char*);  
+		QString readTextFile(const char*);
+		void makeTrackList(const QList<TocEntry>&);  
 
 };
 

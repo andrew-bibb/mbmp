@@ -799,13 +799,13 @@
     <string>Advanced Options</string>
    </property>
   </action>
-  <action name="actionPlayCD">
+  <action name="actionAudioCD">
    <property name="icon">
     <iconset resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/cdaudio_mount.png</normaloff>:/images/images/16x16/cdaudio_mount.png</iconset>
    </property>
    <property name="text">
-    <string>Play CD</string>
+    <string>Audio CD</string>
    </property>
    <property name="toolTip">
     <string>Play an Audio CD</string>

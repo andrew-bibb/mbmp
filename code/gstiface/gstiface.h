@@ -13,9 +13,11 @@
 # include "./code/streaminfo/streaminfo.h"
 
 //	Enum's local to this program
-namespace MBMP 
+//	Enum's local to this program
+namespace MBMP_GI 
 {
   enum {
+		// for the bus
 		State 			= 0x01,		// state changed
 		EOS					= 0x02,		// end of stream detected
 		SOS					= 0x03,		// start of stream detected
@@ -27,9 +29,14 @@ namespace MBMP
 		Application	= 0x09,		// application messages we generate	
 		Duration		= 0x0a,		// a stream duration message
 		TOC					= 0x0b,		// a table of contents
-		Unhandled		= 0xff,		// an unhandled message
+		TOCTL				= 0x0c,		// a table of contents with a new track list	
+		Tag					= 0x0d,		// received a TAG message
+		Unhandled		= 0x2f,		// an unhandled message
+		// return codes
+		NoCDPipe		= 0x31,		// no Audio CD pipe
+		BadCDRead		= 0x32,		// can't read the CD
   };
-} // namespace MBMP
+} // namespace MBMP_GI
 
 // Gstreamer playbin GstPlayFlags
 typedef enum {
@@ -46,6 +53,15 @@ typedef enum {
   GST_PLAY_FLAG_SOFT_COLORBALANCE = (1 << 10)
 } GstPlayFlags;
 
+//	Table of contents structure
+struct TocEntry
+{
+	uint track;			// track number
+	int start;			// start time (seconds)
+	int end;				// end time (seconds)
+	QString title;	// track title
+};
+
 class GST_Interface : public QObject
 {
 	Q_OBJECT
@@ -53,8 +69,9 @@ class GST_Interface : public QObject
 	public:
 		GST_Interface(QObject*);
 		~GST_Interface();
-
-		void playMedia(WId, const QString&);
+			
+		int checkCD();				
+		void playMedia(WId, QString, int track = 0);
 		void playPause();
 		GstState getState();
 		double getVolume();
@@ -65,10 +82,10 @@ class GST_Interface : public QObject
 		QString getAudioStreamInfo();
 		QString getVideoStreamInfo();
 		QString getTextStreamInfo();
+		inline QList<TocEntry> getTrackList() {return tracklist;}
 		inline QMap<QString, int> getStreamMap() {return streammap;} 
 				
 		public slots:
-		void playCD();
 		void seekToPosition(int);
 		void setAudioStream(const int&);
 		void setVideoStream(const int&);
@@ -89,7 +106,7 @@ class GST_Interface : public QObject
 		
 	private:
 		// members
-		GstElement* pipeline;
+		GstElement* pipeline_playbin;
 		GstBus* bus;
 		QTimer* timer;
 		QMap<QString, GstElementFactory*> vismap; 
@@ -97,8 +114,10 @@ class GST_Interface : public QObject
 		StreamInfo* streaminfo;		
 		QWidget* mainwidget;
 		bool b_positionenabled;
+		QList<TocEntry> tracklist;
 		
 		// functions
+		void extractTocTrack(const GstTocEntry*);
 		void analyzeStream();
 		void queryStreamPosition();
 		bool queryStreamSeek();

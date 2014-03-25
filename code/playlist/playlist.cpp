@@ -35,6 +35,8 @@ DEALINGS IN THE SOFTWARE.
 # include <QListWidgetItem>
 # include <QActionGroup>
 # include <QFileInfo>
+# include <QTime>
+# include <QTableWidgetItem>
 
 Playlist::Playlist(QWidget* parent) : QDialog(parent)
 {
@@ -120,7 +122,6 @@ QString Playlist::getItem(const short& direction)
 	if (ui.listWidget_playlist->count() < 1 ) return QString();
 		
 	// Initialize variables
-	QString item = QString();
 	if (ui.listWidget_playlist->currentRow() < 0 ) ui.listWidget_playlist->setCurrentRow(0);
 	int row = ui.listWidget_playlist->currentRow();
 	const int lastrow = ui.listWidget_playlist->count() - 1;
@@ -129,16 +130,16 @@ QString Playlist::getItem(const short& direction)
 	// Set the row based on the direction.  Directions except for Next
 	// work as expected if random is checked.  Random only applies to Next 
 	switch (direction) {
-		case MBMP::First:
+		case MBMP_PL::First:
 			row = 0;
 			break;
-		case MBMP::Previous:
+		case MBMP_PL::Previous:
 			if (row == 0 )
 				ui.checkBox_wrap->isChecked() ?  row = lastrow : row = 0;
 			else	
 				--row;	
 			break;
-		case MBMP::Next:
+		case MBMP_PL::Next:
 			// if the random box is checked and there are at least 2 items 
 			// calculate a random row number
 			if (ui.checkBox_random->isChecked() && ui.listWidget_playlist->count() > 1) {
@@ -156,7 +157,7 @@ QString Playlist::getItem(const short& direction)
 					++row;
 				}	// else
 			break;
-		case MBMP::Last:
+		case MBMP_PL::Last:
 			row = lastrow;
 			break;	
 	}	// switch			
@@ -165,7 +166,7 @@ QString Playlist::getItem(const short& direction)
 	// return an empty string, this won't interupt the current playback
 	// If consume is checked remove the item first, then return the empty
 	// string
-	if (row  == ui.listWidget_playlist->currentRow() && direction != MBMP::Current ) {
+	if (row  == ui.listWidget_playlist->currentRow() && direction != MBMP_PL::Current ) {
 		if (ui.checkBox_consume->isChecked() ) 
 			delete ui.listWidget_playlist->takeItem(ui.listWidget_playlist->row(curitem));
 	return QString();
@@ -173,18 +174,18 @@ QString Playlist::getItem(const short& direction)
 			
 	// Set the current row and the item string based on the previous calculations
 	ui.listWidget_playlist->setCurrentRow(row);	
-	item = ui.listWidget_playlist->item(row)->text();
- 
+	
 	// If the consume box is checked and we are not looking for the current item
 	// consume the item that was current when we entered this function
-	if (ui.checkBox_consume->isChecked() && direction != MBMP::Current ) 
+	if (ui.checkBox_consume->isChecked() && direction != MBMP_PL::Current ) 
 		delete ui.listWidget_playlist->takeItem(ui.listWidget_playlist->row(curitem));
 
-	// Qualify the name for gstreamer
-	if (item.startsWith("http://", Qt::CaseInsensitive)) return item;
-	else if (item.startsWith("cdda://", Qt::CaseInsensitive)) return item;
-		else if (item.startsWith("dvd://", Qt::CaseInsensitive)) return item;
-			else if (QFileInfo(item).exists() ) return item.prepend("file://");
+	// Qualify the name for gstreamer.  
+	if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::File) return ui.listWidget_playlist->item(row)->text().prepend("file://");
+	else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::Url) return ui.listWidget_playlist->item(row)->text();
+		else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::ACD) return ui.listWidget_playlist->item(row)->text();
+			//else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::DVD) return ui.listWidget_playlist->item(row)->text();
+			
 	
 	// Default return value (should never get here)
 	return QString();
@@ -226,9 +227,17 @@ void Playlist::addFile(QAction* a)
                         "/home",
                          s_files);	
                         
-  // If we selected files add them to the playlist
-  if (sl_files.size() > 0)
-		ui.listWidget_playlist->insertItems(ui.listWidget_playlist->count(), sl_files);		                      
+  // If we selected files add them to the playlist.  If the playlist contains device tracks
+	// clear them out first.
+  if (sl_files.size() > 0) {
+		if (ui.listWidget_playlist->count() > 0 ) {
+			this->setWindowTitle(tr("Playlist"));
+			if (ui.listWidget_playlist->item(0)->type() >= MBMP_PL::Dev) ui.listWidget_playlist->clear();
+		}
+		for (int i = 0; i < sl_files.size(); ++i) {
+			new QListWidgetItem(sl_files.at(i), ui.listWidget_playlist, MBMP_PL::File);
+		}	// for
+	}	//if        
 
 	return;
 }
@@ -246,10 +255,45 @@ void Playlist::addURL()
 							tr("Enter a URL to add to the playlist"),
 							tr("URL: ") );
 	
-	// If we got a URL add it to the playlist
-	if (! s.isEmpty() )
-		ui.listWidget_playlist->insertItem(ui.listWidget_playlist->count(), s);
-		
+	// If we got a URL add it to the playlist.  If the playlist contains device tracks
+	// clear them out first.
+	if (! s.isEmpty() ) {
+		if (ui.listWidget_playlist->count() > 0 ) {
+			this->setWindowTitle(tr("Playlist"));
+			if (ui.listWidget_playlist->item(0)->type() >= MBMP_PL::Dev) ui.listWidget_playlist->clear();
+		}	// if
+		new QListWidgetItem(s, ui.listWidget_playlist, MBMP_PL::Url);	
+	}	// if
+	
+	return;
+}
+
+//
+// Slot to add tracks (for instance from an Audio CD or DVD) to the playlist.  Tracks and files/url's
+// can't coexist in the playlist, so clear the playlist first.  The stringlist comes from PlayerControl
+// which creates the list from data provided by GST_Interface.
+//
+// For the time being hardcode for Audio CD.  May be able to use it for DVD, or if not rename this and
+// and create another function for DVD's
+void Playlist::addTracks(QStringList sl_tracks)
+{
+	// return if there is nothing to process
+	if (sl_tracks.size() <= 0 ) return;
+	
+	// build the tracklist entries
+	ui.listWidget_playlist->clear();
+	
+	// set the title
+	this->setWindowTitle(tr("Audio CD - Tracklist"));
+	
+	// create the tracklist entry
+	for (int i = 0; i < sl_tracks.size(); ++i) {
+			new QListWidgetItem(sl_tracks.at(i), ui.listWidget_playlist, MBMP_PL::ACD);
+	}	// for
+	
+	// Make the first entry current
+	ui.listWidget_playlist->setCurrentRow(0);
+	
 	return;
 }
 

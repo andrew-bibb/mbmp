@@ -38,20 +38,26 @@ DEALINGS IN THE SOFTWARE.
 # include <QAction>
 # include <QActionGroup>
 # include <QMenu>
+# include <QList>
 
 # include "ui_playlist.h"
 
 //	Enum's local to this program
-namespace MBMP 
+namespace MBMP_PL 
 {
   enum {
-		First = 0x01,						// First item	
-		Previous = 0x02,				// Previous item
-    Current	= 0x03,					// Current item 
-    Next	= 0x04, 					// Next item
-    Last = 0x05							// Last item 
+		First = 0x01,							// First item	
+		Previous = 0x02,					// Previous item
+    Current	= 0x03,						// Current item 
+    Next	= 0x04, 						// Next item
+    Last = 0x05,							// Last item 
+    File = (QListWidgetItem::UserType + 1),		// Playlist file 
+    Url  = (QListWidgetItem::UserType + 2),		// Playlist url
+    Dev  = (QListWidgetItem::UserType + 100),	// Marker for the start of devices
+    ACD  = (QListWidgetItem::UserType + 101),	// Playlist Audio CD
+    DVD  = (QListWidgetItem::UserType + 102)	// Playlist DVD	
   };
-} // namespace MBMP
+} // namespace MBMP_PL
 
 //	This class is based on a QListWidget and a QDialog
 class Playlist : public QDialog 
@@ -66,12 +72,14 @@ class Playlist : public QDialog
 		void addMedia();
 		void addFile(QAction*);	
 		void addURL();
+		void addTracks(QStringList);
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
 		inline void triggerAddAudio() {ui.actionAddAudio->trigger();}
 		inline void triggerAddVideo() {ui.actionAddVideo->trigger();}
 		inline void triggerAddFiles() {ui.actionAddFiles->trigger();}
+		inline int currentItemType() {return ui.listWidget_playlist->currentItem()->type();}
 	
 	public:
 		void seedPlaylist(const QStringList&);
@@ -90,8 +98,6 @@ class Playlist : public QDialog
 		QMenu* media_menu;
 	       
 	// functions  
-
-  private slots:
 
 };
 

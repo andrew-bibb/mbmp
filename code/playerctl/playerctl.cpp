@@ -152,7 +152,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		QAction* act = vis_menu->addAction(vislist.at(i));
 		act->setCheckable(true);
 		vis_group->addAction(act);
-		if (act->text().contains(QRegExp("^GOOM: what a GOOM!$")) ) act->setChecked(true);
+		if (i == 0 ) act->setChecked(true);
+		else if (act->text().contains(QRegExp("^GOOM: what a GOOM!$")) ) act->setChecked(true);
 	}
 	vis_group->setEnabled(parser.isSet("visualizer"));
 	
@@ -166,9 +167,10 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 			
 	// create the control_menu
 	control_menu = new QMenu(this);
-	control_menu->addAction(ui.actionPlayCD);
 	control_menu->addAction(ui.actionTogglePlaylist);
 	control_menu->addAction(ui.actionAddMedia);
+	control_menu->addAction(ui.actionAudioCD);
+	control_menu->addSeparator();
 	control_menu->addMenu(vis_menu);
 	control_menu->addAction(ui.actionToggleStreamInfo);
 	control_menu->addSeparator();
@@ -259,7 +261,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionPlayerStop, SIGNAL(triggered(bool)), ui.toolButton_playpause, SLOT(setChecked(bool)));
 	connect (ui.horizontalSlider_position, SIGNAL(sliderMoved(int)), p_gstiface, SLOT(seekToPosition(int)));
 	connect (seek_group, SIGNAL(triggered(QAction*)), this, SLOT(seekToPosition(QAction*)));
-	connect (ui.actionPlayCD, SIGNAL (triggered()), p_gstiface, SLOT(playCD()));
+	connect (ui.actionAudioCD, SIGNAL (triggered()), this, SLOT(initializeCD()));
 	
 	// create actions to accept a selected few playlist shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -300,7 +302,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
 	QTimer::singleShot(10, this, SLOT(playMedia()));
- }
+}
 
 
 ////////////////////////////// Public Functions ////////////////////////////
@@ -386,17 +388,49 @@ void PlayerControl::changeVolume(int vol)
 	return;		  
 }
 
+// Slot to initialize the Audio CD.  Called when ui.actonAudioCD is triggered
+// Check the audio CD and if we can read it start playing.
+void PlayerControl::initializeCD()
+{	
+	switch (p_gstiface->checkCD()) {
+		case MBMP_GI::NoCDPipe:
+			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+				tr("<center><b>Unable to create a pipeline to read an audio CD.</b></center>"
+				"<br>Additional information may be found in the log file.  "                       
+				"Audio CD playback will be disabled."
+				) );
+			return;	
+		case MBMP_GI::BadCDRead:
+			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+				tr("<center><b>Unable to read the audio CD.</b></center>"                       
+				"<br>It may still be possible to play a different CD or to "                       
+				"play this CD in a different drive."
+				) );
+			return;	
+	}	// switch			
+
+	// if we are here checkCD passed, start playing the CD. This will
+	// send a TOC to the bus which will trigger filling in the tracklist	
+	WId winId = ui.frame_player->winId();
+	p_gstiface->playMedia(winId, "cdda://");
+			
+	// looks like we could read the CD so show the tracklist
+	if (playlist->isHidden()) playlist->show();
+	
+	return;
+}
+
 
 // Slot to query the playlist for the next media item, and then send
 // it to p_gstiface to play it.
 void PlayerControl::playMedia(QAction* act)
 {
 	// Figure out which way we want to go in the playlist
-	int direction = MBMP::Current;
-	if (act == ui.actionPlaylistFirst)	direction = MBMP::First;
-	else if (act == ui.actionPlaylistBack )	direction = MBMP::Previous;
-		else if (act == ui.actionPlaylistNext ) 	direction = MBMP::Next;
-			else if (act == ui.actionPlaylistLast )	direction = MBMP::Last;
+	int direction = MBMP_PL::Current;
+	if (act == ui.actionPlaylistFirst)	direction = MBMP_PL::First;
+	else if (act == ui.actionPlaylistBack )	direction = MBMP_PL::Previous;
+		else if (act == ui.actionPlaylistNext ) 	direction = MBMP_PL::Next;
+			else if (act == ui.actionPlaylistLast )	direction = MBMP_PL::Last;
 	
 	// Get the media from the playlist
 	QString media = playlist->getItem(direction);
@@ -404,13 +438,28 @@ void PlayerControl::playMedia(QAction* act)
 	// Return if there is no media to play
 	if (media.isEmpty() ) return;
 	
-	// Get the window ID to render the media on and the next item in 
-	// the playlist, then send both to p_gstiface to play the media
-	WId winId = ui.frame_player->winId();
-	p_gstiface->playMedia(winId, media);
-
+	// if we are playing a disk send the track to p_gstiface
+	if (playlist->currentItemType() == MBMP_PL::ACD) {
+		int track = 0;
+		QList<TocEntry> tracklist = p_gstiface->getTrackList();
+		for (int i = 0; i < tracklist.size(); ++i) {
+			if (media.contains(tracklist.at(i).title)) {
+				track = tracklist.at(i).track;
+				break;
+			}	// if
+		}	// for
+		if (track == 0 ) return; 
+		p_gstiface->playMedia(ui.frame_player->winId(), "cdda://", track);
+	}	// if we are playing a disk
+	
+	else {
+		// Get the window ID to render the media on and the next item in 
+		// the playlist, then send both to p_gstiface to play the media
+		p_gstiface->playMedia(ui.frame_player->winId(), media);
+		}	// else
+	
 	// Set the stream volume to agree with the dial
-	changeVolume(ui.dial_volume->value()); 
+	changeVolume(ui.dial_volume->value()); 	
 	
 	return;
 }
@@ -567,7 +616,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 	QTextStream stream2 (&logfile);
 	
 	switch (mtype) {
-		case MBMP::State: 
+		case MBMP_GI::State: 
 			switch (loglevel) {
 				case 0:		// case 0 - surpress state change output
 					break;	
@@ -583,7 +632,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			}	// loglevel switch
 			break;
 						
-		case MBMP::EOS:
+		case MBMP_GI::EOS:	// end of stream
 			switch (loglevel) {
 				case 0:		// case 0 supress EOS output
 					break;	
@@ -594,7 +643,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			ui.actionPlaylistNext->trigger();
 			break;
 			
-		case MBMP::SOS:
+		case MBMP_GI::SOS:	// start of stream
 			switch (loglevel) {
 				case 0:		// case 0 supress SOS output
 					break;	
@@ -604,17 +653,17 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 				}	// loglevel switch
 			break;
 			
-		case MBMP::Error:	// all errors printed regardless of loglevel
+		case MBMP_GI::Error:	// all errors printed regardless of loglevel
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
 			break;
 
-		case MBMP::Warning: //all warnings printed regardless of loglevel
+		case MBMP_GI::Warning: //all warnings printed regardless of loglevel
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
 			break;
 		
-		case MBMP::Info:
+		case MBMP_GI::Info:
 			switch (loglevel) {
 				case 0:		// case 0 supress Info output
 					break;	
@@ -624,12 +673,12 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			}	// loglevel switch
 			break;
 		
-		case MBMP::ClockLost: // message printed regardless of loglevel
+		case MBMP_GI::ClockLost: // message printed regardless of loglevel
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
 			break;
 			
-		case MBMP::Application:	// a message we posted to the bus
+		case MBMP_GI::Application:	// a message we posted to the bus
 			switch (loglevel) {
 				case 0:		// case 0 supress output
 					break;	
@@ -639,7 +688,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			}	// loglevel switch
 			break;
 		
-		case MBMP::Buffering: // buffering messages
+		case MBMP_GI::Buffering: // buffering messages
 			static bool b_finished = true;
 			
 			switch (loglevel) {
@@ -675,25 +724,60 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			else b_finished = true;
 			break;
 			
-		case MBMP::Unhandled: // a GstBus message we didn't handle (should never get here)
-				switch (loglevel) {
-					case 0:		// case 0 supress output
-					break;	
-				default: // otherwise print output
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-				}	// loglevel switch
-			break;	// Unhandled GstBus message		
-		
-		case MBMP::Duration:	// a new stream duration message 
+		case MBMP_GI::Unhandled: // a GstBus message we didn't handle (should never get here)
 			switch (loglevel) {
 				case 0:		// case 0 supress output
 					break;	
 				default: // otherwise print output
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
-				}	// loglevel switch
-			break;				
+			}	// loglevel switch
+			break;	// Unhandled GstBus message		
+		
+		case MBMP_GI::Duration:	// a new stream duration message 
+			switch (loglevel) {
+				case 0:		// case 0 supress output
+					break;	
+				default: // otherwise print output
+					stream1 << msg << endl;
+					if (logtofile) stream2 << msg << endl;
+			}	// loglevel switch
+			break;			
+		
+		case MBMP_GI::TOC: // A generic TOC
+			switch (loglevel) {
+				case 0:	// case 0 supress output
+					break;
+				default:	// otherwise show the message
+					stream1 << msg << endl;
+					if (logtofile) stream2 << msg << endl;
+			}	// loglevel switch
+			break;
+		
+		case MBMP_GI::TOCTL: // A TOC with new tracklist
+			switch (loglevel) {
+				case 0:	// case 0 supress output
+					break;
+				default:	// otherwise show the message
+					stream1 << msg << endl;
+					if (logtofile) stream2 << msg << endl;
+			}	// loglevel switch
+			this->makeTrackList(p_gstiface->getTrackList());
+			break;
+				
+			
+		case MBMP_GI::Tag:	// a TAG message, could include CDDB or Musicbrainz info
+			switch (loglevel) {
+				case 0: // case 0 supress output
+					break;
+				case 1:	// case 1 supress output
+					break;
+				default: // case 2 and above record the message
+					stream1 << msg << endl;
+					if (logtofile) stream2 << msg << endl;
+			}	// loglevel switch
+		break;
+			
 			
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;
@@ -769,3 +853,36 @@ QString PlayerControl::readTextFile(const char* textfile)
 	return rtnstring;
 } 
 
+//
+// Function to create a tracklist to display in the playlist Called from processBusMessages when
+// a new TOC with tracklist bus message is processed.
+void PlayerControl::makeTrackList(const QList<TocEntry>& tlist)
+{
+	QString s;
+	QStringList sl;
+	
+	sl.clear();
+	for (int i = 0; i < tlist.size(); ++i) {
+		s.clear();
+		
+		// track number
+		s.append(QString::number(tlist.at(i).track, 10));
+		s.append("     ");
+		
+		// duration
+		QTime t0 = QTime(0,0,0);
+		QTime t1;
+		t1 = t0.addSecs(tlist.at(i).end - tlist.at(i).start);
+		s.append(t1.toString("mm:ss"));
+		s.append("     ");
+		
+		// title
+		s.append(tlist.at(i).title);
+		
+		sl << s;
+	}	
+	
+	playlist->addTracks(sl);
+	
+	return;
+}
