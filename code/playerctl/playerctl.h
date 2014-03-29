@@ -19,6 +19,9 @@
 # include "./code/keymap/keymap.h"
 # include "./code/playlist/playlist.h"
 
+///////////TESTING
+# include "./code/videowidget/videowidget.h"
+
 class PlayerControl : public QDialog
 {
 	Q_OBJECT
@@ -32,6 +35,7 @@ class PlayerControl : public QDialog
   public slots:
 		void changeVolume(int);
 		void initializeCD();
+		void initializeDVD();
 		void playMedia(QAction* act = 0);
 		void seekToPosition(QAction*);
 		void playPause();
@@ -69,6 +73,7 @@ class PlayerControl : public QDialog
 		QFile logfile;
 		int loglevel;
 		QMessageBox* chtsht;
+		VideoWidget* videowidget;
   
   // functions
 		QString readTextFile(const char*);

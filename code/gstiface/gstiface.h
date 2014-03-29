@@ -1,3 +1,29 @@
+/**************************** gstiface.h ******************************
+
+rCode to interface from our QT widgets, mainly PlayerCtl and Gstreamer
+
+Copyright (C) 2014-2014
+by: Andrew J. Bibb
+License: MIT 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"),to deal 
+in the Software without restriction, including without limitation the rights 
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions: 
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+***********************************************************************/ 
 # ifndef GST_INTERFACE
 # define GST_INTERFACE
 
@@ -70,7 +96,8 @@ class GST_Interface : public QObject
 		GST_Interface(QObject*);
 		~GST_Interface();
 			
-		int checkCD();				
+		int checkCD(QString);	
+		int checkDVD(QString);			
 		void playMedia(WId, QString, int track = 0);
 		void playPause();
 		GstState getState();
@@ -86,6 +113,7 @@ class GST_Interface : public QObject
 		inline QMap<QString, int> getStreamMap() {return streammap;} 
 				
 		public slots:
+		void mouseNavEvent(QString, int, int, int);
 		void seekToPosition(int);
 		void setAudioStream(const int&);
 		void setVideoStream(const int&);
@@ -115,6 +143,7 @@ class GST_Interface : public QObject
 		QWidget* mainwidget;
 		bool b_positionenabled;
 		QList<TocEntry> tracklist;
+		QString opticaldrive;
 		
 		// functions
 		void extractTocTrack(const GstTocEntry*);

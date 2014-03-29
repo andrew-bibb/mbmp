@@ -1,7 +1,35 @@
+/**************************** gstiface.cpp ****************************
+
+Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
+
+Copyright (C) 2014-2014
+by: Andrew J. Bibb
+License: MIT 
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"),to deal 
+in the Software without restriction, including without limitation the rights 
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions: 
+
+The above copyright notice and this permission notice shall be included 
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+***********************************************************************/ 
+
 # include "./code/gstiface/gstiface.h"
 # include "./code/playerctl/playerctl.h"	
 
 # include <gst/video/videooverlay.h>
+# include <gst/video/navigation.h>
 
 # include "./code/resource.h"
 
@@ -11,8 +39,9 @@
 # include <QMessageBox>
 
 //  Helper function: Return TRUE if this is a Visualization element 
-static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data) {
-	
+static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data)
+{	
+	(void) data;
   GstElementFactory* factory;
    
   if (!GST_IS_ELEMENT_FACTORY (feature))
@@ -24,6 +53,22 @@ static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data) {
   return TRUE;
 }
 
+//////////////////////////////TESTING///////////////////////////
+static void sourceSetup(void* bin, GstElement* src, QString* opticaldrive)
+{	
+	(void) bin;
+	gchar* device = NULL;
+	
+	g_object_get(G_OBJECT (src), "device", &device, NULL);
+	// if no device (probably a file or url) return
+	if (device == NULL)
+		return;
+	// otherwise set the device on the source element
+	else 
+		g_object_set(G_OBJECT (src), "device", opticaldrive->toLocal8Bit().data(), NULL);	 	
+}
+
+
 // Constructor
 GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 {
@@ -32,9 +77,10 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 	vismap.clear();
 	streammap.clear();
 	mainwidget = qobject_cast<QWidget*>(parent);
+	opticaldrive.clear();
 	b_positionenabled = true;	// this will be set to false if we fail getting the stream position.
 														// Checked at the top of queryStreamPosition so we don't flood the logs
-														// or the display with failed position messages
+														// or the display with failed position messages									
 	
 	// setup the dialog to display stream info
 	streaminfo = new StreamInfo(this, mainwidget);
@@ -49,6 +95,10 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 	// Create the playbin bus
 	bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline_playbin));
 	
+	////////////TESTING////////////////////////////
+	// Monitor the playbin source-setup signal
+	 g_signal_connect (GST_ELEMENT(pipeline_playbin), "source-setup", G_CALLBACK (&sourceSetup), &opticaldrive);
+	
 	// Start a timer to monitor the bus
   timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(pollGstBus()));
@@ -62,7 +112,7 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
  
   // Get a list of all visualization plugins.  Use the helper function
   // filter_vis_features() at the top of this file.
-  list = gst_registry_feature_filter (gst_registry_get(),filter_vis_features, FALSE, NULL);
+  list = gst_registry_feature_filter (gst_registry_get(), filter_vis_features, FALSE, NULL);
   
   // Walk through each visualizer plugin looking for visualizers
   for (walk = list; walk != NULL; walk = g_list_next (walk)) {
@@ -94,20 +144,25 @@ GST_Interface::~GST_Interface()
 //
 // Slot to query an audio CD for the number of audio tracks on it.
 // If the query succeeds assume we can play the CD.
-int GST_Interface::checkCD()
+int GST_Interface::checkCD(QString dev)
 {
+	// set the optical device
+	opticaldrive = dev;
+	
 	// Create an audiocd pipeline.  
   GstElement* source;
   GstElement* sink;	
   GstElement* pipeline_audiocd;
-      
   source = gst_element_factory_make ("cdparanoiasrc", "cd_source");
+  // TODO need a real device checker
+	g_object_set (G_OBJECT (source), "device", opticaldrive.toLocal8Bit().data(), NULL);
   sink = gst_element_factory_make ("fakesink", "cd_sink");  
   pipeline_audiocd = gst_pipeline_new ("audiocd");	  
   if (!pipeline_audiocd || !source || !sink) {
     gst_element_post_message (pipeline_playbin,
 			gst_message_new_application (GST_OBJECT (pipeline_playbin),
 				gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Failed to create audiocd pipeline - Not all elements could be created.", NULL)));  
+		opticaldrive.clear();		
 		return MBMP_GI::NoCDPipe;
 	}
 	else {  
@@ -116,12 +171,12 @@ int GST_Interface::checkCD()
 			gst_element_post_message (pipeline_playbin,
 				gst_message_new_application (GST_OBJECT (pipeline_playbin),
 					gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Failed to create audiocd pipeline - Elements could not be linked.", NULL)));  
+			opticaldrive.clear();
 			return MBMP_GI::NoCDPipe;
 	  }	// if
 	}	// else		
 	   
   // Set the audiocd pipeline to PAUSED so we can get a track count
-  // and trigger a TOC to the bus
   gst_element_set_state(pipeline_audiocd, GST_STATE_PAUSED);
 
   // Get the track count, if we can't it means we can't read the CD
@@ -131,35 +186,51 @@ int GST_Interface::checkCD()
   if (! gst_element_query_duration(pipeline_audiocd, fmt, &duration) ) {
 		bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline_playbin));
 		gst_element_set_state(pipeline_audiocd, GST_STATE_NULL);
+		opticaldrive.clear();
 		return MBMP_GI::BadCDRead;
 	}
   
-  // clean up
+  // Clean up
 	gst_element_set_state (pipeline_audiocd, GST_STATE_NULL);
 	gst_object_unref (GST_OBJECT (pipeline_audiocd));  
 	  
-	// Next thing that happens is the bus should get a TOC message, so
-	// return no error
+	// So far so go, return no error
 	return 0;
 }
 
+//
+// Slot to check the DVD,  for right now just use it to set the opticaldrive
+int GST_Interface::checkDVD(QString dev)
+{
+	// set the optical device
+	opticaldrive = dev;
+	
+	return 0;
+}
+
+// Play the media.  For local files and URL's only need the WinId and uri
+// Pipeline_playbin is reset for each new file.  For CD do the same initially,
+// but then when we want a new track just do a track seek on the running
+// stream.
 void GST_Interface::playMedia(WId winId, QString uri, int track)
 {
 	// if we need to seek in a currently playing disk
 	if (track > 0 ) {
 		gst_element_seek_simple(pipeline_playbin, gst_format_get_by_nick("track"), (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SKIP) , track - 1);	
 	}
+	
 	// else need to set a new media source
 	else {	
 		// start with the pipeline_playbin set to NULL
 		gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
-
-		// Set the media source
+		
+		// Set the media source. The device is set in checkCD
 		g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(uri), NULL);
 		
-		// Set the video overlay
+		// Set the video overlay and allow it to handle navagation events
 		gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(pipeline_playbin), winId);
-	
+		gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), TRUE);                
+    		
 		// Start the playback
 		gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
 	}
@@ -423,6 +494,29 @@ QString GST_Interface::getTextStreamInfo()
 
 //////////////////////////// Public Slots ////////////////////////////
 //
+// Slot to process a mouse navigation event.  Out VideoWidget emits a signal
+// (via PlayerCtl) containing the mouse event data. The signal is connected
+// to this function which then injects the mouse event into the stream
+void GST_Interface::mouseNavEvent(QString event, int button, int x, int y)
+{
+	// Do nothing if we are not playing	
+	if (getState() != GST_STATE_PLAYING)  return;
+		
+	// Find the gstNavigation element (part of xvimagesink)
+	GstNavigation* nav = 0;           
+	nav = GST_NAVIGATION (pipeline_playbin);
+	
+	// Return if we could not find a GstNavagation element in the pipeline
+	if (! nav) return;
+	
+	// inject the mouse event data into the stream
+	gst_navigation_send_mouse_event(nav, event.toLocal8Bit().data(), button, static_cast<double>(x), static_cast<double>(y));
+	
+	return;
+}
+
+
+//
 // Slot to seek to a specific position in the stream. Seek position
 // sent is in seconds so need to convert it to nanoseconds for gstreamer
 // Called when a QAction is triggered
@@ -663,7 +757,6 @@ void GST_Interface::pollGstBus()
 			case GST_MESSAGE_TOC: {
 				GstToc* toc;
 				gboolean updated = false;
-				
 				// parse the TOC
 				gst_message_parse_toc (msg, &toc, &updated);
 					
@@ -671,6 +764,7 @@ void GST_Interface::pollGstBus()
 				if (updated) {
 					emit busMessage(MBMP_GI::TOC, QString(tr("Received an updated table of contents for the media.")) );
 				 }
+				 
 				// TOC is new, process as appropriate 
 				else {
 					// create a new track list if the TOC contains tracklists
@@ -758,6 +852,7 @@ void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
 void GST_Interface::playerStop()
 {
 	gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
+	opticaldrive.clear();
 	
 	return;
 }

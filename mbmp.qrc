@@ -5,7 +5,8 @@
     <file>text/mbmp.conf</file>
   </qresource>
   <qresource prefix="images">
-    <file>images/16x16/cdaudio_mount.png</file>
+    <file>images/16x16/cdaudio_unmount.png</file>
+    <file>images/16x16/dvd_mount.png</file>
     <file>images/16x16/blend.png</file>
     <file>images/16x16/noatunloopsong.png</file>
     <file>images/16x16/1leftarrow.png</file>

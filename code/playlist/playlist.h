@@ -1,4 +1,3 @@
-
 /**************************** playlist.h *****************************
 
 Code to manage the media playlist.

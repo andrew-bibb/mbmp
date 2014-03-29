@@ -17,6 +17,7 @@ HEADERS 	+= ./code/keymap/keymap.h
 HEADERS 	+= ./code/playlist/playlist.h
 HEADERS 	+= ./code/gstiface/gstiface.h
 HEADERS		+= ./code/streaminfo/streaminfo.h
+HEADERS		+= ./code/videowidget/videowidget.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
@@ -30,6 +31,7 @@ SOURCES	+= ./code/keymap/keymap.cpp
 SOURCES	+= ./code/playlist/playlist.cpp
 SOURCES	+= ./code/gstiface/gstiface.cpp
 SOURCES += ./code/streaminfo/streaminfo.cpp
+SOURCES += ./code/videowidget/videowidget.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc

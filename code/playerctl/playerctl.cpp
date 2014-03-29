@@ -9,6 +9,7 @@
 # include <QFile>
 # include <QRegExp>
 # include <QTime>
+# include <QFileInfo>
 
 # include "./code/playerctl/playerctl.h"	
 # include "./code/resource.h"
@@ -26,6 +27,16 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   ui.setupUi(this);	
 	ui.widget_control->setVisible(parser.isSet("gui"));
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
+	
+	// find the the optical drives, or at least the first five
+	for (int i = 0; i < 5; ++i) {
+		QFileInfo fi(QString("/dev/sr%1").arg(i));
+		if (fi.exists() ) {
+			ui.comboBox_audiocd->addItem(QString("/dev/sr%1").arg(i));
+			ui.comboBox_dvd->addItem(QString("/dev/sr%1").arg(i));
+		}
+		else break;
+	}// while
 		
 	// members
 	keymap = new KeyMap(this);
@@ -33,6 +44,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	playlist->hide();
 	p_gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
+	videowidget = new VideoWidget(this);
+	ui.gridLayout->addWidget(videowidget, 0, 0);
 		
 	// setup the logfile and the logging level
 	logfile.setFileName("/tmp/mbmp.log");	// we don't provide an opportunity to change this
@@ -120,6 +133,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(ui.actionAdvancedMenu);
 	this->addAction(ui.actionAVSync);
 	this->addAction(ui.actionColorBalance);
+	this->addAction(ui.actionAudioCD);
+	this->addAction(ui.actionDVD);
 	
 	// add actions to action groups
 	playlist_group = new QActionGroup(this);	
@@ -170,6 +185,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	control_menu->addAction(ui.actionTogglePlaylist);
 	control_menu->addAction(ui.actionAddMedia);
 	control_menu->addAction(ui.actionAudioCD);
+	control_menu->addAction(ui.actionDVD);
 	control_menu->addSeparator();
 	control_menu->addMenu(vis_menu);
 	control_menu->addAction(ui.actionToggleStreamInfo);
@@ -234,6 +250,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionAdvancedMenu->setShortcuts(getShortcuts("cmd_advanced_menu"));
 	ui.actionAVSync->setShortcuts(getShortcuts("cmd_av_sync"));
 	ui.actionColorBalance->setShortcuts(getShortcuts("cmd_color_bal"));
+	ui.actionAudioCD->setShortcuts(getShortcuts("cmd_playaudiocd"));
+	ui.actionDVD->setShortcuts(getShortcuts("cmd_playdvd"));
 	
   // connect signals to slots 
   connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
@@ -262,6 +280,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.horizontalSlider_position, SIGNAL(sliderMoved(int)), p_gstiface, SLOT(seekToPosition(int)));
 	connect (seek_group, SIGNAL(triggered(QAction*)), this, SLOT(seekToPosition(QAction*)));
 	connect (ui.actionAudioCD, SIGNAL (triggered()), this, SLOT(initializeCD()));
+	connect (ui.actionDVD, SIGNAL (triggered()), this, SLOT(initializeDVD()));
+	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), p_gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
 	
 	// create actions to accept a selected few playlist shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -292,8 +312,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	QAction* pl_Act06 = new QAction(this);
 	this->addAction(pl_Act06);
 	pl_Act06->setShortcuts(getShortcuts("cmd_cyclevideo") );
-	
-	
+		
 	QAction* pl_Act07 = new QAction(this);
 	this->addAction(pl_Act07);
 	pl_Act07->setShortcuts(getShortcuts("cmd_cyclesubtitle") );
@@ -385,14 +404,14 @@ void PlayerControl::changeVolume(int vol)
 	
 	p_gstiface->changeVolume(d_vol);
 	
-	return;		  
+	return;
 }
 
 // Slot to initialize the Audio CD.  Called when ui.actonAudioCD is triggered
 // Check the audio CD and if we can read it start playing.
 void PlayerControl::initializeCD()
 {	
-	switch (p_gstiface->checkCD()) {
+	switch (p_gstiface->checkCD(ui.comboBox_audiocd->currentText()) ) {
 		case MBMP_GI::NoCDPipe:
 			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
 				tr("<center><b>Unable to create a pipeline to read an audio CD.</b></center>"
@@ -403,16 +422,15 @@ void PlayerControl::initializeCD()
 		case MBMP_GI::BadCDRead:
 			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
 				tr("<center><b>Unable to read the audio CD.</b></center>"                       
-				"<br>It may still be possible to play a different CD or to "                       
-				"play this CD in a different drive."
-				) );
+				"<br>Make sure the CD is in %1.  It may still be possible to play a different CD or to "                       
+				"play this CD in a different drive.").arg(ui.comboBox_audiocd->currentText())
+				);
 			return;	
 	}	// switch			
 
 	// if we are here checkCD passed, start playing the CD. This will
-	// send a TOC to the bus which will trigger filling in the tracklist	
-	WId winId = ui.frame_player->winId();
-	p_gstiface->playMedia(winId, "cdda://");
+	// send a TOC to the bus which will trigger filling in the tracklist.
+	p_gstiface->playMedia(videowidget->winId(), "cdda://" );
 			
 	// looks like we could read the CD so show the tracklist
 	if (playlist->isHidden()) playlist->show();
@@ -420,6 +438,22 @@ void PlayerControl::initializeCD()
 	return;
 }
 
+// Slot to setup the DVD.  Called when ui.actionDVD is triggered
+// For now just play it
+void PlayerControl::initializeDVD()
+{
+	if (p_gstiface->checkDVD(ui.comboBox_dvd->currentText()) ) {
+		QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+				tr("<center><b>Unable to read the DVD.</b></center>"                       
+				"<br>Make sure the DVD is in %1 or try the DVD in a different drive").arg(ui.comboBox_dvd->currentText())
+				);
+	}	// if
+	
+	// if we are here checkDVD passed, start playing the DVD. 
+	p_gstiface->playMedia(videowidget->winId(), "dvd://" );
+	
+	return;
+}
 
 // Slot to query the playlist for the next media item, and then send
 // it to p_gstiface to play it.
@@ -449,13 +483,15 @@ void PlayerControl::playMedia(QAction* act)
 			}	// if
 		}	// for
 		if (track == 0 ) return; 
-		p_gstiface->playMedia(ui.frame_player->winId(), "cdda://", track);
+		p_gstiface->playMedia(videowidget->winId(), "cdda://", track);
 	}	// if we are playing a disk
 	
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to p_gstiface to play the media
-		p_gstiface->playMedia(ui.frame_player->winId(), media);
+		//p_gstiface->playMedia(videowidget->winId(), media);
+		/////////TESTING/////////
+		p_gstiface->playMedia(videowidget->winId(), media);
 		}	// else
 	
 	// Set the stream volume to agree with the dial
