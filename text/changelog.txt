@@ -6,7 +6,9 @@
 <li>Added command line option to specify network connection speed</li>
 <li>Audio CD playback working</li>
 <li>DVD playback with navigation menus is working<li>
-<li>Can select the CD and DVD devices from ComboBoxes</li>
+<li>Can select the CD and DVD devices from ComboBoxes in the GUI</li>
+<li>Added CD and DVD device selection from the command line</li>
+<li>Fixed escape of &lt; character when making the cheatsheet and improved the readability</li>
 </ul>
 <br>
 <b>9 March 2014 - </b>Initial Version
@@ -19,10 +21,7 @@
 <br>
 <b>To Do</b>
 <ul>
-<li>Need CD and DVD device selection from the command line</li>
 <li>Need DVD keyboard navigation</li>
-<li>Need to implement DVD checking, currently assume all is well - ha!</li>
-<li>Need to escape left angle character when making the cheatsheet</li>
 <li>Add libquvi support to parse YouTube and similar URL's</li>
 <li>Need a proper man page</li>
 <li>Need to have config file in the user's home directory</li>

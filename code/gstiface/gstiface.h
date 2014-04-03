@@ -1,6 +1,6 @@
 /**************************** gstiface.h ******************************
 
-rCode to interface from our QT widgets, mainly PlayerCtl and Gstreamer
+Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
 
 Copyright (C) 2014-2014
 by: Andrew J. Bibb
@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QTimer>
 # include <QMap>
 # include <QList>
+# include <QVariant>
 
 # include "./code/streaminfo/streaminfo.h"
 
@@ -59,8 +60,10 @@ namespace MBMP_GI
 		Tag					= 0x0d,		// received a TAG message
 		Unhandled		= 0x2f,		// an unhandled message
 		// return codes
-		NoCDPipe		= 0x31,		// no Audio CD pipe
+		NoCDPipe		= 0x31,		// not able to create an Audio CD pipe
 		BadCDRead		= 0x32,		// can't read the CD
+		NoDVDPipe		= 0x33,		// not able to create a DVD pipe
+		BadDVDRead	= 0x34,		// can't read the DVD
   };
 } // namespace MBMP_GI
 
@@ -102,13 +105,14 @@ class GST_Interface : public QObject
 		void playPause();
 		GstState getState();
 		double getVolume();
-		QList<QString> getVisualizerList();
 		void changeVisualizer(const QString&);
 		bool checkPlayFlag(const guint&);
 		void setPlayFlag(const guint&, const bool&);
 		QString getAudioStreamInfo();
 		QString getVideoStreamInfo();
 		QString getTextStreamInfo();
+		// inline function to get private data members
+		inline QList<QString> getVisualizerList() {return vismap.keys();}
 		inline QList<TocEntry> getTrackList() {return tracklist;}
 		inline QMap<QString, int> getStreamMap() {return streammap;} 
 				
@@ -143,6 +147,7 @@ class GST_Interface : public QObject
 		QWidget* mainwidget;
 		bool b_positionenabled;
 		QList<TocEntry> tracklist;
+		QMap<QString, QVariant> tagmap_cd;
 		QString opticaldrive;
 		
 		// functions

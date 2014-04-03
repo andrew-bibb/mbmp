@@ -75,24 +75,22 @@ QList<QKeySequence> KeyMap::getKeySequence(const QString& cmd)
 //	Slot to return a cheatsheet of key bindings
 QString KeyMap::getCheatSheet()
 {
-	QString s = QString("<code>");
-	const int pad = 12;
-	s.append(QString("%1%2<br>").arg(tr("KEY(S)").leftJustified(pad, '.')).arg(tr("COMMAND")) );
+	QString s = QString();
+	
+	s.append(QString("<tr><td><b>%1</b></td><td><b>%2</b></td></tr>").arg(tr("KEY(S)")).arg(tr("COMMAND")) );
 			
 	QMap<QString, QList<QKeySequence> >::const_iterator itr = usermap.constBegin();
 	while (itr != usermap.constEnd()) {
 		QStringList sl;
 		for (int i = 0; i < itr.value().size(); ++i) {
-			sl.append(itr.value().at(i).toString() );
+			sl.append(itr.value().at(i).toString().toHtmlEscaped() );
 		}	// for
 		if (! sl.at(0).isEmpty() ) {
-			s.append(QString("%1%2").arg(sl.join(',').leftJustified(pad, '.')).arg(itr.key()) );
-			s.append("<br>");
+			s.append(QString("<tr><td>%1</td><td>%2</td></tr>").arg(sl.join(',')).arg(itr.key()) );
 		}	// if
     ++itr;
 	}
-	s.append("</code>");
-	
+
 	return s;
 }
   

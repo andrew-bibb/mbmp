@@ -28,6 +28,18 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.widget_control->setVisible(parser.isSet("gui"));
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
 	
+	// members
+	keymap = new KeyMap(this);
+	playlist = new Playlist(this); 
+	playlist->hide();
+	p_gstiface = new GST_Interface(this);
+	ncurs = this->cursor();
+	videowidget = new VideoWidget(this);
+	ui.gridLayout->addWidget(videowidget, 0, 0);
+
+	// hide the buffering progress bar
+	ui.progressBar_buffering->hide();	
+	
 	// find the the optical drives, or at least the first five
 	for (int i = 0; i < 5; ++i) {
 		QFileInfo fi(QString("/dev/sr%1").arg(i));
@@ -37,16 +49,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		}
 		else break;
 	}// while
-		
-	// members
-	keymap = new KeyMap(this);
-	playlist = new Playlist(this); 
-	playlist->hide();
-	p_gstiface = new GST_Interface(this);
-	ncurs = this->cursor();
-	videowidget = new VideoWidget(this);
-	ui.gridLayout->addWidget(videowidget, 0, 0);
-		
+	
+	// set the CD and DVD devices, default for both is /dev/sr0
+	ui.comboBox_audiocd->setCurrentText(parser.value("CD"));
+	ui.comboBox_dvd->setCurrentText(parser.value("DVD"));
+				
 	// setup the logfile and the logging level
 	logfile.setFileName("/tmp/mbmp.log");	// we don't provide an opportunity to change this
 	if (logfile.exists() ) logfile.remove();	
@@ -59,14 +66,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// enable subtitles if requested
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, (parser.isSet("subtitles")) ); 
-		
-	// hide the buffering progress bar
-	ui.progressBar_buffering->hide();
 	
 	// setup the connection speed
 	qint64 cnxnspeed = parser.value("connection-speed").toInt(&ok,10);
 	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);
-
+	
 	// setup the cheatsheet message box
 	chtsht = new QMessageBox(this);
 	chtsht->setWindowTitle(tr("Key Bindings"));
@@ -393,11 +397,11 @@ void PlayerControl::changeVolume(int vol)
 	// Gstreamer volume ranges are doubles in the range of 0.0 to 10.0
 	// 0.0 = mute, 1.0 = 100%, so 10.0 must be really loud.  The volume
 	// scale is linear, and the default is 1.0  Our dial uses integers
-	// and is set up on a range of 0-20, with 10 being 100%. The conversions:
+	// and is set up on a range of 0-30, with 10 being 100%. The conversions:
 	//	Vol%		GStreamer MBMP
 	//	  0%		0.0				0
 	//	100%		1.0				10
-	//	200%		2.0				20  This is the maximum we want to go
+	//	300%		3.0				30  This is the maximum we want to go
 	
 	double d_vol = 0.0;
 	d_vol = (static_cast<double>(vol) / 10.0);
@@ -422,7 +426,7 @@ void PlayerControl::initializeCD()
 		case MBMP_GI::BadCDRead:
 			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
 				tr("<center><b>Unable to read the audio CD.</b></center>"                       
-				"<br>Make sure the CD is in %1.  It may still be possible to play a different CD or to "                       
+				"<br>Make sure the audio CD is in %1.  It may still be possible to play a different CD or to "                       
 				"play this CD in a different drive.").arg(ui.comboBox_audiocd->currentText())
 				);
 			return;	
@@ -442,12 +446,21 @@ void PlayerControl::initializeCD()
 // For now just play it
 void PlayerControl::initializeDVD()
 {
-	if (p_gstiface->checkDVD(ui.comboBox_dvd->currentText()) ) {
-		QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+	switch (p_gstiface->checkDVD(ui.comboBox_dvd->currentText()) ) {
+		case MBMP_GI::NoDVDPipe:
+			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
 				tr("<center><b>Unable to read the DVD.</b></center>"                       
 				"<br>Make sure the DVD is in %1 or try the DVD in a different drive").arg(ui.comboBox_dvd->currentText())
 				);
-	}	// if
+			return;
+		case MBMP_GI::BadDVDRead:		
+			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+				tr("<center><b>Unable to read the DVD.</b></center>"                       
+				"<br>Make sure the disk is in %1.  It may still be possible to play a different DVD or to "                       
+				"play this DVD in a different drive.").arg(ui.comboBox_dvd->currentText())
+				);
+			return;	
+	}	// switch			
 	
 	// if we are here checkDVD passed, start playing the DVD. 
 	p_gstiface->playMedia(videowidget->winId(), "dvd://" );

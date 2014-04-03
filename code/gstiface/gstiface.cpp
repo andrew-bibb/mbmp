@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 
 # include <gst/video/videooverlay.h>
 # include <gst/video/navigation.h>
+# include <gst/tag/tag.h>
 
 # include "./code/resource.h"
 
@@ -78,6 +79,7 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 	streammap.clear();
 	mainwidget = qobject_cast<QWidget*>(parent);
 	opticaldrive.clear();
+	tagmap_cd.clear();
 	b_positionenabled = true;	// this will be set to false if we fail getting the stream position.
 														// Checked at the top of queryStreamPosition so we don't flood the logs
 														// or the display with failed position messages									
@@ -143,28 +145,32 @@ GST_Interface::~GST_Interface()
 ///////////////////////////// Public Functions /////////////////////////
 //
 // Slot to query an audio CD for the number of audio tracks on it.
-// If the query succeeds assume we can play the CD.
+// If the query succeeds assume we can play the CD.  Also used to set
+// or clear the opticaldrive data element
 int GST_Interface::checkCD(QString dev)
 {
-	// set the optical device
+	// set the optical device and clear CD tag map
 	opticaldrive = dev;
+	tagmap_cd.clear();
 	
 	// Create an audiocd pipeline.  
   GstElement* source;
   GstElement* sink;	
   GstElement* pipeline_audiocd;
   source = gst_element_factory_make ("cdparanoiasrc", "cd_source");
-  // TODO need a real device checker
 	g_object_set (G_OBJECT (source), "device", opticaldrive.toLocal8Bit().data(), NULL);
   sink = gst_element_factory_make ("fakesink", "cd_sink");  
-  pipeline_audiocd = gst_pipeline_new ("audiocd");	  
+  pipeline_audiocd = gst_pipeline_new ("audiocd");
+  
+  // check that all elements were created properly	  
   if (!pipeline_audiocd || !source || !sink) {
     gst_element_post_message (pipeline_playbin,
 			gst_message_new_application (GST_OBJECT (pipeline_playbin),
 				gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Failed to create audiocd pipeline - Not all elements could be created.", NULL)));  
-		opticaldrive.clear();		
+		opticaldrive.clear();		 
 		return MBMP_GI::NoCDPipe;
 	}
+	// create the pipeline and check to see if we were successful.
 	else {  
 	  gst_bin_add_many (GST_BIN (pipeline_audiocd), source, sink, NULL);
 	  if (gst_element_link (source, sink) != TRUE) {
@@ -181,10 +187,9 @@ int GST_Interface::checkCD(QString dev)
 
   // Get the track count, if we can't it means we can't read the CD
   // so return with an error
-  gint64 duration;
+  gint64 duration = 0;
   GstFormat fmt = gst_format_get_by_nick("track");
   if (! gst_element_query_duration(pipeline_audiocd, fmt, &duration) ) {
-		bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline_playbin));
 		gst_element_set_state(pipeline_audiocd, GST_STATE_NULL);
 		opticaldrive.clear();
 		return MBMP_GI::BadCDRead;
@@ -199,12 +204,58 @@ int GST_Interface::checkCD(QString dev)
 }
 
 //
-// Slot to check the DVD,  for right now just use it to set the opticaldrive
+// Slot to check the DVD by doing a query of the number of chapters that
+// are on it. If the query succeeds assume we can play the DVD.  Also
+// used to set or clear the opticaldrive data element (used in the 
+// gstreamer callback to set a device source)
 int GST_Interface::checkDVD(QString dev)
 {
-	// set the optical device
+	// set the optical device and clear the dvd tag map
 	opticaldrive = dev;
+
+	// Create a dvd pipeline.  
+  GstElement* source;
+  GstElement* sink;	
+  GstElement* pipeline_dvd;
+  source = gst_element_factory_make ("dvdreadsrc", "dvd_source");
+	g_object_set (G_OBJECT (source), "device", opticaldrive.toLocal8Bit().data(), NULL);
+  sink = gst_element_factory_make ("fakesink", "dvd_sink");  
+  pipeline_dvd = gst_pipeline_new ("dvd");
+  
+  // Check that all elements were created properly	  
+  if (!pipeline_dvd || !source || !sink) {
+    gst_element_post_message (pipeline_playbin,
+			gst_message_new_application (GST_OBJECT (pipeline_playbin),
+				gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Failed to create DVD pipeline - Not all elements could be created.", NULL)));  
+		opticaldrive.clear();		 
+		return MBMP_GI::NoDVDPipe;
+	}
+	// create the pipeline and check to see if we were successful.
+	else {  
+	  gst_bin_add_many (GST_BIN (pipeline_dvd), source, sink, NULL);
+	  if (gst_element_link (source, sink) != TRUE) {
+			gst_element_post_message (pipeline_playbin,
+				gst_message_new_application (GST_OBJECT (pipeline_playbin),
+					gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Failed to create DVD pipeline - Elements could not be linked.", NULL)));  
+			opticaldrive.clear();
+			return MBMP_GI::NoDVDPipe;
+	  }	// if
+	}	// else	
 	
+	// Set the dvd pipeline to PAUSED 
+  gst_element_set_state(pipeline_dvd, GST_STATE_PAUSED);
+	
+  gint64 duration = 0;
+  GstFormat fmt = gst_format_get_by_nick("chapter");
+  if (! gst_element_query_duration(pipeline_dvd, fmt, &duration) ) {
+		gst_element_set_state(pipeline_dvd, GST_STATE_NULL);
+		opticaldrive.clear();
+		return MBMP_GI::BadDVDRead;
+	}	
+	
+	// Clean up
+	gst_element_set_state (pipeline_dvd, GST_STATE_NULL);
+	gst_object_unref (GST_OBJECT (pipeline_dvd)); 
 	return 0;
 }
 
@@ -282,13 +333,6 @@ double GST_Interface::getVolume()
 	g_object_get (G_OBJECT (pipeline_playbin), "volume", &vol, NULL);
 	return vol;
 }   
-
-//
-// Function to return a QStringList of the visualizers found
-QList<QString> GST_Interface::getVisualizerList()
-{
-	return vismap.keys();
-}
 
 
 //
@@ -387,8 +431,8 @@ QString GST_Interface::getAudioStreamInfo()
 				// While we are here extract some media tags if present.
 				// Set the title of the main player window using the tags
 				// or our fallback string if tags are not found.
-				QString qs_title = 0;
-				QString qs_artist = 0;
+				QString qs_title = QString();
+				QString qs_artist = QString();
 				if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
 					if (str) qs_title = QString(str);
 					else qs_title.clear();
@@ -789,20 +833,38 @@ void GST_Interface::pollGstBus()
 			// we have not implemented these as of yet, so for now just send a notification
 			// to PlayerCtl that we got a tag
 			case GST_MESSAGE_TAG: {
-				emit busMessage(MBMP_GI::Tag, QString(tr("Stream contains extended tag (gsttag) information.")) );
+				emit busMessage(MBMP_GI::Tag, QString(tr("Stream contains tag information.")) );
+							
+				gchar* str;
+				guint num = 0;
+				GstTagList* tags = 0;
+				gst_message_parse_tag (msg, &tags);
 				
-				
-				//GstTagList* tags = 0;
-				//gst_message_parse_tag (msg, &tags);
-				//qDebug() << "toc tag list size: " << gst_tag_list_n_tags (tags);
-				//for (int i = 0; i < gst_tag_list_n_tags (tags); ++i) {
-					//qDebug() << gst_tag_list_nth_tag_name (tags, i);
-				//}
-				//gst_tag_list_free (tags);
-				
+				// Get Audio CD tags. tagmap_cd has already been cleared in function check_CD 
+				// May need a new emit when we actually want to use some of this data
+				if (!tagmap_cd.contains(GST_TAG_CDDA_CDDB_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID, &str)) {
+					tagmap_cd[GST_TAG_CDDA_CDDB_DISCID] = QString(str);
+					g_free (str);
+				}
+				if (!tagmap_cd.contains(GST_TAG_CDDA_CDDB_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID_FULL, &str)) {
+					tagmap_cd[GST_TAG_CDDA_CDDB_DISCID_FULL] = QString(str);
+					g_free (str);
+				}
+				if (!tagmap_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID, &str)) {
+					tagmap_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID] = QString(str);
+					g_free (str);
+				}
+				if (!tagmap_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL, &str)) {
+					tagmap_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL] = QString(str);
+					g_free (str);
+				}
+				if (!tagmap_cd.contains(GST_TAG_TRACK_COUNT) && gst_tag_list_get_uint (tags, GST_TAG_TRACK_COUNT, &num)) {
+					tagmap_cd[GST_TAG_TRACK_COUNT] = num;
+					num = 0;
+				}
+
+				gst_tag_list_free (tags);
 				break; }
-				
-				
 				
 			default:
 				emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message")) );
@@ -852,7 +914,10 @@ void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
 void GST_Interface::playerStop()
 {
 	gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
+	
+	// reset data elements
 	opticaldrive.clear();
+	tagmap_cd.clear();
 	
 	return;
 }

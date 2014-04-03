@@ -25,28 +25,36 @@ int main(int argc, char *argv[])
 	// setup the command line parser
 	QCommandLineParser parser;
 	parser.setApplicationDescription(QApplication::translate("main.cpp", "GStreamer based media player.") );
-  parser.addHelpOption();
-  parser.addVersionOption();
 	
-	parser.addPositionalArgument("filename", QCoreApplication::translate("main.cpp", "Media file to play."));
+  QCommandLineOption connectionSpeed(QStringList() << "c" << "connection-speed", QCoreApplication::translate("main.cpp", "Specify a network connection speed in kbps (default is 0)."), QCoreApplication::translate("main.cpp", "connection-speed"), "0" );  
+  parser.addOption(connectionSpeed);
 	
-	QCommandLineOption openFullScreen(QStringList() << "f" << "fullscreen", QCoreApplication::translate("main.cpp", "Start the player in full screen mode (default is start in window.") );
+	QCommandLineOption openFullScreen(QStringList() << "f" << "fullscreen", QCoreApplication::translate("main.cpp", "Start the player in full screen mode (default is start in window).") );
 	parser.addOption(openFullScreen);
 	
 	QCommandLineOption openGUI(QStringList() << "g" << "gui", QCoreApplication::translate("main.cpp", "Open the player in GUI mode (default is no GUI).") );
 	parser.addOption(openGUI);
 	
+  parser.addHelpOption();  
+	
 	QCommandLineOption logLevel(QStringList() << "l" << "loglevel", QCoreApplication::translate("main.cpp", "Set the log level from 0 to 2 (default is 1)."), QCoreApplication::translate("main.cpp", "loglevel"), "1" );
 	parser.addOption(logLevel);  
   
-  QCommandLineOption enableVisualizer(QStringList() << "V" << "visualizer", QCoreApplication::translate("main.cpp", "Enable a visualizer when playing audio tracks (default is no visualizer).") );
-  parser.addOption(enableVisualizer);
-  
   QCommandLineOption enableSubtitles(QStringList() << "s" << "subtitles", QCoreApplication::translate("main.cpp", "Enable display of subtitles if a subtitle stream is found (default is no subtitles).") );
   parser.addOption(enableSubtitles);  
+	
+  parser.addVersionOption();	  
+    
+  QCommandLineOption cdDevice(QStringList() << "C" << "CD", QCoreApplication::translate("main.cpp", "Specify the optical drive that will play the audio CD (default is /dev/sr0)."), QCoreApplication::translate("main.cpp", "CD"), "/dev/sr0");
+  parser.addOption(cdDevice);
   
-  QCommandLineOption connectionSpeed(QStringList() << "c" << "connection-speed", QCoreApplication::translate("main.cpp", "Specify a network connection speed in kbps (default is 0)."), QCoreApplication::translate("main.cpp", "connection-speed"), "0" );  
-  parser.addOption(connectionSpeed);
+  QCommandLineOption dvdDevice(QStringList() << "D" << "DVD", QCoreApplication::translate("main.cpp", "Specify the optical drive that will play the DVD (default is /dev/sr0)."), QCoreApplication::translate("main.cpp", "DVD"), "/dev/sr0");
+  parser.addOption(dvdDevice);
+  
+  QCommandLineOption enableVisualizer(QStringList() << "V" << "visualizer", QCoreApplication::translate("main.cpp", "Enable a visualizer when playing audio tracks (default is no visualizer).") );
+  parser.addOption(enableVisualizer);  
+  
+	parser.addPositionalArgument("filename", QCoreApplication::translate("main.cpp", "Media file to play."));
   
   // setup translations 
 	#ifdef USE_TRANSLATIONS
