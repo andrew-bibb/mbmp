@@ -541,6 +541,9 @@ void GST_Interface::mouseNavEvent(QString event, int button, int x, int y)
 {
 	// Do nothing if we are not playing	
 	if (getState() != GST_STATE_PLAYING)  return;
+	
+	// Return if we're not playing a dvd
+	if (mediatype != MBMP_GI::DVD) return;
 		
 	// Find the gstNavigation element (part of xvimagesink)
 	GstNavigation* nav = 0;           
@@ -559,6 +562,9 @@ void GST_Interface::mouseNavEvent(QString event, int button, int x, int y)
 //	Slot to process a key navigation event
 void GST_Interface::keyNavEvent(GstNavigationCommand cmd)
 {
+	// Return if we're not playing a dvd
+	if (mediatype != MBMP_GI::DVD) return;	
+	
 	// Find the gstNavigation element (part of xvimagesink)
 	GstNavigation* nav = 0;           
 	nav = GST_NAVIGATION (pipeline_playbin);	
