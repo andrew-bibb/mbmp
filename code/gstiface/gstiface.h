@@ -27,7 +27,8 @@ DEALINGS IN THE SOFTWARE.
 # ifndef GST_INTERFACE
 # define GST_INTERFACE
 
-#include <gst/gst.h>
+# include <gst/gst.h>
+# include <gst/video/navigation.h>
 
 # include <QWidget>
 # include <QString>
@@ -89,6 +90,7 @@ typedef enum {
   GST_PLAY_FLAG_SOFT_COLORBALANCE = (1 << 10)
 } GstPlayFlags;
 
+
 //	Table of contents structure
 struct TocEntry
 {
@@ -127,6 +129,7 @@ class GST_Interface : public QObject
 				
 		public slots:
 		void mouseNavEvent(QString, int, int, int);
+		void keyNavEvent(GstNavigationCommand);
 		void seekToPosition(int);
 		void setAudioStream(const int&);
 		void setVideoStream(const int&);

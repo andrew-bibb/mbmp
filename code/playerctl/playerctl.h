@@ -39,6 +39,7 @@ class PlayerControl : public QDialog
 		void playMedia(QAction* act = 0);
 		void stopPlaying();
 		void seekToPosition(QAction*);
+		void dvdNavigationCommand(QAction*);
 		void playPause();
 		void toggleFullScreen();
 		void togglePlaylist();
@@ -67,6 +68,7 @@ class PlayerControl : public QDialog
 		QActionGroup* playlist_group;    
 		QActionGroup* volume_group;
 		QActionGroup* seek_group;
+		QActionGroup* dvd_group;
 		QMenu* control_menu;
 		QMenu* vis_menu;
 		QMenu* advanced_menu;

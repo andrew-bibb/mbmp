@@ -139,6 +139,18 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(ui.actionColorBalance);
 	this->addAction(ui.actionAudioCD);
 	this->addAction(ui.actionDVD);
+	this->addAction(ui.actionDVDBackOneMenu);
+	this->addAction(ui.actionDVDTitleMenu);
+	this->addAction(ui.actionDVDRootMenu);
+	this->addAction(ui.actionDVDSubpictureMenu);
+	this->addAction(ui.actionDVDAudioMenu);
+	this->addAction(ui.actionDVDAngleMenu);
+	this->addAction(ui.actionDVDChapterMenu);
+	this->addAction(ui.actionDVDLeft);
+	this->addAction(ui.actionDVDRight);
+	this->addAction(ui.actionDVDUp);
+	this->addAction(ui.actionDVDDown);
+	this->addAction(ui.actionDVDActivate);
 	
 	// add actions to action groups
 	playlist_group = new QActionGroup(this);	
@@ -159,6 +171,20 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	seek_group->addAction(ui.actionSeekBack600);
 	seek_group->addAction(ui.actionSeekFrwd600);
 	seek_group->setEnabled(false);
+	
+	dvd_group = new QActionGroup(this);
+	dvd_group->addAction(ui.actionDVDBackOneMenu);
+	dvd_group->addAction(ui.actionDVDTitleMenu);
+	dvd_group->addAction(ui.actionDVDRootMenu);
+	dvd_group->addAction(ui.actionDVDSubpictureMenu);
+	dvd_group->addAction(ui.actionDVDAudioMenu);
+	dvd_group->addAction(ui.actionDVDAngleMenu);
+	dvd_group->addAction(ui.actionDVDChapterMenu);
+	dvd_group->addAction(ui.actionDVDLeft);
+	dvd_group->addAction(ui.actionDVDRight);
+	dvd_group->addAction(ui.actionDVDUp);
+	dvd_group->addAction(ui.actionDVDDown);
+	dvd_group->addAction(ui.actionDVDActivate);
 	
 	// create the visualizer menu. It is tearoff enabled.
 	vis_menu = new QMenu(this);
@@ -256,6 +282,18 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionColorBalance->setShortcuts(getShortcuts("cmd_color_bal"));
 	ui.actionAudioCD->setShortcuts(getShortcuts("cmd_playaudiocd"));
 	ui.actionDVD->setShortcuts(getShortcuts("cmd_playdvd"));
+	ui.actionDVDBackOneMenu->setShortcuts(getShortcuts("cmd_dvd_back_one_menu"));
+	ui.actionDVDTitleMenu->setShortcuts(getShortcuts("cmd_dvd_title_menu"));
+	ui.actionDVDRootMenu->setShortcuts(getShortcuts("cmd_dvd_root_menu"));
+	ui.actionDVDSubpictureMenu->setShortcuts(getShortcuts("cmd_dvd_subpicture_menu"));
+	ui.actionDVDAudioMenu->setShortcuts(getShortcuts("cmd_dvd_audio_menu"));
+	ui.actionDVDAngleMenu->setShortcuts(getShortcuts("cmd_dvd_angle_menu"));
+	ui.actionDVDChapterMenu->setShortcuts(getShortcuts("cmd_dvd_chapter_menu"));
+	ui.actionDVDLeft->setShortcuts(getShortcuts("cmd_dvd_left"));
+	ui.actionDVDRight->setShortcuts(getShortcuts("cmd_dvd_right"));
+	ui.actionDVDUp->setShortcuts(getShortcuts("cmd_dvd_up"));
+	ui.actionDVDDown->setShortcuts(getShortcuts("cmd_dvd_down"));
+	ui.actionDVDActivate->setShortcuts(getShortcuts("cmd_dvd_activate"));
 	
   // connect signals to slots 
   connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
@@ -283,11 +321,12 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionPlayerStop, SIGNAL(triggered(bool)), ui.toolButton_playpause, SLOT(setChecked(bool)));
 	connect (ui.horizontalSlider_position, SIGNAL(sliderMoved(int)), p_gstiface, SLOT(seekToPosition(int)));
 	connect (seek_group, SIGNAL(triggered(QAction*)), this, SLOT(seekToPosition(QAction*)));
+	connect (dvd_group, SIGNAL(triggered(QAction*)), this, SLOT(dvdNavigationCommand(QAction*)));
 	connect (ui.actionAudioCD, SIGNAL (triggered()), this, SLOT(initializeCD()));
 	connect (ui.actionDVD, SIGNAL (triggered()), this, SLOT(initializeDVD()));
 	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), p_gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
 	
-	// create actions to accept a selected few playlist shortcuts
+	// create actions to accept a selected few playlist and p_gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
 	this->addAction(pl_Act01);
 	pl_Act01->setShortcuts(getShortcuts("cmd_addaudio") );
@@ -560,6 +599,29 @@ void PlayerControl::seekToPosition(QAction* act)
 	
 	p_gstiface->seekToPosition(pos);
 	
+	return;
+}
+
+//
+// Slot to send a DVD navigation command to the stream.  Called when
+// one of the actions assigned to dvd_group action group are triggered
+void PlayerControl::dvdNavigationCommand(QAction* act)
+{
+	GstNavigationCommand cmd = GST_NAVIGATION_COMMAND_INVALID;
+	if (act == ui.actionDVDBackOneMenu) cmd = GST_NAVIGATION_COMMAND_DVD_MENU;
+	else if (act == ui.actionDVDTitleMenu) cmd = GST_NAVIGATION_COMMAND_DVD_TITLE_MENU;
+		else if (act == ui.actionDVDRootMenu) cmd = GST_NAVIGATION_COMMAND_DVD_ROOT_MENU;
+			else if (act == ui.actionDVDSubpictureMenu) cmd = GST_NAVIGATION_COMMAND_DVD_SUBPICTURE_MENU;
+				else if (act == ui.actionDVDAudioMenu) cmd = GST_NAVIGATION_COMMAND_DVD_AUDIO_MENU;
+					else if (act == ui.actionDVDAngleMenu) cmd = GST_NAVIGATION_COMMAND_DVD_ANGLE_MENU;
+						else if (act == ui.actionDVDChapterMenu) cmd = GST_NAVIGATION_COMMAND_DVD_CHAPTER_MENU;
+							else if (act == ui.actionDVDLeft) cmd = GST_NAVIGATION_COMMAND_LEFT;
+								else if (act == ui.actionDVDRight) cmd = GST_NAVIGATION_COMMAND_RIGHT;
+									else if (act == ui.actionDVDUp) cmd = GST_NAVIGATION_COMMAND_UP;
+										else if (act == ui.actionDVDDown) cmd = GST_NAVIGATION_COMMAND_DOWN;
+											else if (act == ui.actionDVDActivate) cmd = GST_NAVIGATION_COMMAND_ACTIVATE;
+	
+	p_gstiface->keyNavEvent(cmd);
 	return;
 }
 

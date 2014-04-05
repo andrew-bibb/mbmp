@@ -44,6 +44,8 @@ VideoWidget::VideoWidget(QWidget* parent) : QWidget(parent)
 	this->setPalette(pal);
 	this->setAutoFillBackground(true);
 	
+	setFocusPolicy(Qt::StrongFocus);
+	
 }
 
 ///////////////////// Protected Functions /////////////////////////////
@@ -83,5 +85,3 @@ void VideoWidget::mouseReleaseEvent(QMouseEvent* e)
 	}
 	else 	e->ignore();
 }
-
-

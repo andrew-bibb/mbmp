@@ -226,7 +226,7 @@
         <item>
          <widget class="QLabel" name="label_audiocd">
           <property name="text">
-           <string>Audio &amp;CD Device:</string>
+           <string>Audio CD Device:</string>
           </property>
           <property name="buddy">
            <cstring>comboBox_audiocd</cstring>
@@ -265,7 +265,7 @@
         <item>
          <widget class="QLabel" name="label_dvd">
           <property name="text">
-           <string>&amp;DVD Device: </string>
+           <string>DVD Device: </string>
           </property>
           <property name="buddy">
            <cstring>comboBox_dvd</cstring>
@@ -825,6 +825,102 @@
    </property>
    <property name="toolTip">
     <string>Play a DVD</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDBackOneMenu">
+   <property name="text">
+    <string>DVD Back One Menu</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDTitleMenu">
+   <property name="text">
+    <string>DVD Title Menu</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDRootMenu">
+   <property name="text">
+    <string>DVD Root Menu</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDSubpictureMenu">
+   <property name="text">
+    <string>DVD Subpicture Menu</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDAudioMenu">
+   <property name="text">
+    <string>DVD Audio Menu</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDAngleMenu">
+   <property name="text">
+    <string>DVD Angle Menu</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDLeft">
+   <property name="text">
+    <string>DVD Left</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDRight">
+   <property name="text">
+    <string>DVD Right</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDUp">
+   <property name="text">
+    <string>DVD Up</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDDown">
+   <property name="text">
+    <string>DVD Down</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDActivate">
+   <property name="text">
+    <string>DVD Activate</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionDVDChapterMenu">
+   <property name="text">
+    <string>DVD Chapter Menu</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>

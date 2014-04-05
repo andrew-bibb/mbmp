@@ -86,7 +86,8 @@ QString KeyMap::getCheatSheet()
 			sl.append(itr.value().at(i).toString().toHtmlEscaped() );
 		}	// for
 		if (! sl.at(0).isEmpty() ) {
-			s.append(QString("<tr><td>%1</td><td>%2</td></tr>").arg(sl.join(',')).arg(itr.key()) );
+			QString t = itr.key();
+			s.append(QString("<tr><td>%1</td><td>%2</td></tr>").arg(sl.join(',')).arg(t.remove(0,4)) );
 		}	// if
     ++itr;
 	}

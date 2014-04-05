@@ -9,6 +9,7 @@
 <li>Can select the CD and DVD devices from ComboBoxes in the GUI</li>
 <li>Added CD and DVD device selection from the command line</li>
 <li>Chapterlist (DVD) and Tracklist (CD) properly disable and reenable ui controls<li>
+<li>DVD keyboard navigation</li>
 <li>Fixed escape of &lt; character when making the cheatsheet and improved the readability</li>
 </ul>
 <br>
@@ -22,7 +23,6 @@
 <br>
 <b>To Do</b>
 <ul>
-<li>Need DVD keyboard navigation</li>
 <li>Add libquvi support to parse YouTube and similar URL's</li>
 <li>Need a proper man page</li>
 <li>Need to have config file in the user's home directory</li>

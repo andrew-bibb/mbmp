@@ -6,7 +6,7 @@ Copyright (C) 2014-2014
 by: Andrew J. Bibb
 License: MIT 
 
-Permission is hereby granted, free of charge, to any person obtaining a copy ya
+Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"),to deal 
 in the Software without restriction, including without limitation the rights 
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
@@ -29,7 +29,6 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/playerctl/playerctl.h"	
 
 # include <gst/video/videooverlay.h>
-# include <gst/video/navigation.h>
 # include <gst/tag/tag.h>
 
 # include "./code/resource.h"
@@ -295,7 +294,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 			else if (uri.startsWith("http://", Qt::CaseInsensitive) || uri.startsWith("ftp://", Qt::CaseInsensitive)) mediatype = MBMP_GI::URL;
 				else	mediatype = MBMP_GI::File;
 
-		// Set the video overlay and allow it to handle navagation events
+		// Set the video overlay and allow it to handle navigation events
 		gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(pipeline_playbin), winId);
 		gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), TRUE);                
     		
@@ -547,15 +546,28 @@ void GST_Interface::mouseNavEvent(QString event, int button, int x, int y)
 	GstNavigation* nav = 0;           
 	nav = GST_NAVIGATION (pipeline_playbin);
 	
-	// Return if we could not find a GstNavagation element in the pipeline
+	// Return if we could not find a GstNavigation element in the pipeline
 	if (! nav) return;
 	
-	// inject the mouse event data into the stream
+	// Inject the mouse event data into the stream
 	gst_navigation_send_mouse_event(nav, qPrintable(event), button, static_cast<double>(x), static_cast<double>(y));
 	
 	return;
 }
 
+//
+//	Slot to process a key navigation event
+void GST_Interface::keyNavEvent(GstNavigationCommand cmd)
+{
+	// Find the gstNavigation element (part of xvimagesink)
+	GstNavigation* nav = 0;           
+	nav = GST_NAVIGATION (pipeline_playbin);	
+	
+	// Inject the command into the stream
+	gst_navigation_send_command(nav, cmd);
+	
+	return;
+}
 
 //
 // Slot to seek to a specific position in the stream. Seek position
