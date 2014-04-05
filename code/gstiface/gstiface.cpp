@@ -541,9 +541,6 @@ void GST_Interface::mouseNavEvent(QString event, int button, int x, int y)
 {
 	// Do nothing if we are not playing	
 	if (getState() != GST_STATE_PLAYING)  return;
-	
-	// Return if we're not playing a dvd
-	if (mediatype != MBMP_GI::DVD) return;
 		
 	// Find the gstNavigation element (part of xvimagesink)
 	GstNavigation* nav = 0;           
@@ -923,35 +920,36 @@ void GST_Interface::pollGstBus()
 							gint64 chaptercount = 0;
 							gint64 currentchapter = 0;
 							GstFormat fmt = gst_format_get_by_nick("chapter");
-							if (gst_element_query_position(pipeline_playbin, fmt, &currentchapter) ) {
-								if (map_md_dvd.value("currentchapter") != static_cast<int>(currentchapter))  {
-									map_md_dvd["currentchapter"] = static_cast<int>(currentchapter);
-									currentchapter = 0;
-								}	// if there is a new chapter
-							}	// if we could extract the chapter								
 							if (gst_element_query_duration(pipeline_playbin, fmt, &chaptercount) ) {
 								if (map_md_dvd.value("chaptercount") != static_cast<int>(chaptercount))  {
 									map_md_dvd["chaptercount"] = static_cast<int>(chaptercount);
 									emit busMessage(MBMP_GI::TagCL, QString(tr("DVD chapter count changed to %1")).arg(map_md_dvd.value("chaptercount").toInt()) );
 									chaptercount = 0;
 								}	// if there is a new chaptercount
-							}	// if we could extract the chaptercount
+							}	// if we could extract the chaptercount							
+							if (gst_element_query_position(pipeline_playbin, fmt, &currentchapter) ) {
+								if (map_md_dvd.value("currentchapter") != static_cast<int>(currentchapter))  {
+									map_md_dvd["currentchapter"] = static_cast<int>(currentchapter);
+									emit busMessage(MBMP_GI::TagCC, QString(tr("DVD current chapter changed to %1")).arg(map_md_dvd.value("currentchapter").toInt()) );									
+									currentchapter = 0;
+								}	// if there is a new chapter
+							}	// if we could extract the chapter								
 											
+							gint64 titlecount = 0;											
 							gint64 currenttitle = 0;
-							gint64 titlecount = 0;
 							fmt = gst_format_get_by_nick("title");
-							if (gst_element_query_position(pipeline_playbin, fmt, &currenttitle) ) {
-								if (map_md_dvd.value("currenttitle") != static_cast<int>(currenttitle))  {
-									map_md_dvd["currenttitle"] = static_cast<int>(currenttitle);
-									currenttitle = 0;
-								}	// if there is a new currenttitle
-							}	// if we could extract the currenttitle								
 							if (gst_element_query_duration(pipeline_playbin, fmt, &titlecount) ) {
 								if (map_md_dvd.value("titlecount") != static_cast<int>(titlecount))  {
 									map_md_dvd["titlecount"] = static_cast<int>(titlecount);
 									titlecount = 0;
 								}	// if there is a new titlecount
-							}	// if we could extract the titlecount 					
+							}	// if we could extract the titlecount 							
+							if (gst_element_query_position(pipeline_playbin, fmt, &currenttitle) ) {
+								if (map_md_dvd.value("currenttitle") != static_cast<int>(currenttitle))  {
+									map_md_dvd["currenttitle"] = static_cast<int>(currenttitle);
+									currenttitle = 0;
+								}	// if there is a new currenttitle
+							}	// if we could extract the currenttitle													
 						break; }	// dvd case
 						
 					default: {	

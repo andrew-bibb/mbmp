@@ -80,9 +80,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// seed the playlist with the positional arguments from the command line
 	playlist->seedPlaylist(parser.positionalArguments() );
 	
-	/////////////// for testing if we want something to play
-	//playlist->seedPlaylist(QStringList("/mnt/p-stor/sambashare/Media/Video/Pacific Rim Elbow Rocket Clip.webm"));
-	
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work provided
   // the toolbutton is visible.  Since we can hide GUI in this widget
@@ -301,7 +298,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionQuit, SIGNAL (triggered()), qApp, SLOT(quit()));
 	connect (ui.actionToggleGUI, SIGNAL (triggered()), this, SLOT(toggleGUI()));
 	connect (ui.actionToggleFullscreen, SIGNAL (triggered()), this, SLOT(toggleFullScreen()));
-	connect (ui.actionShowCheatsheet, SIGNAL (triggered()), this->chtsht, SLOT(show()));
+	connect (ui.actionShowCheatsheet, SIGNAL (triggered()), this, SLOT(toggleCheatsheet()));
 	connect (ui.actionAbout, SIGNAL (triggered()), this, SLOT(showAbout()));
 	connect (ui.actionAboutMBMP, SIGNAL (triggered()), this, SLOT(aboutMBMP()));
 	connect (ui.actionAboutNuvola, SIGNAL (triggered()), this, SLOT(aboutNuvola()));
@@ -684,6 +681,15 @@ void PlayerControl::toggleGUI()
 }
 
 //
+// Slot to toggle the cheatsheet up or down
+void PlayerControl::toggleCheatsheet()
+{
+	chtsht->isVisible() ? chtsht->hide() : chtsht->show();
+
+	return;
+}
+
+//
 //	Slot to enter the About dialogs
 void PlayerControl::showAbout()
 {
@@ -930,10 +936,23 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
-			playlist->addChapters(p_gstiface->getChapterCount(),p_gstiface->getCurrentChapter() );
+			playlist->addChapters(p_gstiface->getChapterCount());
 			playlist->lockControls(true);
 			if (playlist->isHidden()) playlist->show();	
 		break;
+		
+		case MBMP_GI::TagCC:	// a TAG message indicating a new dvd chapter
+			switch (loglevel) {
+				case 0: // case 0 supress output
+					break;
+				case 1:	// case 1 supress output
+					break;
+				default: // case 2 and above record the message
+					stream1 << msg << endl;
+					if (logtofile) stream2 << msg << endl;
+			}	// loglevel switch
+			playlist->setCurrentChapter(p_gstiface->getCurrentChapter() );
+		break;		
 				
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;

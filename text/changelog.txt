@@ -23,6 +23,7 @@
 <br>
 <b>To Do</b>
 <ul>
+<li>Still a problem with dvd keyboard navigation, seems to loose where it is</li>
 <li>Add libquvi support to parse YouTube and similar URL's</li>
 <li>Need a proper man page</li>
 <li>Need to have config file in the user's home directory</li>

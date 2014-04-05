@@ -85,3 +85,15 @@ void VideoWidget::mouseReleaseEvent(QMouseEvent* e)
 	}
 	else 	e->ignore();
 }
+
+//
+// Eat keypresses, let the playerctl shortcuts do it
+void VideoWidget::keyPressEvent(QKeyEvent* e)
+{
+	e->accept();
+}
+
+void VideoWidget::keyReleaseEvent(QKeyEvent* e)
+{
+	e->accept();
+}

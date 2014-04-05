@@ -31,6 +31,7 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QWidget>
 # include <QMouseEvent>
+# include <QKeyEvent>
 # include <QString>
 
 class VideoWidget : public QWidget 
@@ -48,6 +49,8 @@ class VideoWidget : public QWidget
 	void	mouseMoveEvent(QMouseEvent*);
 	void	mousePressEvent(QMouseEvent*);
 	void	mouseReleaseEvent(QMouseEvent*);	
+	void keyPressEvent(QKeyEvent*);
+	void keyReleaseEvent(QKeyEvent*);
 };
 
 #endif

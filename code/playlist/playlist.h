@@ -72,7 +72,7 @@ class Playlist : public QDialog
 		void addFile(QAction*);	
 		void addURL();
 		void addTracks(QStringList);
-		void addChapters(int, int);
+		void addChapters(int);
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
@@ -80,6 +80,7 @@ class Playlist : public QDialog
 		inline void triggerAddVideo() {ui.actionAddVideo->trigger();}
 		inline void triggerAddFiles() {ui.actionAddFiles->trigger();}
 		inline int currentItemType() {return ui.listWidget_playlist->currentItem()->type();}
+		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
 		inline void clearPlaylist() {ui.listWidget_playlist->clear();}
 	
 	public:

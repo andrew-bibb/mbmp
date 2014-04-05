@@ -306,10 +306,10 @@ void Playlist::addTracks(QStringList sl_tracks)
 // Slot to add dvd chapters to the playlist, as above Chapters and files/url's 
 // can't coexist in the playlist so clear the playlist first. The count comes
 // from GST_Interface via PlayerCtl
-void Playlist::addChapters(int count, int current)
+void Playlist::addChapters(int count)
 {
 	// return if count is not at least one chapter
-	if (count < 1 || current < 0 ) return;
+	if (count < 1 ) return;
 	
 	// clear the tracklist entries
 	ui.listWidget_playlist->clear();
@@ -320,7 +320,6 @@ void Playlist::addChapters(int count, int current)
 	// create the entries
 	for (int i = 1; i <= count; ++i) {
 		new QListWidgetItem(tr("Chapter %1").arg(i), ui.listWidget_playlist, MBMP_PL::DVD);
-		if (i == current) ui.listWidget_playlist->setCurrentRow(i - 1);
 	} // for
 		
 	return;	
