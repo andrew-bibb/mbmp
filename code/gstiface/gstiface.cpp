@@ -1,4 +1,4 @@
-/**************************** gstiface.cpp ****************************
+/**************************** gstiface.cpp *****************************
 
 Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
 
@@ -6,7 +6,7 @@ Copyright (C) 2014-2014
 by: Andrew J. Bibb
 License: MIT 
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
+Permission is hereby granted, free of charge, to any person obtaining a copy ya
 of this software and associated documentation files (the "Software"),to deal 
 in the Software without restriction, including without limitation the rights 
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
@@ -54,14 +54,16 @@ static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data)
   return TRUE;
 }
 
-//////////////////////////////TESTING///////////////////////////
 static void sourceSetup(void* bin, GstElement* src, QString* opticaldrive)
 {	
 	(void) bin;
 	gchar* device = NULL;
 	
+	// return now if opticaldrive is empty (means we are not playing a CD or DVD)
+	if (opticaldrive->isEmpty() ) return;
+
 	g_object_get(G_OBJECT (src), "device", &device, NULL);
-	// if no device (probably a file or url) return
+	// if no device (probably a file or url) return. 
 	if (device == NULL)
 		return;
 	// otherwise set the device on the source element
@@ -74,12 +76,14 @@ static void sourceSetup(void* bin, GstElement* src, QString* opticaldrive)
 GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 {
 	// members
-	tracklist.clear();
+	mediatype = MBMP_GI::NotPlaying;	// the type of media playing
 	vismap.clear();
 	streammap.clear();
 	mainwidget = qobject_cast<QWidget*>(parent);
 	opticaldrive.clear();
-	tagmap_cd.clear();
+	tracklist.clear();
+	map_md_cd.clear();				// map containing CD metadata
+	map_md_dvd.clear();				// map containing DVD metadata
 	b_positionenabled = true;	// this will be set to false if we fail getting the stream position.
 														// Checked at the top of queryStreamPosition so we don't flood the logs
 														// or the display with failed position messages									
@@ -97,9 +101,8 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 	// Create the playbin bus
 	bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline_playbin));
 	
-	////////////TESTING////////////////////////////
 	// Monitor the playbin source-setup signal
-	 g_signal_connect (GST_ELEMENT(pipeline_playbin), "source-setup", G_CALLBACK (&sourceSetup), &opticaldrive);
+	g_signal_connect (GST_ELEMENT(pipeline_playbin), "source-setup", G_CALLBACK (&sourceSetup), &opticaldrive);
 	
 	// Start a timer to monitor the bus
   timer = new QTimer(this);
@@ -151,14 +154,14 @@ int GST_Interface::checkCD(QString dev)
 {
 	// set the optical device and clear CD tag map
 	opticaldrive = dev;
-	tagmap_cd.clear();
+	map_md_cd.clear();
 	
 	// Create an audiocd pipeline.  
   GstElement* source;
   GstElement* sink;	
   GstElement* pipeline_audiocd;
   source = gst_element_factory_make ("cdparanoiasrc", "cd_source");
-	g_object_set (G_OBJECT (source), "device", opticaldrive.toLocal8Bit().data(), NULL);
+	g_object_set (G_OBJECT (source), "device", qPrintable(opticaldrive), NULL);
   sink = gst_element_factory_make ("fakesink", "cd_sink");  
   pipeline_audiocd = gst_pipeline_new ("audiocd");
   
@@ -212,13 +215,14 @@ int GST_Interface::checkDVD(QString dev)
 {
 	// set the optical device and clear the dvd tag map
 	opticaldrive = dev;
+	map_md_dvd.clear();
 
 	// Create a dvd pipeline.  
   GstElement* source;
   GstElement* sink;	
   GstElement* pipeline_dvd;
   source = gst_element_factory_make ("dvdreadsrc", "dvd_source");
-	g_object_set (G_OBJECT (source), "device", opticaldrive.toLocal8Bit().data(), NULL);
+	g_object_set (G_OBJECT (source), "device", qPrintable(opticaldrive), NULL);
   sink = gst_element_factory_make ("fakesink", "dvd_sink");  
   pipeline_dvd = gst_pipeline_new ("dvd");
   
@@ -256,6 +260,8 @@ int GST_Interface::checkDVD(QString dev)
 	// Clean up
 	gst_element_set_state (pipeline_dvd, GST_STATE_NULL);
 	gst_object_unref (GST_OBJECT (pipeline_dvd)); 
+	
+	// So far so go, return no error
 	return 0;
 }
 
@@ -265,9 +271,14 @@ int GST_Interface::checkDVD(QString dev)
 // stream.
 void GST_Interface::playMedia(WId winId, QString uri, int track)
 {
-	// if we need to seek in a currently playing disk
+	// if we need to seek in a currently playing disk (CD or DVD)
 	if (track > 0 ) {
-		gst_element_seek_simple(pipeline_playbin, gst_format_get_by_nick("track"), (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SKIP) , track - 1);	
+		if (uri.contains("cdda", Qt::CaseInsensitive)) {
+			gst_element_seek_simple(pipeline_playbin, gst_format_get_by_nick("track"), (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SKIP) , track - 1);	
+		}
+		else if (uri.contains("dvd", Qt::CaseInsensitive)) {
+			gst_element_seek_simple(pipeline_playbin, gst_format_get_by_nick("chapter"), (GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SKIP) , track);
+		}
 	}
 	
 	// else need to set a new media source
@@ -278,6 +289,12 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 		// Set the media source. The device is set in checkCD
 		g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(uri), NULL);
 		
+		// Set our media type variable
+		if (uri.startsWith("cdda://", Qt::CaseInsensitive)) mediatype = MBMP_GI::CD;
+		else if (uri.startsWith("dvd://", Qt::CaseInsensitive)) mediatype = MBMP_GI::DVD;
+			else if (uri.startsWith("http://", Qt::CaseInsensitive) || uri.startsWith("ftp://", Qt::CaseInsensitive)) mediatype = MBMP_GI::URL;
+				else	mediatype = MBMP_GI::File;
+
 		// Set the video overlay and allow it to handle navagation events
 		gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(pipeline_playbin), winId);
 		gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), TRUE);                
@@ -427,27 +444,7 @@ QString GST_Interface::getAudioStreamInfo()
 				if (gst_tag_list_get_uint (tags, GST_TAG_BITRATE, &rate)) {
 					s.append(tr("Bitrate: %1<br>").arg(rate));
 				}
-				
-				// While we are here extract some media tags if present.
-				// Set the title of the main player window using the tags
-				// or our fallback string if tags are not found.
-				QString qs_title = QString();
-				QString qs_artist = QString();
-				if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
-					if (str) qs_title = QString(str);
-					else qs_title.clear();
-					g_free (str);
-				}
-				
-				if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
-					if (str) qs_artist = QString(str);
-					else qs_artist.clear();
-					g_free (str);
-				}
-				if (qs_title.isEmpty() ) mainwidget->setWindowTitle(WINDOW_TITLE);
-				else mainwidget->setWindowTitle(QString("%1 - %2").arg(qs_title).arg(qs_artist) );
-				
-				// side trip to window title is over, now back to business
+	
 				s.append("<br>");
 				gst_tag_list_free (tags);
 				if (i == streammap["current-audio"] ) s.append("</b>");
@@ -554,7 +551,7 @@ void GST_Interface::mouseNavEvent(QString event, int button, int x, int y)
 	if (! nav) return;
 	
 	// inject the mouse event data into the stream
-	gst_navigation_send_mouse_event(nav, event.toLocal8Bit().data(), button, static_cast<double>(x), static_cast<double>(y));
+	gst_navigation_send_mouse_event(nav, qPrintable(event), button, static_cast<double>(x), static_cast<double>(y));
 	
 	return;
 }
@@ -801,6 +798,7 @@ void GST_Interface::pollGstBus()
 			case GST_MESSAGE_TOC: {
 				GstToc* toc;
 				gboolean updated = false;
+				
 				// parse the TOC
 				gst_message_parse_toc (msg, &toc, &updated);
 					
@@ -822,7 +820,6 @@ void GST_Interface::pollGstBus()
 					}	// if
 					else {
 						emit busMessage(MBMP_GI::TOC, QString(tr("Received a new table of contents for the media.")) );
-						g_list_free(entry);
 					}	// else
 				}	// else
 							
@@ -833,46 +830,149 @@ void GST_Interface::pollGstBus()
 			// we have not implemented these as of yet, so for now just send a notification
 			// to PlayerCtl that we got a tag
 			case GST_MESSAGE_TAG: {
-				emit busMessage(MBMP_GI::Tag, QString(tr("Stream contains tag information.")) );
-							
-				gchar* str;
+				gchar* str = NULL;
 				guint num = 0;
-				GstTagList* tags = 0;
+				GstTagList* tags = NULL;
 				gst_message_parse_tag (msg, &tags);
 				
-				// Get Audio CD tags. tagmap_cd has already been cleared in function check_CD 
-				// May need a new emit when we actually want to use some of this data
-				if (!tagmap_cd.contains(GST_TAG_CDDA_CDDB_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID, &str)) {
-					tagmap_cd[GST_TAG_CDDA_CDDB_DISCID] = QString(str);
-					g_free (str);
-				}
-				if (!tagmap_cd.contains(GST_TAG_CDDA_CDDB_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID_FULL, &str)) {
-					tagmap_cd[GST_TAG_CDDA_CDDB_DISCID_FULL] = QString(str);
-					g_free (str);
-				}
-				if (!tagmap_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID, &str)) {
-					tagmap_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID] = QString(str);
-					g_free (str);
-				}
-				if (!tagmap_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL, &str)) {
-					tagmap_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL] = QString(str);
-					g_free (str);
-				}
-				if (!tagmap_cd.contains(GST_TAG_TRACK_COUNT) && gst_tag_list_get_uint (tags, GST_TAG_TRACK_COUNT, &num)) {
-					tagmap_cd[GST_TAG_TRACK_COUNT] = num;
-					num = 0;
-				}
-
-				gst_tag_list_free (tags);
-				break; }
+				// Get tags and emit a message listing the tags we've got with their values
+				str = gst_tag_list_to_string(tags);
+				emit busMessage(MBMP_GI::Tag, QString(tr("Stream contains this taglist: %1")).arg(QString(str)) );
+				g_free(str);
+				
+				// Process tags appropriate to each media type
+				switch (mediatype) {
+					case MBMP_GI::CD: {
+						// Get Audio CD tags. map_md_cd has already been cleared in function check_CD 
+						// May need a new emit when we actually want to use some of this data, which right now we don't.
+						if (!map_md_cd.contains(GST_TAG_CDDA_CDDB_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID, &str)) {
+							map_md_cd[GST_TAG_CDDA_CDDB_DISCID] = QString(str);
+							g_free (str);
+						}
+						if (!map_md_cd.contains(GST_TAG_CDDA_CDDB_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID_FULL, &str)) {
+							map_md_cd[GST_TAG_CDDA_CDDB_DISCID_FULL] = QString(str);
+							g_free (str);
+						}
+						if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID, &str)) {
+							map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID] = QString(str);
+							g_free (str);
+						}
+						if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL, &str)) {
+							map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL] = QString(str);
+							g_free (str);
+						}
+						if (!map_md_cd.contains(GST_TAG_TRACK_COUNT) && gst_tag_list_get_uint (tags, GST_TAG_TRACK_COUNT, &num)) {
+							map_md_cd[GST_TAG_TRACK_COUNT] = num;
+							num = 0;
+						}
+						if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &num)) {
+							if (num != map_md_cd.value(GST_TAG_TRACK_NUMBER)) {
+								map_md_cd[GST_TAG_TRACK_NUMBER] = num;
+								mainwidget->setWindowTitle(tr("Audio CD - Track %1").arg(map_md_cd.value(GST_TAG_TRACK_NUMBER).toString()) );					
+							}	// if we have a new track number
+							num = 0;
+						}
+						break; }	// cd case
+				
+					case MBMP_GI::DVD: {
+						// Get DVD tags. map_md_dvd has already been cleared in function check_DVD. 
+						// As with Audio CD we don't really do much with any of this (yet)
+							if (!map_md_dvd.contains(GST_TAG_VIDEO_CODEC) && gst_tag_list_get_string (tags, GST_TAG_VIDEO_CODEC, &str)) {
+								map_md_dvd[GST_TAG_VIDEO_CODEC] = QString(str);
+								g_free (str);
+							}
+							if (!map_md_dvd.contains(GST_TAG_MINIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MINIMUM_BITRATE, &num)) {
+								map_md_dvd[GST_TAG_MINIMUM_BITRATE] = num;
+								num = 0;
+							}
+							if (!map_md_dvd.contains(GST_TAG_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_BITRATE, &num)) {
+								map_md_dvd[GST_TAG_BITRATE] = num;
+								num = 0;
+							}
+							if (!map_md_dvd.contains(GST_TAG_MAXIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MAXIMUM_BITRATE, &num)) {
+								map_md_dvd[GST_TAG_MAXIMUM_BITRATE] = num;
+								num = 0;
+							}
+							if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+								if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
+									map_md_dvd[GST_TAG_TITLE] = QString(str);
+									mainwidget->setWindowTitle(map_md_dvd.value(GST_TAG_TITLE).toString());
+									g_free (str);
+								}	// if we have a new title
+							}	// if we have a new DVD title
+							
+							// not actually tag information, but see if we can extract some metadata from the dvd stream
+							gint64 chaptercount = 0;
+							gint64 currentchapter = 0;
+							GstFormat fmt = gst_format_get_by_nick("chapter");
+							if (gst_element_query_position(pipeline_playbin, fmt, &currentchapter) ) {
+								if (map_md_dvd.value("currentchapter") != static_cast<int>(currentchapter))  {
+									map_md_dvd["currentchapter"] = static_cast<int>(currentchapter);
+									currentchapter = 0;
+								}	// if there is a new chapter
+							}	// if we could extract the chapter								
+							if (gst_element_query_duration(pipeline_playbin, fmt, &chaptercount) ) {
+								if (map_md_dvd.value("chaptercount") != static_cast<int>(chaptercount))  {
+									map_md_dvd["chaptercount"] = static_cast<int>(chaptercount);
+									emit busMessage(MBMP_GI::TagCL, QString(tr("DVD chapter count changed to %1")).arg(map_md_dvd.value("chaptercount").toInt()) );
+									chaptercount = 0;
+								}	// if there is a new chaptercount
+							}	// if we could extract the chaptercount
+											
+							gint64 currenttitle = 0;
+							gint64 titlecount = 0;
+							fmt = gst_format_get_by_nick("title");
+							if (gst_element_query_position(pipeline_playbin, fmt, &currenttitle) ) {
+								if (map_md_dvd.value("currenttitle") != static_cast<int>(currenttitle))  {
+									map_md_dvd["currenttitle"] = static_cast<int>(currenttitle);
+									currenttitle = 0;
+								}	// if there is a new currenttitle
+							}	// if we could extract the currenttitle								
+							if (gst_element_query_duration(pipeline_playbin, fmt, &titlecount) ) {
+								if (map_md_dvd.value("titlecount") != static_cast<int>(titlecount))  {
+									map_md_dvd["titlecount"] = static_cast<int>(titlecount);
+									titlecount = 0;
+								}	// if there is a new titlecount
+							}	// if we could extract the titlecount 					
+						break; }	// dvd case
+						
+					default: {	
+						// if we are not playing a CD or DVD try to get title and artist to set the player
+						// window title
+						if (map_md_cd.isEmpty() && map_md_dvd.isEmpty() ) {
+							QString qs_title = QString();
+							QString qs_artist = QString();
+							if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+								if (str) qs_title = QString(str);
+								else qs_title.clear();
+								g_free (str);
+							}			
+							if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
+								if (str) qs_artist = QString(str);
+								else qs_artist.clear();
+								g_free (str);
+							}
+							if (qs_title.isEmpty() ) mainwidget->setWindowTitle(WINDOW_TITLE);
+							else {
+								if (qs_artist.isEmpty() )
+									mainwidget->setWindowTitle(QString("%1").arg(qs_title) );
+								else
+									mainwidget->setWindowTitle(QString("%1 - %2").arg(qs_title).arg(qs_artist) );
+							}	// else
+						}	// if both maps are empty (were're playing something other than a CD or DVD)
+						break; }	// default media type case
+					}	// mediatype switch
+					
+				gst_tag_list_free (tags);	
+				break; }	// GST_TAG case
 				
 			default:
 				emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message")) );
 		}	// GST_MESSAGE switch
-			
-		gst_message_unref(msg);
+		
+		gst_message_unref(msg); 	
 		msg = (GstMessage*)(gst_bus_pop_filtered(bus, (GstMessageType)(msgtypes)) );		
-	}	// while loop 
+	}	// while loop
 		
 	return;
 }
@@ -917,7 +1017,12 @@ void GST_Interface::playerStop()
 	
 	// reset data elements
 	opticaldrive.clear();
-	tagmap_cd.clear();
+	map_md_cd.clear();
+	map_md_dvd.clear();
+	mediatype = MBMP_GI::NotPlaying;	
+	
+	// reset the window title
+	mainwidget->setWindowTitle(WINDOW_TITLE);
 	
 	return;
 }

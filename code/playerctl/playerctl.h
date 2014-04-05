@@ -37,6 +37,7 @@ class PlayerControl : public QDialog
 		void initializeCD();
 		void initializeDVD();
 		void playMedia(QAction* act = 0);
+		void stopPlaying();
 		void seekToPosition(QAction*);
 		void playPause();
 		void toggleFullScreen();
@@ -78,6 +79,7 @@ class PlayerControl : public QDialog
   // functions
 		QString readTextFile(const char*);
 		void makeTrackList(const QList<TocEntry>&);  
+		void makeChapterList(int);
 
 };
 

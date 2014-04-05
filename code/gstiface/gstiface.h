@@ -58,12 +58,19 @@ namespace MBMP_GI
 		TOC					= 0x0b,		// a table of contents
 		TOCTL				= 0x0c,		// a table of contents with a new track list	
 		Tag					= 0x0d,		// received a TAG message
+		TagCL				=	0x0e,		// received a TAG and extracted a new chapter list
 		Unhandled		= 0x2f,		// an unhandled message
 		// return codes
 		NoCDPipe		= 0x31,		// not able to create an Audio CD pipe
 		BadCDRead		= 0x32,		// can't read the CD
 		NoDVDPipe		= 0x33,		// not able to create a DVD pipe
-		BadDVDRead	= 0x34,		// can't read the DVD
+		BadDVDRead	= 0x34,		// can't read the DVD	
+		// media types
+		NotPlaying	= 0x00,		// not playing anything
+		File				= 0x01,		// a local media file
+		URL					= 0x02, 	// a remote file
+		CD					= 0x03,		// an audio cd
+		DVD					= 0x04,		// a dvd
   };
 } // namespace MBMP_GI
 
@@ -115,6 +122,8 @@ class GST_Interface : public QObject
 		inline QList<QString> getVisualizerList() {return vismap.keys();}
 		inline QList<TocEntry> getTrackList() {return tracklist;}
 		inline QMap<QString, int> getStreamMap() {return streammap;} 
+		inline int getChapterCount() {return map_md_dvd.value("chaptercount").toInt();}
+		inline int getCurrentChapter() {return map_md_dvd.value("currentchapter").toInt();}
 				
 		public slots:
 		void mouseNavEvent(QString, int, int, int);
@@ -147,8 +156,10 @@ class GST_Interface : public QObject
 		QWidget* mainwidget;
 		bool b_positionenabled;
 		QList<TocEntry> tracklist;
-		QMap<QString, QVariant> tagmap_cd;
+		QMap<QString, QVariant> map_md_cd;
+		QMap<QString, QVariant> map_md_dvd;
 		QString opticaldrive;
+		int mediatype;
 		
 		// functions
 		void extractTocTrack(const GstTocEntry*);

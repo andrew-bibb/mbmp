@@ -8,6 +8,7 @@
 <li>DVD playback with navigation menus is working<li>
 <li>Can select the CD and DVD devices from ComboBoxes in the GUI</li>
 <li>Added CD and DVD device selection from the command line</li>
+<li>Chapterlist (DVD) and Tracklist (CD) properly disable and reenable ui controls<li>
 <li>Fixed escape of &lt; character when making the cheatsheet and improved the readability</li>
 </ul>
 <br>

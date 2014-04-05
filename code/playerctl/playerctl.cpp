@@ -279,7 +279,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));	
 	connect (ui.actionVisualizer, SIGNAL(triggered()), this, SLOT(popupVisualizerMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
-	connect (ui.actionPlayerStop, SIGNAL(triggered()), p_gstiface, SLOT(playerStop()));
+	connect (ui.actionPlayerStop, SIGNAL(triggered()), this, SLOT(stopPlaying()));
 	connect (ui.actionPlayerStop, SIGNAL(triggered(bool)), ui.toolButton_playpause, SLOT(setChecked(bool)));
 	connect (ui.horizontalSlider_position, SIGNAL(sliderMoved(int)), p_gstiface, SLOT(seekToPosition(int)));
 	connect (seek_group, SIGNAL(triggered(QAction*)), this, SLOT(seekToPosition(QAction*)));
@@ -435,10 +435,7 @@ void PlayerControl::initializeCD()
 	// if we are here checkCD passed, start playing the CD. This will
 	// send a TOC to the bus which will trigger filling in the tracklist.
 	p_gstiface->playMedia(videowidget->winId(), "cdda://" );
-			
-	// looks like we could read the CD so show the tracklist
-	if (playlist->isHidden()) playlist->show();
-	
+				
 	return;
 }
 
@@ -462,7 +459,7 @@ void PlayerControl::initializeDVD()
 			return;	
 	}	// switch			
 	
-	// if we are here checkDVD passed, start playing the DVD. 
+	// if we are here checkDVD passed, disable the addmedia menu and
 	p_gstiface->playMedia(videowidget->winId(), "dvd://" );
 	
 	return;
@@ -485,7 +482,7 @@ void PlayerControl::playMedia(QAction* act)
 	// Return if there is no media to play
 	if (media.isEmpty() ) return;
 	
-	// if we are playing a disk send the track to p_gstiface
+	// if we are playing a CD send the track to p_gstiface
 	if (playlist->currentItemType() == MBMP_PL::ACD) {
 		int track = 0;
 		QList<TocEntry> tracklist = p_gstiface->getTrackList();
@@ -499,13 +496,20 @@ void PlayerControl::playMedia(QAction* act)
 		p_gstiface->playMedia(videowidget->winId(), "cdda://", track);
 	}	// if we are playing a disk
 	
+	// if we are playing a DVD send the chapter to p_gstifacd 
+	else if (playlist->currentItemType() == MBMP_PL::DVD) {
+		QString itemstring = media.simplified();
+		QString chapterstring = itemstring.section(' ',1);
+		bool ok;
+		int chapter = chapterstring.toInt(&ok, 10);
+		if (ok) p_gstiface->playMedia(videowidget->winId(), "dvd://", chapter);
+	}
+	
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to p_gstiface to play the media
-		//p_gstiface->playMedia(videowidget->winId(), media);
-		/////////TESTING/////////
 		p_gstiface->playMedia(videowidget->winId(), media);
-		}	// else
+	}	// else
 	
 	// Set the stream volume to agree with the dial
 	changeVolume(ui.dial_volume->value()); 	
@@ -513,6 +517,32 @@ void PlayerControl::playMedia(QAction* act)
 	return;
 }
 
+//
+// Slot to set ui elements back to where they need to be when the user
+// chooses to stop the playback.  Also let GST_Interface know we want
+// to to stop the playback.
+void PlayerControl::stopPlaying()
+{
+	// Let p_gstiface know about it
+	p_gstiface->playerStop();
+	
+	// If we're playing a DVD
+	if (playlist->currentItemType() == MBMP_PL::DVD) {
+		playlist->clearPlaylist();
+		playlist->lockControls(false);
+	}
+	
+	// If we're playing a CD
+	else if (playlist->currentItemType() == MBMP_PL::ACD) {
+		playlist->clearPlaylist();
+		playlist->lockControls(false);
+	}
+	
+	// Disable seek ui elements
+	seek_group->setEnabled(false);
+	
+	return;
+}	
 //
 // Slot to jump to a stream position, called when a QAction is triggered
 void PlayerControl::seekToPosition(QAction* act)
@@ -677,7 +707,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					break;
 				default: // default (case 2 and above) - output everything	
 					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;			
+					if (logtofile) stream2 << msg << endl;				
 			}	// loglevel switch
 			break;
 						
@@ -812,10 +842,11 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
 			this->makeTrackList(p_gstiface->getTrackList());
+			if (playlist->isHidden()) playlist->show();
 			break;
 				
 			
-		case MBMP_GI::Tag:	// a TAG message, could include CDDB or Musicbrainz info
+		case MBMP_GI::Tag:	// a TAG message 
 			switch (loglevel) {
 				case 0: // case 0 supress output
 					break;
@@ -826,8 +857,22 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
 		break;
-			
-			
+		
+		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count
+			switch (loglevel) {
+				case 0: // case 0 supress output
+					break;
+				case 1:	// case 1 supress output
+					break;
+				default: // case 2 and above record the message
+					stream1 << msg << endl;
+					if (logtofile) stream2 << msg << endl;
+			}	// loglevel switch
+			playlist->addChapters(p_gstiface->getChapterCount(),p_gstiface->getCurrentChapter() );
+			playlist->lockControls(true);
+			if (playlist->isHidden()) playlist->show();	
+		break;
+				
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
@@ -903,7 +948,7 @@ QString PlayerControl::readTextFile(const char* textfile)
 } 
 
 //
-// Function to create a tracklist to display in the playlist Called from processBusMessages when
+// Function to create a tracklist to display in the playlist. Called from processBusMessages when
 // a new TOC with tracklist bus message is processed.
 void PlayerControl::makeTrackList(const QList<TocEntry>& tlist)
 {
@@ -935,3 +980,4 @@ void PlayerControl::makeTrackList(const QList<TocEntry>& tlist)
 	
 	return;
 }
+

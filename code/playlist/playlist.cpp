@@ -184,7 +184,7 @@ QString Playlist::getItem(const short& direction)
 	if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::File) return ui.listWidget_playlist->item(row)->text().prepend("file://");
 	else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::Url) return ui.listWidget_playlist->item(row)->text();
 		else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::ACD) return ui.listWidget_playlist->item(row)->text();
-			//else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::DVD) return ui.listWidget_playlist->item(row)->text();
+			else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::DVD) return ui.listWidget_playlist->item(row)->text();
 			
 	
 	// Default return value (should never get here)
@@ -269,18 +269,15 @@ void Playlist::addURL()
 }
 
 //
-// Slot to add tracks (for instance from an Audio CD or DVD) to the playlist.  Tracks and files/url's
+// Slot to add tracks (for instance from an Audio CD) to the playlist.  Tracks and files/url's
 // can't coexist in the playlist, so clear the playlist first.  The stringlist comes from PlayerControl
 // which creates the list from data provided by GST_Interface.
-//
-// For the time being hardcode for Audio CD.  May be able to use it for DVD, or if not rename this and
-// and create another function for DVD's
 void Playlist::addTracks(QStringList sl_tracks)
 {
 	// return if there is nothing to process
 	if (sl_tracks.size() <= 0 ) return;
 	
-	// build the tracklist entries
+	// clear the tracklist entries
 	ui.listWidget_playlist->clear();
 	
 	// set the title
@@ -294,7 +291,39 @@ void Playlist::addTracks(QStringList sl_tracks)
 	// Make the first entry current
 	ui.listWidget_playlist->setCurrentRow(0);
 	
+	// Disable adding of any other media types
+	ui.actionAddMedia->setDisabled(true);
+	ui.actionAddFiles->setDisabled(true);
+	ui.actionAddURL->setDisabled(true);
+	ui.actionAddAudio->setDisabled(true);
+	ui.actionAddVideo->setDisabled(true);
+	media_menu->setDisabled(true);
+	
 	return;
+}
+
+//
+// Slot to add dvd chapters to the playlist, as above Chapters and files/url's 
+// can't coexist in the playlist so clear the playlist first. The count comes
+// from GST_Interface via PlayerCtl
+void Playlist::addChapters(int count, int current)
+{
+	// return if count is not at least one chapter
+	if (count < 1 || current < 0 ) return;
+	
+	// clear the tracklist entries
+	ui.listWidget_playlist->clear();
+	
+	// set the title
+	this->setWindowTitle(tr("DVD - Chapters"));
+	
+	// create the entries
+	for (int i = 1; i <= count; ++i) {
+		new QListWidgetItem(tr("Chapter %1").arg(i), ui.listWidget_playlist, MBMP_PL::DVD);
+		if (i == current) ui.listWidget_playlist->setCurrentRow(i - 1);
+	} // for
+		
+	return;	
 }
 
 //
@@ -345,6 +374,25 @@ void Playlist::seedPlaylist(const QStringList& seed)
 		
 }
 
+//
+// Function to lock or unlock the playlist controls. Users can nomally 
+// drag and drop, move or delete items in the playlist.  For DVD disable
+// this since movement is mainly through menus and I have no interest 
+// in watching a movie with the chapters all out of order
+void Playlist::lockControls(bool b_lock)
+{
+	ui.checkBox_wrap->setDisabled(b_lock);
+	ui.checkBox_consume->setDisabled(b_lock);
+	ui.checkBox_random->setDisabled(b_lock);
+	ui.actionMoveUp->setDisabled(b_lock);
+	ui.actionMoveDown->setDisabled(b_lock);
+	ui.actionAddMedia->setDisabled(b_lock);
+	ui.actionRemoveItem->setDisabled(b_lock);
+	ui.actionRemoveAll->setDisabled(b_lock);
+	media_menu->setDisabled(b_lock);
+	
+}
+
 //////////////////////////// Protected Functions ////////////////////////////
 //
 //	Reimplement the QHideEvent 
@@ -371,3 +419,4 @@ void Playlist::contextMenuEvent(QContextMenuEvent* e)
 {
 	playlist_menu->popup(e->globalPos());
 }	
+

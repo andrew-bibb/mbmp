@@ -72,6 +72,7 @@ class Playlist : public QDialog
 		void addFile(QAction*);	
 		void addURL();
 		void addTracks(QStringList);
+		void addChapters(int, int);
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
@@ -79,9 +80,11 @@ class Playlist : public QDialog
 		inline void triggerAddVideo() {ui.actionAddVideo->trigger();}
 		inline void triggerAddFiles() {ui.actionAddFiles->trigger();}
 		inline int currentItemType() {return ui.listWidget_playlist->currentItem()->type();}
+		inline void clearPlaylist() {ui.listWidget_playlist->clear();}
 	
 	public:
 		void seedPlaylist(const QStringList&);
+		void lockControls(bool);
 
 	protected:
 		void hideEvent(QHideEvent*);
