@@ -388,7 +388,12 @@ void PlayerControl:: setDurationWidgets(int duration, bool seek_enabled)
 		ui.label_duration->setText(t.toString("HH:mm:ss") );
 		ui.horizontalSlider_position->setMaximum(duration);
 		ui.horizontalSlider_position->setEnabled(seek_enabled);
-		seek_group->setEnabled(seek_enabled);
+		// we are playing a DVD enable seeking only after we've got a chapter
+		if (p_gstiface->getMediaType() == MBMP_GI::DVD) {
+			if (p_gstiface->getCurrentChapter() > 0 ) seek_group->setEnabled(seek_enabled);
+		}
+		else 
+			seek_group->setEnabled(seek_enabled);
 	}
 	// duration is negative, for instance we just stopped the stream,
 	else {
@@ -559,26 +564,30 @@ void PlayerControl::playMedia(QAction* act)
 // to to stop the playback.
 void PlayerControl::stopPlaying()
 {
-	// Let p_gstiface know about it
-	p_gstiface->playerStop();
+	// save the current media type before we reset it in the next line
+	int mt = p_gstiface->getMediaType();
+	
+	// Let p_gstiface know about it, this will set the playerstate to NULL
+	p_gstiface->playerStop();	
 	
 	// If we're playing a DVD
-	if (playlist->currentItemType() == MBMP_PL::DVD) {
+	if (mt == MBMP_GI::DVD) {
 		playlist->clearPlaylist();
 		playlist->lockControls(false);
 	}
 	
 	// If we're playing a CD
-	else if (playlist->currentItemType() == MBMP_PL::ACD) {
+	else if (mt == MBMP_GI::CD) {
 		playlist->clearPlaylist();
 		playlist->lockControls(false);
 	}
-	
-	// Disable seek ui elements
-	seek_group->setEnabled(false);
+		
+	// Set duration labels to zero, will also disable seek ui elements
+	this->setDurationWidgets(-1);
 	
 	return;
 }	
+
 //
 // Slot to jump to a stream position, called when a QAction is triggered
 void PlayerControl::seekToPosition(QAction* act)
