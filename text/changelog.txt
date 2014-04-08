@@ -1,7 +1,7 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>No Date</b>
+<b>8 April 2014 - Major Elements complete</b>
 <ul>
 <li>Added command line option to specify network connection speed</li>
 <li>Audio CD playback working</li>
@@ -13,7 +13,7 @@
 <li>Fixed escape of &lt; character when making the cheatsheet and improved the readability</li>
 </ul>
 <br>
-<b>9 March 2014 - </b>Initial Version
+<b>9 March 2014 - Initial Version</b>
 <ul>
 <li>Basic media playback and controls are functional</li>
 <li>Playlist is functional</li>

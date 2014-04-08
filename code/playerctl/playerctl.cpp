@@ -135,7 +135,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(ui.actionAVSync);
 	this->addAction(ui.actionColorBalance);
 	this->addAction(ui.actionAudioCD);
+	this->ui.toolButton_cd->setDefaultAction(ui.actionAudioCD);
 	this->addAction(ui.actionDVD);
+	this->ui.toolButton_dvd->setDefaultAction(ui.actionDVD);
 	this->addAction(ui.actionDVDBackOneMenu);
 	this->addAction(ui.actionDVDTitleMenu);
 	this->addAction(ui.actionDVDRootMenu);
