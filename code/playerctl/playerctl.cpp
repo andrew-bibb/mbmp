@@ -521,10 +521,17 @@ void PlayerControl::playMedia(QAction* act)
 	
 	// Get the media from the playlist
 	QString media = playlist->getItem(direction);
-	
+		
 	// Return if there is no media to play
-	if (media.isEmpty() ) return;
+	if (media.isEmpty() ) {
+		ui.toolButton_playpause->setChecked(true);
+		return;
+	}
 	
+	// Make sure playpause is checked, a double click in the playlist will
+	// come here directly so handle that case
+	ui.toolButton_playpause->setChecked(true);
+		
 	// if we are playing a CD send the track to p_gstiface
 	if (playlist->currentItemType() == MBMP_PL::ACD) {
 		int track = 0;
