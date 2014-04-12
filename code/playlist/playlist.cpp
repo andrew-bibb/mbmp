@@ -365,12 +365,23 @@ void Playlist::moveItemDown()
 ////////////////////////////// Public Functions ////////////////////////////
 //
 //	Function to seed the playlist (called from the playerctl constructor)
-void Playlist::seedPlaylist(const QStringList& seed)
+void Playlist::seedPlaylist(const QStringList& sl_seed)
 {
-	ui.listWidget_playlist->insertItems(0, seed);
-	
-	return;
+	// Assume url's are good, for files check to make sure we can find it before we add it
+	for (int i = 0; i < sl_seed.size(); ++i) {
+		if (sl_seed.at(i).startsWith("ftp", Qt::CaseInsensitive) || sl_seed.at(i).startsWith("http", Qt::CaseInsensitive)) {
+			new QListWidgetItem(sl_seed.at(i), ui.listWidget_playlist, MBMP_PL::Url);
+		}	// if
 		
+		else {
+			QFileInfo fi = sl_seed.at(i);
+			if (fi.exists()) {
+				new QListWidgetItem(fi.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
+			}	// if fileinfo exists
+		}	// else does not start with ftp or http
+	}	// for
+	
+	return;	
 }
 
 //
