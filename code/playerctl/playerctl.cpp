@@ -246,6 +246,16 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	control_menu->addAction(ui.actionAbout);
 	control_menu->addAction(ui.actionQuit);
 	
+	// create the options menu
+	options_menu = new QMenu(this);
+	QAction* act = optons_menu->addAction(tr("Subtitles"));
+	act->setCheckable(true);
+	act->setChecked(parser.isSet("subtitles"));
+	act = optons_menu->addAction(tr("Visualizer"));
+	act->setCheckable(true);
+	act->setChecked(parser.isSet("visualizer"));
+	
+	
 	// now assign the shortcuts to each action
 	ui.actionTogglePlaylist->setShortcuts(getShortcuts("cmd_playlist"));
 	ui.actionToggleStreamInfo->setShortcuts(getShortcuts("cmd_streaminfo"));
@@ -524,13 +534,13 @@ void PlayerControl::playMedia(QAction* act)
 		
 	// Return if there is no media to play
 	if (media.isEmpty() ) {
-		ui.toolButton_playpause->setChecked(true);
+		ui.actionPlayPause->setChecked(false);
 		return;
 	}
 	
 	// Make sure playpause is checked, a double click in the playlist will
 	// come here directly so handle that case
-	ui.toolButton_playpause->setChecked(true);
+	ui.actionPlayPause->setChecked(true);
 		
 	// if we are playing a CD send the track to p_gstiface
 	if (playlist->currentItemType() == MBMP_PL::ACD) {

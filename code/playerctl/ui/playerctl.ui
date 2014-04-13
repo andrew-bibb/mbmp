@@ -63,7 +63,7 @@
       <property name="bottomMargin">
        <number>2</number>
       </property>
-      <item row="0" column="2">
+      <item row="0" column="1">
        <widget class="QLabel" name="label_position">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream position&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -211,7 +211,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
+      <item row="1" column="1">
        <widget class="QLabel" name="label_duration">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream duration&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -305,9 +305,29 @@
           </property>
          </widget>
         </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_options">
+          <property name="text">
+           <string>Options</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
-      <item row="0" column="3" rowspan="3">
+      <item row="0" column="2" rowspan="3">
        <widget class="QDial" name="dial_volume">
         <property name="enabled">
          <bool>true</bool>
@@ -950,5 +970,22 @@
  <resources>
   <include location="../../../mbmp.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>toolButton_playpause</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButton_options</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>327</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>544</x>
+     <y>307</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

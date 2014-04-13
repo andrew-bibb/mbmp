@@ -51,7 +51,7 @@ KeyMap::KeyMap(QObject* parent) : QObject(parent)
 	
 	// Read the local file, if the returned stringlist is empty, meaning
 	// we could not read the file, fallback to the hardcoded conf file.
-	QStringList sl_rawdata = readTextFile(qPrintable(filepath + "/mbmp.conf"));
+	QStringList sl_rawdata = readTextFile(qPrintable(QString(filepath + "/%1.conf").arg(QString(PROGRAM_NAME).toLower())) );
 	if (sl_rawdata.isEmpty()) QStringList sl_rawdata = readTextFile(":/text/text/mbmp.conf");
 	
 	// set up the usermap
@@ -115,15 +115,13 @@ QString KeyMap::getCheatSheet()
 void KeyMap::makeLocalFile()
 {
 	// if the conf file exists return now
-	QFile f(filepath + "/mbmp.conf");
+	QFile f(QString(filepath + "/%1.conf").arg(QString(PROGRAM_NAME).toLower()) );
 	if (f.exists() ) return;
 
 	// make the directory if it does not exist and copy the hardconded
 	// conf file to the directory
 	QDir d;
-	qDebug() << "file path: " << filepath;
 	if (d.mkpath(filepath)) {
-		qDebug() << "inside mkdir if";
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return;
 		
 		// copy the file line by line

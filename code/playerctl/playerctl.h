@@ -71,6 +71,7 @@ class PlayerControl : public QDialog
 		QMenu* control_menu;
 		QMenu* vis_menu;
 		QMenu* advanced_menu;
+		QMenu* options_menu;
 		QCursor ncurs;
 		QFile logfile;
 		int loglevel;
