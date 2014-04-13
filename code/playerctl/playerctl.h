@@ -53,7 +53,9 @@ class PlayerControl : public QDialog
 		void processBusMessages(int, QString);
 		void changeVolumeDialStep(QAction*);
 		void popupVisualizerMenu();
+		void popupOptionsMenu();
 		void changeVisualizer(QAction*);
+		void changeOptions(QAction*);
 
 	protected:
 		void contextMenuEvent(QContextMenuEvent*);		
@@ -77,6 +79,8 @@ class PlayerControl : public QDialog
 		int loglevel;
 		QMessageBox* chtsht;
 		VideoWidget* videowidget;
+		QAction* action_vis;
+		QAction* action_sub;
   
   // functions
 		QString readTextFile(const char*);

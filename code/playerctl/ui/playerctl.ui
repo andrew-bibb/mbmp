@@ -319,9 +319,9 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_options">
+         <widget class="QToolButton" name="toolButton_options">
           <property name="text">
-           <string>Options</string>
+           <string/>
           </property>
          </widget>
         </item>
@@ -966,26 +966,21 @@
     <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
+  <action name="actionOptions">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/configure.png</normaloff>:/images/images/16x16/configure.png</iconset>
+   </property>
+   <property name="text">
+    <string>Options</string>
+   </property>
+   <property name="toolTip">
+    <string>Enable or disable player options</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../../../mbmp.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>toolButton_playpause</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButton_options</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>327</x>
-     <y>262</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>544</x>
-     <y>307</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

@@ -150,6 +150,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(ui.actionDVDUp);
 	this->addAction(ui.actionDVDDown);
 	this->addAction(ui.actionDVDActivate);
+	this->addAction(ui.actionOptions);
+	this->ui.toolButton_options->setDefaultAction(ui.actionOptions);
 	
 	// add actions to action groups
 	playlist_group = new QActionGroup(this);	
@@ -208,6 +210,19 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	advanced_menu->addAction(ui.actionAVSync);
 	advanced_menu->addAction(ui.actionColorBalance);
 	advanced_menu->setDisabled(true);
+	
+	// create the options menu.  Actions are class members because we
+	// need to access them in slot changeOptions, but they are not diectly
+	// accessable from the ui (so not defined from there)
+	options_menu = new QMenu(this);
+	options_menu->setTitle(ui.actionOptions->text());
+	options_menu->setIcon(ui.actionOptions->icon());
+	action_vis = options_menu->addAction(tr("Visualizer"));
+	action_vis->setCheckable(true);
+	action_vis->setChecked(parser.isSet("visualizer"));		
+	action_sub = options_menu->addAction(tr("Subtitles"));
+	action_sub->setCheckable(true);
+	action_sub->setChecked(parser.isSet("subtitles"));
 			
 	// create the control_menu
 	control_menu = new QMenu(this);
@@ -243,18 +258,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	control_menu->addAction(ui.actionVolumeDecreaseStep);
 	control_menu->addAction(ui.actionToggleMute);
 	control_menu->addSeparator();
+	control_menu->addMenu(options_menu);
 	control_menu->addAction(ui.actionAbout);
-	control_menu->addAction(ui.actionQuit);
-	
-	// create the options menu
-	options_menu = new QMenu(this);
-	QAction* act = optons_menu->addAction(tr("Subtitles"));
-	act->setCheckable(true);
-	act->setChecked(parser.isSet("subtitles"));
-	act = optons_menu->addAction(tr("Visualizer"));
-	act->setCheckable(true);
-	act->setChecked(parser.isSet("visualizer"));
-	
+	control_menu->addAction(ui.actionQuit);	
 	
 	// now assign the shortcuts to each action
 	ui.actionTogglePlaylist->setShortcuts(getShortcuts("cmd_playlist"));
@@ -303,6 +309,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionDVDUp->setShortcuts(getShortcuts("cmd_dvd_up"));
 	ui.actionDVDDown->setShortcuts(getShortcuts("cmd_dvd_down"));
 	ui.actionDVDActivate->setShortcuts(getShortcuts("cmd_dvd_activate"));
+	ui.actionOptions->setShortcuts(getShortcuts("cmd_options"));
 	
   // connect signals to slots 
   connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
@@ -318,6 +325,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionShowLicense, SIGNAL (triggered()), this, SLOT(showLicense())); 
 	connect (ui.actionShowChangeLog, SIGNAL (triggered()), this, SLOT(showChangeLog()));
 	connect (ui.actionPlayPause, SIGNAL (triggered()), this, SLOT(playPause()));
+	connect (ui.toolButton_playpause, SIGNAL(toggled(bool)), options_menu, SLOT(setDisabled(bool)));
 	connect (playlist_group, SIGNAL(triggered(QAction*)), this, SLOT(playMedia(QAction*)));
 	connect (p_gstiface, SIGNAL(busMessage(int, QString)), this, SLOT(processBusMessages(int, QString)));
 	connect (ui.actionAddMedia, SIGNAL (triggered()), playlist, SLOT(addMedia()));
@@ -325,6 +333,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (volume_group, SIGNAL(triggered(QAction*)), this, SLOT(changeVolumeDialStep(QAction*)));
 	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));	
 	connect (ui.actionVisualizer, SIGNAL(triggered()), this, SLOT(popupVisualizerMenu()));
+	connect (ui.actionOptions, SIGNAL(triggered()), this, SLOT(popupOptionsMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
 	connect (ui.actionPlayerStop, SIGNAL(triggered()), this, SLOT(stopPlaying()));
 	connect (ui.actionPlayerStop, SIGNAL(triggered(bool)), ui.toolButton_playpause, SLOT(setChecked(bool)));
@@ -334,6 +343,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionAudioCD, SIGNAL (triggered()), this, SLOT(initializeCD()));
 	connect (ui.actionDVD, SIGNAL (triggered()), this, SLOT(initializeDVD()));
 	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), p_gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
+	connect (options_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeOptions(QAction*)));
 	
 	// create actions to accept a selected few playlist and p_gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -519,7 +529,10 @@ void PlayerControl::initializeDVD()
 }
 
 // Slot to query the playlist for the next media item, and then send
-// it to p_gstiface to play it.
+// it to p_gstiface to play it.  There are two ways into this, primary way
+// is when ui.actionPlayPause is toggled.  It is also called from playlist
+// when a playlist item is double clicked.  This bypasses the action so
+// we need to keep the action in sync with setChecked
 void PlayerControl::playMedia(QAction* act)
 {
 	// Figure out which way we want to go in the playlist
@@ -1015,6 +1028,16 @@ void PlayerControl::popupVisualizerMenu()
 }
 
 //
+// Slot to popup the options menu, called when the options action shortcut
+// is triggered
+void PlayerControl::popupOptionsMenu()
+{
+	options_menu->popup(QCursor::pos());
+	
+	return;
+}
+
+//
 // Slot to select or change the audio visualizer. Extract the visualizer
 // name from the QAction and send it to p_gstiface. 
 void PlayerControl::changeVisualizer(QAction* act)
@@ -1025,6 +1048,19 @@ void PlayerControl::changeVisualizer(QAction* act)
 	return;
 }
 
+//
+// Slot to change the player options.  
+void PlayerControl::changeOptions(QAction* act)
+{
+	QString opt = act->text();
+	
+	if (act == action_vis)
+		p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, act->isChecked() );
+	else if (act == action_sub)
+		p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, act->isChecked() );  
+	
+	return;
+}
 
 ////////////////////////////// Protected Functions ////////////////////////////
 //
