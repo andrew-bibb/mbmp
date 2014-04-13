@@ -212,8 +212,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	advanced_menu->setDisabled(true);
 	
 	// create the options menu.  Actions are class members because we
-	// need to access them in slot changeOptions, but they are not diectly
-	// accessable from the ui (so not defined from there)
+	// need to access them in the slot changeOptions, but they are not
+	// directly accessable from the ui (so they are not defined from there)
 	options_menu = new QMenu(this);
 	options_menu->setTitle(ui.actionOptions->text());
 	options_menu->setIcon(ui.actionOptions->icon());
