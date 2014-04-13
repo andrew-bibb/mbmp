@@ -53,8 +53,10 @@ class KeyMap : public QObject
   private:
 		// members 
 		QMap<QString, QList<QKeySequence> > usermap;
+		QString filepath;
 	       
-	// functions  
+	// functions
+		void makeLocalFile();
 		QStringList readTextFile(const char*);
 
 };

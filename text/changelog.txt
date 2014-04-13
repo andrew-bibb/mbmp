@@ -12,6 +12,7 @@
 <li>DVD keyboard navigation</li>
 <li>Fixed escape of &lt; character when making the cheatsheet and improved the readability</li>
 <li>Check to make sure file names supplied on the command line exist before they are added to the playlist, and convert names (which may be relative) to full canonical path names</li>
+<li>Create a config file in the user's home directory</li>
 </ul>
 <br>
 <b>9 March 2014 - Initial Version</b>
@@ -27,7 +28,6 @@
 <li>Still a problem with dvd keyboard navigation, seems to loose where it is</li>
 <li>Add libquvi support to parse YouTube and similar URL's</li>
 <li>Need a proper man page</li>
-<li>Need to have config file in the user's home directory</li>
 <li>Improve buffering from real bad internet connections</li>
 <li>Color balance adjustments</li>
 <li>Modifiy playback speed<li>

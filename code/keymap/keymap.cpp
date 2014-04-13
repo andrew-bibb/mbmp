@@ -26,11 +26,14 @@ DEALINGS IN THE SOFTWARE.
 ***********************************************************************/ 
 
 # include "./code/keymap/keymap.h"	
+# include "./code/resource.h"
 
 # include <QtCore/QDebug>
 # include <QTextStream>
 # include <QFile>
 # include <QRegExp>
+# include <QDir>
+# include <QFile>
 
 
 KeyMap::KeyMap(QObject* parent) : QObject(parent)
@@ -38,8 +41,20 @@ KeyMap::KeyMap(QObject* parent) : QObject(parent)
 	// setup the user key map
 	usermap.clear();
 	
-	// set up the user map.  Default mapping is from the resource file
-	QStringList sl_rawdata = readTextFile(":/text/text/mbmp.conf");
+	// set the filepath data member
+	// PROGRAM_NAME defined in resource.h
+	filepath = QDir::homePath();
+	filepath.append(QString("/.config/%1").arg(QString(PROGRAM_NAME).toLower()) );
+
+	// make the local conf file if necessary
+	this->makeLocalFile();
+	
+	// Read the local file, if the returned stringlist is empty, meaning
+	// we could not read the file, fallback to the hardcoded conf file.
+	QStringList sl_rawdata = readTextFile(qPrintable(filepath + "/mbmp.conf"));
+	if (sl_rawdata.isEmpty()) QStringList sl_rawdata = readTextFile(":/text/text/mbmp.conf");
+	
+	// set up the usermap
 	for (int i =0; i < sl_rawdata.size(); ++i) {
 		QString s = sl_rawdata.at(i);
 		s = s.simplified();
@@ -76,7 +91,6 @@ QList<QKeySequence> KeyMap::getKeySequence(const QString& cmd)
 QString KeyMap::getCheatSheet()
 {
 	QString s = QString();
-	
 	s.append(QString("<tr><td><b>%1</b></td><td><b>%2</b></td></tr>").arg(tr("KEY(S)")).arg(tr("COMMAND")) );
 			
 	QMap<QString, QList<QKeySequence> >::const_iterator itr = usermap.constBegin();
@@ -96,6 +110,33 @@ QString KeyMap::getCheatSheet()
 }
   
 ////////////////////////////// Private Functions ////////////////////////////
+//
+// Function to make a local version of the configuration file
+void KeyMap::makeLocalFile()
+{
+	// if the conf file exists return now
+	QFile f(filepath + "/mbmp.conf");
+	if (f.exists() ) return;
+
+	// make the directory if it does not exist and copy the hardconded
+	// conf file to the directory
+	QDir d;
+	qDebug() << "file path: " << filepath;
+	if (d.mkpath(filepath)) {
+		qDebug() << "inside mkdir if";
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+		
+		// copy the file line by line
+		QTextStream out(&f);
+		QStringList sl_rawdata = readTextFile(":/text/text/mbmp.conf");
+    for (int i = 0; i < sl_rawdata.size(); ++i) {
+			out << sl_rawdata.at(i) << "\n";
+		}	// for
+	}	// if mkpath returned ture
+  
+	return;
+}
+
 //
 // Function to read text contained in a text or resource file.  Input is a 
 // const char* to the file. Return value is a QStringList where each entry 

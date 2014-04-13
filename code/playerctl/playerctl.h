@@ -18,8 +18,6 @@
 # include "./code/gstiface/gstiface.h"
 # include "./code/keymap/keymap.h"
 # include "./code/playlist/playlist.h"
-
-///////////TESTING
 # include "./code/videowidget/videowidget.h"
 
 class PlayerControl : public QDialog
