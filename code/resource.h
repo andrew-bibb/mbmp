@@ -34,8 +34,8 @@ DEALINGS IN THE SOFTWARE.
 
 ///////////////////////////////// Program Values ///////////////////////
 // Program Info 
-#define VERSION "14.04.11"
-#define RELEASE_DATE "Not Released"
+#define VERSION "14.04.14"
+#define RELEASE_DATE "2014.04.14"
 #define COPYRIGHT_DATE "2014"
 
 // Program Values

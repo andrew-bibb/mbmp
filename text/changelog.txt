@@ -1,7 +1,7 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>8 April 2014 - Major Elements complete</b>
+<b>14 April 2014 - Initial Release on GitHub</b>
 <ul>
 <li>Added command line option to specify network connection speed</li>
 <li>Audio CD playback working</li>
