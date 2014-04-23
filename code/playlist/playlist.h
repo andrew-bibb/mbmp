@@ -38,8 +38,11 @@ DEALINGS IN THE SOFTWARE.
 # include <QActionGroup>
 # include <QMenu>
 # include <QList>
+# include <QListWidgetItem>
 
 # include "ui_playlist.h"
+# include "./code/playlist/playlistitem.h"
+# include "./code/gstiface/gstiface.h"
 
 //	Enum's local to this program
 namespace MBMP_PL 
@@ -58,6 +61,7 @@ namespace MBMP_PL
   };
 } // namespace MBMP_PL
 
+		
 //	This class is based on a QListWidget and a QDialog
 class Playlist : public QDialog 
 {	
@@ -67,11 +71,11 @@ class Playlist : public QDialog
 		Playlist (QWidget*);
   
   public slots:
-		QString getItem(const short&);
+		bool selectItem(const short&);
 		void addMedia();
 		void addFile(QAction*);	
 		void addURL();
-		void addTracks(QStringList);
+		void addTracks(QList<TocEntry>);
 		void addChapters(int);
 		void removeItem();
 		void moveItemUp();
@@ -82,6 +86,8 @@ class Playlist : public QDialog
 		inline int currentItemType() {return ui.listWidget_playlist->currentItem()->type();}
 		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
 		inline void clearPlaylist() {ui.listWidget_playlist->clear();}
+		inline QString getCurrentUri() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri();}
+		inline uint getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
 	
 	public:
 		void seedPlaylist(const QStringList&);

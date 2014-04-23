@@ -541,12 +541,9 @@ void PlayerControl::playMedia(QAction* act)
 	else if (act == ui.actionPlaylistBack )	direction = MBMP_PL::Previous;
 		else if (act == ui.actionPlaylistNext ) 	direction = MBMP_PL::Next;
 			else if (act == ui.actionPlaylistLast )	direction = MBMP_PL::Last;
-	
-	// Get the media from the playlist
-	QString media = playlist->getItem(direction);
 		
-	// Return if there is no media to play
-	if (media.isEmpty() ) {
+	// Return if the playlist item has not changed
+	if (! playlist->selectItem(direction) ) {
 		ui.actionPlayPause->setChecked(false);
 		return;
 	}
@@ -557,31 +554,18 @@ void PlayerControl::playMedia(QAction* act)
 		
 	// if we are playing a CD send the track to p_gstiface
 	if (playlist->currentItemType() == MBMP_PL::ACD) {
-		int track = 0;
-		QList<TocEntry> tracklist = p_gstiface->getTrackList();
-		for (int i = 0; i < tracklist.size(); ++i) {
-			if (media.contains(tracklist.at(i).title)) {
-				track = tracklist.at(i).track;
-				break;
-			}	// if
-		}	// for
-		if (track == 0 ) return; 
-		p_gstiface->playMedia(videowidget->winId(), "cdda://", track);
+		p_gstiface->playMedia(videowidget->winId(), "cdda://", playlist->getCurrentSeq());
 	}	// if we are playing a disk
 	
 	// if we are playing a DVD send the chapter to p_gstifacd 
 	else if (playlist->currentItemType() == MBMP_PL::DVD) {
-		QString itemstring = media.simplified();
-		QString chapterstring = itemstring.section(' ',1);
-		bool ok;
-		int chapter = chapterstring.toInt(&ok, 10);
-		if (ok) p_gstiface->playMedia(videowidget->winId(), "dvd://", chapter);
+		p_gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
 	
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to p_gstiface to play the media
-		p_gstiface->playMedia(videowidget->winId(), media);
+		p_gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());
 	}	// else
 	
 	// Set the stream volume to agree with the dial
@@ -950,7 +934,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
-			this->makeTrackList(p_gstiface->getTrackList());
+			playlist->addTracks(p_gstiface->getTrackList());
 			if (playlist->isHidden()) playlist->show();
 			break;
 				
@@ -1092,37 +1076,4 @@ QString PlayerControl::readTextFile(const char* textfile)
 	return rtnstring;
 } 
 
-//
-// Function to create a tracklist to display in the playlist. Called from processBusMessages when
-// a new TOC with tracklist bus message is processed.
-void PlayerControl::makeTrackList(const QList<TocEntry>& tlist)
-{
-	QString s;
-	QStringList sl;
-	
-	sl.clear();
-	for (int i = 0; i < tlist.size(); ++i) {
-		s.clear();
-		
-		// track number
-		s.append(QString::number(tlist.at(i).track, 10));
-		s.append("     ");
-		
-		// duration
-		QTime t0 = QTime(0,0,0);
-		QTime t1;
-		t1 = t0.addSecs(tlist.at(i).end - tlist.at(i).start);
-		s.append(t1.toString("mm:ss"));
-		s.append("     ");
-		
-		// title
-		s.append(tlist.at(i).title);
-		
-		sl << s;
-	}	
-	
-	playlist->addTracks(sl);
-	
-	return;
-}
 

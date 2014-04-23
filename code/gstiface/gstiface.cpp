@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QTime>
 # include <QMessageBox>
 
-//  Helper function: Return TRUE if this is a Visualization element 
+//  Callback Function: Return TRUE if this is a Visualization element 
 static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data)
 {	
 	(void) data;
@@ -53,6 +53,7 @@ static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data)
   return TRUE;
 }
 
+// Callback Function: Set the opticaldrive if necessary
 static void sourceSetup(void* bin, GstElement* src, QString* opticaldrive)
 {	
 	(void) bin;
@@ -301,7 +302,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 		// Start the playback
 		gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
 	}
-
+	
   return;
 }
 

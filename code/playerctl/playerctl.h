@@ -84,7 +84,6 @@ class PlayerControl : public QDialog
   
   // functions
 		QString readTextFile(const char*);
-		void makeTrackList(const QList<TocEntry>&);  
 		void makeChapterList(int);
 
 };

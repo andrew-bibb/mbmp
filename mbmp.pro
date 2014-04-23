@@ -15,6 +15,7 @@ HEADERS		+= ./code/resource.h
 HEADERS 	+= ./code/playerctl/playerctl.h
 HEADERS 	+= ./code/keymap/keymap.h
 HEADERS 	+= ./code/playlist/playlist.h
+HEADERS 	+= ./code/playlist/playlistiem.h
 HEADERS 	+= ./code/gstiface/gstiface.h
 HEADERS		+= ./code/streaminfo/streaminfo.h
 HEADERS		+= ./code/videowidget/videowidget.h
@@ -29,6 +30,7 @@ SOURCES	+= ./code/main.cpp
 SOURCES	+= ./code/playerctl/playerctl.cpp
 SOURCES	+= ./code/keymap/keymap.cpp
 SOURCES	+= ./code/playlist/playlist.cpp
+SOURCES	+= ./code/playlist/playlistitem.cpp
 SOURCES	+= ./code/gstiface/gstiface.cpp
 SOURCES += ./code/streaminfo/streaminfo.cpp
 SOURCES += ./code/videowidget/videowidget.cpp
@@ -52,6 +54,7 @@ INCLUDEPATH += /usr/lib/glib-2.0/include
 CONFIG += link_pkgconfig
 PKGCONFIG += gstreamer-1.0
 PKGCONFIG += gstreamer-video-1.0
+PKGCONFIG += gstreamer-pbutils-1.0
 
 ##  Place all object files in their own directory and moc files in their own directory
 ##  This is not necessary but keeps things cleaner.

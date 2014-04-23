@@ -32,11 +32,11 @@ DEALINGS IN THE SOFTWARE.
 # include <QFileDialog>
 # include <QInputDialog>
 # include <QStringList>
-# include <QListWidgetItem>
 # include <QActionGroup>
 # include <QFileInfo>
 # include <QTime>
 # include <QTableWidgetItem>
+
 
 Playlist::Playlist(QWidget* parent) : QDialog(parent)
 {
@@ -114,12 +114,14 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 
 ////////////////////////////// Public Slots ////////////////////////////
 //
-// Slot to return a string from the playlist.  Direction tells which
+// Slot to select an item the playlist.  Direction tells which
 // way to go in the playlist and should be an MBMP namespace enum.
-QString Playlist::getItem(const short& direction)
+// Return true if the current item is different then when we entered,
+// false otherwise.
+bool Playlist::selectItem(const short& direction)
 {
 	// If there is nothing in the playlist return now
-	if (ui.listWidget_playlist->count() < 1 ) return QString();
+	if (ui.listWidget_playlist->count() < 1 ) return false;
 		
 	// Initialize variables
 	if (ui.listWidget_playlist->currentRow() < 0 ) ui.listWidget_playlist->setCurrentRow(0);
@@ -164,12 +166,11 @@ QString Playlist::getItem(const short& direction)
 				
 	// If current row did not change with all the previous calculations 
 	// return an empty string, this won't interupt the current playback
-	// If consume is checked remove the item first, then return the empty
-	// string
+	// If consume is checked remove the item first, then return false
 	if (row  == ui.listWidget_playlist->currentRow() && direction != MBMP_PL::Current ) {
 		if (ui.checkBox_consume->isChecked() ) 
 			delete ui.listWidget_playlist->takeItem(ui.listWidget_playlist->row(curitem));
-	return QString();
+	return false;
 	}
 			
 	// Set the current row and the item string based on the previous calculations
@@ -180,15 +181,8 @@ QString Playlist::getItem(const short& direction)
 	if (ui.checkBox_consume->isChecked() && direction != MBMP_PL::Current ) 
 		delete ui.listWidget_playlist->takeItem(ui.listWidget_playlist->row(curitem));
 
-	// Qualify the name for gstreamer.  
-	if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::File) return ui.listWidget_playlist->item(row)->text().prepend("file://");
-	else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::Url) return ui.listWidget_playlist->item(row)->text();
-		else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::ACD) return ui.listWidget_playlist->item(row)->text();
-			else if (ui.listWidget_playlist->item(row)->type() == MBMP_PL::DVD) return ui.listWidget_playlist->item(row)->text();
-			
-	
-	// Default return value (should never get here)
-	return QString();
+	// We have a new current item, return true.
+	return true;
 }
 
 //
@@ -235,7 +229,7 @@ void Playlist::addFile(QAction* a)
 			if (ui.listWidget_playlist->item(0)->type() >= MBMP_PL::Dev) ui.listWidget_playlist->clear();
 		}
 		for (int i = 0; i < sl_files.size(); ++i) {
-			new QListWidgetItem(sl_files.at(i), ui.listWidget_playlist, MBMP_PL::File);
+			new PlaylistItem(sl_files.at(i), ui.listWidget_playlist, MBMP_PL::File);
 		}	// for
 	}	//if        
 
@@ -262,7 +256,7 @@ void Playlist::addURL()
 			this->setWindowTitle(tr("Playlist"));
 			if (ui.listWidget_playlist->item(0)->type() >= MBMP_PL::Dev) ui.listWidget_playlist->clear();
 		}	// if
-		new QListWidgetItem(s, ui.listWidget_playlist, MBMP_PL::Url);	
+		new PlaylistItem(s, ui.listWidget_playlist, MBMP_PL::Url);	
 	}	// if
 	
 	return;
@@ -270,12 +264,12 @@ void Playlist::addURL()
 
 //
 // Slot to add tracks (for instance from an Audio CD) to the playlist.  Tracks and files/url's
-// can't coexist in the playlist, so clear the playlist first.  The stringlist comes from PlayerControl
-// which creates the list from data provided by GST_Interface.
-void Playlist::addTracks(QStringList sl_tracks)
+// can't coexist in the playlist, so clear the playlist first.  The <TOCEntry> list comes from 
+// GST_InterFace via PlayerControl/
+void Playlist::addTracks(QList<TocEntry> tracks)
 {
 	// return if there is nothing to process
-	if (sl_tracks.size() <= 0 ) return;
+	if (tracks.size() <= 0 ) return;
 	
 	// clear the tracklist entries
 	ui.listWidget_playlist->clear();
@@ -284,20 +278,27 @@ void Playlist::addTracks(QStringList sl_tracks)
 	this->setWindowTitle(tr("Audio CD - Tracklist"));
 	
 	// create the tracklist entry
-	for (int i = 0; i < sl_tracks.size(); ++i) {
-			new QListWidgetItem(sl_tracks.at(i), ui.listWidget_playlist, MBMP_PL::ACD);
+	for (int i = 0; i < tracks.size(); ++i) {
+			if (tracks.at(i).end - tracks.at(i).start >= 0)
+				new PlaylistItem(tracks.at(i).title, ui.listWidget_playlist, MBMP_PL::ACD, tracks.at(i).track, tracks.at(i).end - tracks.at(i).start);
+			else
+				new PlaylistItem(tracks.at(i).title, ui.listWidget_playlist, MBMP_PL::ACD, tracks.at(i).track);
 	}	// for
 	
 	// Make the first entry current
 	ui.listWidget_playlist->setCurrentRow(0);
 	
-	// Disable adding of any other media types
+	// Disable adding of any other media types.  Don't call lockContols as 
+	// we do allow some of the movement controls to be active with audio CD's
 	ui.actionAddMedia->setDisabled(true);
 	ui.actionAddFiles->setDisabled(true);
 	ui.actionAddURL->setDisabled(true);
 	ui.actionAddAudio->setDisabled(true);
 	ui.actionAddVideo->setDisabled(true);
-	media_menu->setDisabled(true);
+	ui.actionAddAudio->setDisabled(true);
+	ui.actionAddVideo->setDisabled(true);
+	ui.actionAddFiles->setDisabled(true);
+	ui.actionAddURL->setDisabled(true);	
 	
 	return;
 }
@@ -318,8 +319,8 @@ void Playlist::addChapters(int count)
 	this->setWindowTitle(tr("DVD - Chapters"));
 	
 	// create the entries
-	for (int i = 1; i <= count; ++i) {
-		new QListWidgetItem(tr("Chapter %1").arg(i), ui.listWidget_playlist, MBMP_PL::DVD);
+	for (int chap = 1; chap <= count; ++chap) {
+		new PlaylistItem(tr("Chapter"), ui.listWidget_playlist, MBMP_PL::DVD, chap);
 	} // for
 		
 	return;	
@@ -370,13 +371,13 @@ void Playlist::seedPlaylist(const QStringList& sl_seed)
 	// Assume url's are good, for files check to make sure we can find it before we add it
 	for (int i = 0; i < sl_seed.size(); ++i) {
 		if (sl_seed.at(i).startsWith("ftp", Qt::CaseInsensitive) || sl_seed.at(i).startsWith("http", Qt::CaseInsensitive)) {
-			new QListWidgetItem(sl_seed.at(i), ui.listWidget_playlist, MBMP_PL::Url);
+			new PlaylistItem(sl_seed.at(i), ui.listWidget_playlist, MBMP_PL::Url);
 		}	// if
 		
 		else {
 			QFileInfo fi = sl_seed.at(i);
 			if (fi.exists()) {
-				new QListWidgetItem(fi.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
+				new PlaylistItem(fi.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
 			}	// if fileinfo exists
 		}	// else does not start with ftp or http
 	}	// for
@@ -399,8 +400,10 @@ void Playlist::lockControls(bool b_lock)
 	ui.actionAddMedia->setDisabled(b_lock);
 	ui.actionRemoveItem->setDisabled(b_lock);
 	ui.actionRemoveAll->setDisabled(b_lock);
-	media_menu->setDisabled(b_lock);
-	
+	ui.actionAddAudio->setDisabled(b_lock);
+	ui.actionAddVideo->setDisabled(b_lock);
+	ui.actionAddFiles->setDisabled(b_lock);
+	ui.actionAddURL->setDisabled(b_lock);	
 }
 
 //////////////////////////// Protected Functions ////////////////////////////

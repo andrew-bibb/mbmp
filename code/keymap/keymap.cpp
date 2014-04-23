@@ -91,7 +91,7 @@ QList<QKeySequence> KeyMap::getKeySequence(const QString& cmd)
 QString KeyMap::getCheatSheet()
 {
 	QString s = QString();
-	s.append(QString("<tr><td><b>%1</b></td><td><b>%2</b></td></tr>").arg(tr("KEY(S)")).arg(tr("COMMAND")) );
+	s.append(QString("<table><tr><td width=110><b>%1</b></td><td><b>%2</b></td></tr>").arg(tr("KEY(S)")).arg(tr("COMMAND")) );
 			
 	QMap<QString, QList<QKeySequence> >::const_iterator itr = usermap.constBegin();
 	while (itr != usermap.constEnd()) {
@@ -105,13 +105,13 @@ QString KeyMap::getCheatSheet()
 		}	// if
     ++itr;
 	}
-
+	s.append("</table>");
 	return s;
 }
   
 ////////////////////////////// Private Functions ////////////////////////////
 //
-// Function to make a local version of the configuration file
+// Function to make a local version of the configuration fiqle
 void KeyMap::makeLocalFile()
 {
 	// if the conf file exists return now
