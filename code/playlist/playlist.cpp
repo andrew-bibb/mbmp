@@ -390,7 +390,8 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 void Playlist::addChapters(int count)
 {
 	// return if count is not at least one chapter
-if (count < 1 ) return;
+	if (count < 1 ) return;
+	
 	// clear the tracklist entries
 	ui.listWidget_playlist->clear();
 	
