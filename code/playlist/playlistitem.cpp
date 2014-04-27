@@ -31,11 +31,11 @@ DEALINGS IN THE SOFTWARE.
 # include <QtCore/QDebug>
 # include <QTime>
 
-
-// use GStreamer to process media tags
+// Use GStreamer to process media tags
 # include <gst/gst.h>
 # include <gst/tag/tag.h>
 #include <gst/pbutils/pbutils.h>
+
 
 PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) : QListWidgetItem(text, parent, type)
 {
@@ -236,7 +236,9 @@ void PlaylistItem::runDiscoverer()
 		errors.append(QObject::tr("Error creating a gst_discoverer instance: %1").arg(err->message) 
 		);
 		errors.append("\n");
+		errors.append(QObject::tr("This URI may not be able to be played") );
 		g_clear_error (&err);
+		this->setForeground(Qt::yellow);
 		return;
 	}
 	
