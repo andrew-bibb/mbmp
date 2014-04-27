@@ -1,6 +1,12 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>InProgress</b>
+<ul>
+<li>Created PlaylistItems that contain data, major rework on the playlist itself to deal with them.</li>
+<li>Playlists (*.m3u) can be saved and read.</li>  
+</ul>
+<br>
 <b>14 April 2014 - Initial Release on GitHub</b>
 <ul>
 <li>Added command line option to specify network connection speed</li>
@@ -26,7 +32,9 @@
 <br>
 <b>To Do</b>
 <ul>
-<li>Still a problem with dvd keyboard navigation, seems to loose where it is</li>
+<li>Still a problem with dvd keyboard navigation, seems to lose where it is - verify, maybe not</li>
+<li>Improve PlaylistItem tooltip display</li>
+<li>Put more information from DVD and CD into PlaylistItems</li>
 <li>Add libquvi support to parse YouTube and similar URL's</li>
 <li>Need a proper man page</li>
 <li>Improve buffering from real bad internet connections</li>

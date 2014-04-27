@@ -5,6 +5,8 @@
     <file>text/mbmp.conf</file>
   </qresource>
   <qresource prefix="images">
+    <file>images/16x16/view_text.png</file>
+    <file>images/16x16/filesave.png</file>
     <file>images/16x16/configure.png</file>
     <file>images/16x16/cdaudio_unmount.png</file>
     <file>images/16x16/dvd_mount.png</file>

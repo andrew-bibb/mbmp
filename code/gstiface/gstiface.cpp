@@ -1076,8 +1076,6 @@ void GST_Interface::extractTocTrack(const GstTocEntry* e)
 			entry.start = start / (1000 * 1000 * 1000);	// in seconds
 			entry.end = end / (1000 * 1000 * 1000);			// in seconds
 		}	// if
-		// We've not implemented CDDB or similar lookups (yet)
-		entry.title = QString(tr("Track-%1")).arg(track, 2, 10, QLatin1Char('0'));
 	}	// if
 	tracklist.append(entry);
 	

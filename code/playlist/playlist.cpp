@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 
 # include "./code/playlist/playlist.h"
 # include "./code/playerctl/playerctl.h"
+# include "./code/resource.h"
 
 # include <QtCore/QDebug>
 # include <QFileDialog>
@@ -36,6 +37,9 @@ DEALINGS IN THE SOFTWARE.
 # include <QFileInfo>
 # include <QTime>
 # include <QTableWidgetItem>
+# include <QDir>
+# include <QFile>
+# include <QTextStream>
 
 
 Playlist::Playlist(QWidget* parent) : QDialog(parent)
@@ -55,17 +59,21 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	this->ui.toolButton_add->setDefaultAction(ui.actionAddMedia);
 	this->addAction(ui.actionAddAudio);
 	this->addAction(ui.actionAddVideo);
+	this->addAction(ui.actionAddPlaylist);
 	this->addAction(ui.actionAddFiles);
 	this->addAction(ui.actionAddURL);
 	this->ui.toolButton_remove->setDefaultAction(ui.actionRemoveItem);
 	this->ui.toolButton_removeall->setDefaultAction(ui.actionRemoveAll);
 	this->addAction(ui.actionHidePlaylist);	
 	this->ui.toolButton_exit->setDefaultAction(ui.actionHidePlaylist);
+	this->addAction(ui.actionSavePlaylist);
+	this->ui.toolButton_save->setDefaultAction(ui.actionSavePlaylist);
 	
 	// add actions to action groups
 	media_group = new QActionGroup(this);	
 	media_group->addAction(ui.actionAddAudio);
 	media_group->addAction(ui.actionAddVideo);
+	media_group->addAction(ui.actionAddPlaylist);
 	media_group->addAction(ui.actionAddFiles);
 	
 	// create the media menu
@@ -74,6 +82,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	media_menu->setIcon(ui.actionAddMedia->icon());
 	media_menu->addAction(ui.actionAddAudio);
 	media_menu->addAction(ui.actionAddVideo);
+	media_menu->addAction(ui.actionAddPlaylist);
 	media_menu->addAction(ui.actionAddFiles);
 	media_menu->addSeparator();
 	media_menu->addAction(ui.actionAddURL);
@@ -86,6 +95,8 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	playlist_menu->addMenu(media_menu);
 	playlist_menu->addAction(ui.actionRemoveItem);
 	playlist_menu->addAction(ui.actionRemoveAll);
+	playlist_menu->addSeparator();
+	playlist_menu->addAction(ui.actionSavePlaylist);
 	playlist_menu->addSeparator();	
 	playlist_menu->addAction(ui.actionHidePlaylist);	
 		  
@@ -94,11 +105,13 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   ui.actionMoveDown->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_movedown") );
   ui.actionAddAudio->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addaudio") );
   ui.actionAddVideo->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addvideo") );
+  ui.actionAddPlaylist->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addplaylist") );
   ui.actionAddFiles->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addfile") );
   ui.actionAddURL->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addurl") );  
   ui.actionRemoveItem->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_removeitem") );
   ui.actionRemoveAll->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_removeall") );
   ui.actionHidePlaylist->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_playlist") );
+  ui.actionSavePlaylist->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_saveplaylist") );
   
   // connect signals to slots
   connect (ui.actionMoveUp, SIGNAL(triggered()), this, SLOT(moveItemUp()));
@@ -110,9 +123,59 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionRemoveAll, SIGNAL(triggered()), ui.listWidget_playlist, SLOT(clear()));
   connect (ui.actionHidePlaylist, SIGNAL(triggered()), this, SLOT(hide()));
   connect (ui.listWidget_playlist, SIGNAL(itemDoubleClicked(QListWidgetItem*)), qobject_cast<PlayerControl*>(parent), SLOT(playMedia()));
+  connect (ui.actionSavePlaylist, SIGNAL(triggered()), this, SLOT(savePlaylist()));
 }
 
 ////////////////////////////// Public Slots ////////////////////////////
+//
+// Slot to save the playlist to file.  Called when ui.actionSavePlaylist
+// is triggered.
+void Playlist::savePlaylist()
+{
+	// return if there are no items to save
+	if (ui.listWidget_playlist->count() <= 0 ) return;
+	
+	// constants
+	const QString playlistfiles = "*.m3u";	
+	
+	// default file path to store the playlist  
+  // PROGRAM_NAME defined in resource.h
+	QString filepath = QDir::homePath();
+	filepath.append(QString("/.%1/playlists").arg(QString(PROGRAM_NAME).toLower()) );    
+	
+	// make the directory if it does not exist
+	QDir d = QDir(filepath);
+	if (! d.exists()) d.mkpath(filepath);
+
+	// Get the filename to save as
+	QString sfiles = tr("Playlists (%1);;All Files (*.*)").arg(playlistfiles);
+	QString filename = QFileDialog::getSaveFileName(
+											this,
+											tr("Save the playlist"),
+                      filepath,
+                      sfiles );
+  
+  // if filename is empty return
+  if (filename.isEmpty() ) return;
+  
+  // create a QFile, and write the data to it
+  if (! filename.endsWith(".m3u", Qt::CaseInsensitive)) filename.append(".m3u");
+  QFile file(filename);
+  if (! file.open(QIODevice::WriteOnly | QIODevice::Text)) return;
+  QTextStream out(&file);
+  out << "# EXTM3U" << "\n" << "\n";
+  for (int i = 0; i < ui.listWidget_playlist->count(); ++i) {
+		PlaylistItem* pli = static_cast<PlaylistItem*>(ui.listWidget_playlist->item(i));
+		QString line1 = QString("#EXTINF:%1,%2 - %3").arg(pli->getDuration()).arg(pli->getArtist()).arg(pli->getTitle());
+		QString line2 = (pli->getUri()).remove("file://");
+		out << line1 << "\n";
+		out << line2 << "\n" << "\n";
+	}
+	
+	file.close();                    
+	return;
+}
+
 //
 // Slot to select an item the playlist.  Direction tells which
 // way to go in the playlist and should be an MBMP namespace enum.
@@ -208,17 +271,23 @@ void Playlist::addFile(QAction* a)
 	
 	const QString audio = "*.mp3 *.mp4 *.m4a *.ogg *.oga *.flac";
 	const QString video = "*.mp4 *.mkv *.avi *.ogv *.webm *.vob";
+	const QString plext = "*.m3u";
 	
 	// select the files to be presented
+	QString startdir = QDir::homePath();
 	QString s_files = tr("Media (%1 %2);;All Files (*.*)").arg(audio).arg(video);
 	if (a == ui.actionAddAudio ) s_files = tr("Audio (%1);;All Files (*.*)").arg(audio);
 	else if (a == ui.actionAddVideo ) s_files = tr("Video (%1);;All Files (*.*)").arg(video);
+		else if (a == ui.actionAddPlaylist) {
+			s_files = tr("Playlist (%1);;All Files (*.*)").arg(plext);
+			startdir.append(QString("/.%1/playlists").arg(QString(PROGRAM_NAME).toLower()) );
+		}
 	
 	// Open a file dialog to select media files
 	QStringList sl_files = QFileDialog::getOpenFileNames(
                         this,
                         tr("Select one or more media files to add to the playlist"),
-                        "/home",
+                        startdir,
                          s_files);	
                         
   // If we selected files add them to the playlist.  If the playlist contains device tracks
@@ -229,7 +298,10 @@ void Playlist::addFile(QAction* a)
 			if (ui.listWidget_playlist->item(0)->type() >= MBMP_PL::Dev) ui.listWidget_playlist->clear();
 		}
 		for (int i = 0; i < sl_files.size(); ++i) {
-			new PlaylistItem(sl_files.at(i), ui.listWidget_playlist, MBMP_PL::File);
+			if (sl_files.at(i).endsWith(".m3u", Qt::CaseInsensitive) )
+				this->processM3U(sl_files.at(i));
+			else
+				new PlaylistItem(sl_files.at(i), ui.listWidget_playlist, MBMP_PL::File);
 		}	// for
 	}	//if        
 
@@ -240,6 +312,8 @@ void Playlist::addFile(QAction* a)
 //	Slot to open an input dialog to get a url
 void Playlist::addURL()
 {
+	if (! ui.actionAddURL->isEnabled() ) return;
+	
 	// make sure the playlist is visible
 	if (this->isHidden() ) this->show();
 	
@@ -279,10 +353,18 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 	
 	// create the tracklist entry
 	for (int i = 0; i < tracks.size(); ++i) {
-			if (tracks.at(i).end - tracks.at(i).start >= 0)
-				new PlaylistItem(tracks.at(i).title, ui.listWidget_playlist, MBMP_PL::ACD, tracks.at(i).track, tracks.at(i).end - tracks.at(i).start);
-			else
-				new PlaylistItem(tracks.at(i).title, ui.listWidget_playlist, MBMP_PL::ACD, tracks.at(i).track);
+			PlaylistItem* pli = 0;
+			if (tracks.at(i).end - tracks.at(i).start >= 0) {
+				pli = new PlaylistItem(tr("Track"), ui.listWidget_playlist, MBMP_PL::ACD);
+				pli->setSequence(tracks.at(i).track);
+				pli->setDuration(tracks.at(i).end - tracks.at(i).start);
+				pli->makeDisplayText();
+			}	// if we can calculate a duration
+			else {
+				pli= new PlaylistItem(tr("Track"), ui.listWidget_playlist, MBMP_PL::ACD);
+				pli->setSequence(tracks.at(i).track);
+				pli->makeDisplayText();
+			}	// else cannot calculate a duration
 	}	// for
 	
 	// Make the first entry current
@@ -291,14 +373,12 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 	// Disable adding of any other media types.  Don't call lockContols as 
 	// we do allow some of the movement controls to be active with audio CD's
 	ui.actionAddMedia->setDisabled(true);
-	ui.actionAddFiles->setDisabled(true);
-	ui.actionAddURL->setDisabled(true);
 	ui.actionAddAudio->setDisabled(true);
 	ui.actionAddVideo->setDisabled(true);
-	ui.actionAddAudio->setDisabled(true);
-	ui.actionAddVideo->setDisabled(true);
+	ui.actionAddPlaylist->setDisabled(true);
 	ui.actionAddFiles->setDisabled(true);
 	ui.actionAddURL->setDisabled(true);	
+	ui.actionSavePlaylist->setDisabled(true);
 	
 	return;
 }
@@ -310,8 +390,7 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 void Playlist::addChapters(int count)
 {
 	// return if count is not at least one chapter
-	if (count < 1 ) return;
-	
+if (count < 1 ) return;
 	// clear the tracklist entries
 	ui.listWidget_playlist->clear();
 	
@@ -319,8 +398,10 @@ void Playlist::addChapters(int count)
 	this->setWindowTitle(tr("DVD - Chapters"));
 	
 	// create the entries
-	for (int chap = 1; chap <= count; ++chap) {
-		new PlaylistItem(tr("Chapter"), ui.listWidget_playlist, MBMP_PL::DVD, chap);
+	for (int i = 0; i < count; ++i) {
+		PlaylistItem* pli = new PlaylistItem(tr("Chapter"), ui.listWidget_playlist, MBMP_PL::DVD);
+		pli->setSequence(i + 1);
+		pli->makeDisplayText();		
 	} // for
 		
 	return;	
@@ -402,8 +483,10 @@ void Playlist::lockControls(bool b_lock)
 	ui.actionRemoveAll->setDisabled(b_lock);
 	ui.actionAddAudio->setDisabled(b_lock);
 	ui.actionAddVideo->setDisabled(b_lock);
+	ui.actionAddPlaylist->setDisabled(b_lock);
 	ui.actionAddFiles->setDisabled(b_lock);
 	ui.actionAddURL->setDisabled(b_lock);	
+	ui.actionSavePlaylist->setDisabled(b_lock);
 }
 
 //////////////////////////// Protected Functions ////////////////////////////
@@ -431,5 +514,36 @@ void Playlist::showEvent(QShowEvent* )
 void Playlist::contextMenuEvent(QContextMenuEvent* e)
 {
 	playlist_menu->popup(e->globalPos());
+}	
+
+//////////////////////////// Private Functions ////////////////////////////
+//
+// Function to process a .m3u (playlist) file.  Called from addFile() when
+// a file ends with .m3u
+void Playlist::processM3U(const QString& plfile)
+{
+	// Make a QDir out of the input string, if plfile contains relative
+	// paths we'll need this.
+	QFileInfo pldir = QFileInfo(plfile);
+	
+	// Open plfile for reading
+  QFile file(plfile);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+
+	// read the file and create playlist entries from the contents
+  QTextStream in(&file);
+  while (!in.atEnd()) {
+		QString line = in.readLine();
+    if (line.startsWith("#EXTINF:", Qt::CaseSensitive)) {
+			QFileInfo itemtarget = QFileInfo(in.readLine());
+			if (itemtarget.isRelative()) 
+				new PlaylistItem(QString(pldir.canonicalPath() + "/" + itemtarget.filePath()), ui.listWidget_playlist, MBMP_PL::File);
+			else 
+				new PlaylistItem(itemtarget.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
+		}	// if
+	}	// while
+	
+	file.close();
+	return;	
 }	
 

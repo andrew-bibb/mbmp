@@ -98,7 +98,6 @@ struct TocEntry
 	uint track;			// track number
 	int start;			// start time (seconds)
 	int end;				// end time (seconds)
-	QString title;	// track title
 };
 
 class GST_Interface : public QObject

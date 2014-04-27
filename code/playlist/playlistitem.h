@@ -37,21 +37,40 @@ DEALINGS IN THE SOFTWARE.
 class PlaylistItem : public QListWidgetItem
 {
 	public:
-		PlaylistItem (const QString&, QListWidget*, int, uint seq = 0, int dur = -1);
+		PlaylistItem (const QString&, QListWidget*, int);
 		
-		inline uint getSequence() {return sequence;};
+		// get functions
+		inline int getSequence() {return sequence;};
 		inline QString getUri() {return uri;};
+		inline QString getArtist() {return artist;};
+		inline QString getTitle() {return title;};
+		inline qint16 getDuration() {return duration;};
+		inline bool isPlayable() {return errors.isEmpty() ? true : false;};
+		
+		// set functions
+		inline void setSequence(uint seq) {sequence = seq;};
+		inline void setDuration(qint16 dur) {duration = dur;};
+		
+		// functions
+		void makeDisplayText();
 		
 	private:
 	// members - which ones are used depends upon the item type
-		QString errors;				// compliation of any errors encountered in creating the item
-		uint sequence;				// track or chapter number
+		int sequence;					// track or chapter number
+		qint16 duration;			// length in seconds, or a negative number for duation not known		
 		QString uri;					// the uri of the media 
-		qint16 duration;			// length in seconds, or a negative number for duation not known
 		bool seekable;				// true if we can seek in the stream, false otherwise	
 		QString title;				// the title of the media file	
 		QString artist;				// the artist
 		QString album;				// the album	
+		QString description;	// a tag comment
+		QString genre;				// a genre tag
+		QString errors;				// compliation of any errors encountered in creating the item		
+		
+	// functions	
+		void makeToolTip();
+		void runDiscoverer();
+		
 };
 		
 

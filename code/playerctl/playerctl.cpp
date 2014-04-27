@@ -358,27 +358,33 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	QAction* pl_Act03 = new QAction(this);
 	this->addAction(pl_Act03);
-	pl_Act03->setShortcuts(getShortcuts("cmd_addfile") );
-	connect (pl_Act03, SIGNAL(triggered()), playlist, SLOT(triggerAddFiles()));
+	pl_Act03->setShortcuts(getShortcuts("cmd_addplaylist") );
+	connect (pl_Act03, SIGNAL(triggered()), playlist, SLOT(triggerAddPlaylist()));
 	
 	QAction* pl_Act04 = new QAction(this);
 	this->addAction(pl_Act04);
-	pl_Act04->setShortcuts(getShortcuts("cmd_addurl") );
-	connect (pl_Act04, SIGNAL(triggered()), playlist, SLOT(addURL()));	
+	pl_Act04->setShortcuts(getShortcuts("cmd_addfile") );
+	connect (pl_Act04, SIGNAL(triggered()), playlist, SLOT(triggerAddFiles()));	
 	
 	QAction* pl_Act05 = new QAction(this);
 	this->addAction(pl_Act05);
-	pl_Act05->setShortcuts(getShortcuts("cmd_cycleaudio") );
-	connect (pl_Act05, SIGNAL(triggered()), p_gstiface, SLOT(cycleAudioStream()));		
-		
+	pl_Act05->setShortcuts(getShortcuts("cmd_addurl") );
+	connect (pl_Act05, SIGNAL(triggered()), playlist, SLOT(addURL()));	
+	
 	QAction* pl_Act06 = new QAction(this);
 	this->addAction(pl_Act06);
-	pl_Act06->setShortcuts(getShortcuts("cmd_cyclevideo") );
+	pl_Act06->setShortcuts(getShortcuts("cmd_cycleaudio") );
+	connect (pl_Act06, SIGNAL(triggered()), p_gstiface, SLOT(cycleAudioStream()));		
 		
 	QAction* pl_Act07 = new QAction(this);
 	this->addAction(pl_Act07);
-	pl_Act07->setShortcuts(getShortcuts("cmd_cyclesubtitle") );
-	connect (pl_Act07, SIGNAL(triggered()), p_gstiface, SLOT(cycleTextStream()));		
+	pl_Act07->setShortcuts(getShortcuts("cmd_cyclevideo") );
+	connect (pl_Act07, SIGNAL(triggered()), p_gstiface, SLOT(cycleVideoStream()));
+		
+	QAction* pl_Act08 = new QAction(this);
+	this->addAction(pl_Act08);
+	pl_Act08->setShortcuts(getShortcuts("cmd_cyclesubtitle") );
+	connect (pl_Act08, SIGNAL(triggered()), p_gstiface, SLOT(cycleTextStream()));		
 		
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
@@ -565,7 +571,8 @@ void PlayerControl::playMedia(QAction* act)
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to p_gstiface to play the media
-		p_gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());
+		if (playlist->isCurrentPlayable() )
+			p_gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());
 	}	// else
 	
 	// Set the stream volume to agree with the dial
@@ -934,10 +941,10 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
+			// send the tracklist to the playlist to create playlist entries
 			playlist->addTracks(p_gstiface->getTrackList());
 			if (playlist->isHidden()) playlist->show();
 			break;
-				
 			
 		case MBMP_GI::Tag:	// a TAG message 
 			switch (loglevel) {

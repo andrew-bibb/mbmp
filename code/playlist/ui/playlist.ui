@@ -89,6 +89,16 @@
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="QToolButton" name="toolButton_save">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
@@ -272,6 +282,30 @@
    </property>
    <property name="toolTip">
     <string>Remove All Items</string>
+   </property>
+  </action>
+  <action name="actionSavePlaylist">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/filesave.png</normaloff>:/images/images/16x16/filesave.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save Playlist</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the playlist to disk.</string>
+   </property>
+  </action>
+  <action name="actionAddPlaylist">
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/view_text.png</normaloff>:/images/images/16x16/view_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Add Playlist</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Files from .m3u playlist</string>
    </property>
   </action>
  </widget>

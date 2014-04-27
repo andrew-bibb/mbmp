@@ -37,18 +37,21 @@ DEALINGS IN THE SOFTWARE.
 # include <gst/tag/tag.h>
 #include <gst/pbutils/pbutils.h>
 
-PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type, uint seq, int dur) : QListWidgetItem(text, parent, type)
+PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) : QListWidgetItem(text, parent, type)
 {
-	// data members
-	errors = QString();
-	sequence = seq;
+	// Data members.  Not all are used for any single PlaylistItem.  We probably could have used the QListWidgetItem::data
+	// functions (with Qt::UserData), but we need to subclass PlaylistItem anyway and it just seemed easier to add
+	// in our own data items.
+	sequence = -1;
+	duration = -1;	
 	uri = QString();	
-	duration = dur;
 	seekable = false;		
 	title = QString();
 	artist = QString();
 	album = QString();
-	
+	description = QString();
+	genre = QString();		
+	errors = QString();	
 	
 	// Somewhat of a hack, but to display text in nice columns we either need a full QTableWidget (or worse a QTableView),
 	// or QListWidgetItems with monospace text.  Since we're only looking for appearance, not function, monospace fonts
@@ -57,125 +60,63 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type, u
 	font.setStyleHint(QFont::Monospace);
 	this->setFont(font);
 		
+	// Finish constructing based on the item type
+	switch (type) {	
+		case MBMP_PL::File: {
+			uri = QString("file://" + text);
+			this->runDiscoverer();	
+			this->makeDisplayText();
+			break; }
+			
+		case MBMP_PL::Url: {
+			uri = text;
+			break; }
+		
+		// for ACD and DVD makeDisplayText() is called from the function that
+		// creates this item, in Playlist.cpp.  No reason to call it here.	
+		case MBMP_PL::ACD: {
+			break; }
+			
+		case MBMP_PL::DVD: {
+			break; }
+		
+		default:
+			break;
+	}	// switch	
+		
+	return;
+}
+
+//////////////////////////// Public Functions ////////////////////////////
+
+//
+// Function to set the display text for the PlaylistItem
+// called from the constructor and from playlist.cpp when we are
+// making ACD or DVD items
+void PlaylistItem::makeDisplayText()
+{
 	// process based on the item type
-	switch (type) {
-		// For Files try to determine some track information to display.
+	switch (this->type()) {
 		case MBMP_PL::File: {
 			// Constants
 			const short wcol1 = -10;
 			const short wcol2 = -25;	
 			const short wcol3 = -60;	
 			
-			// Text should be the absolute path
-			uri = QString("file://" + text);
-					
-			// variables (actually pointers)
-			GstDiscoverer* disc = NULL;
-			GstDiscovererInfo* info = NULL;
-			const GstTagList* tags = NULL;
-			GError* err = NULL;
-			
-			// Create the discoverer
-			disc = gst_discoverer_new (5 * GST_SECOND, &err); // timeout is 5 seconds
-			if (! disc ) {
-				errors.append(QObject::tr("Error creating a gst_discoverer instance: %1").arg(err->message) 
-				);
-				errors.append("\n");
-				g_clear_error (&err);
-				return;
-			}
-			
-			// Run discoverer on the url
-			info = gst_discoverer_discover_uri(disc, qPrintable(uri), &err);
-			
-			// Process the dicoverer result
-			GstDiscovererResult result;
-			result = gst_discoverer_info_get_result(info);
-			QString s0 = QString(QObject::tr("Discoverer Result: " ));
-			switch (result)	{
-				case GST_DISCOVERER_URI_INVALID:
-					s0.append(QObject::tr("Invalid URI: %1").arg(gst_discoverer_info_get_uri(info)) );
-					s0.append("\n");
-					break;
-				case GST_DISCOVERER_ERROR:
-					s0.append(QObject::tr("Error: %1").arg(err->message) );
-					s0.append("\n");
-					g_clear_error (&err);				
-					break;
-				case GST_DISCOVERER_TIMEOUT:
-					s0.append(QObject::tr("Timeout"));
-					s0.append("\n");
-					break;
-				case GST_DISCOVERER_BUSY:	
-					s0.append(QObject::tr("Discoverer Busy"));
-					s0.append("\n");
-					break;
-				case GST_DISCOVERER_MISSING_PLUGINS:
-					const GstStructure *s;
-					gchar *str;
-					s = gst_discoverer_info_get_misc (info);
-					str = gst_structure_to_string (s);
-					s0.append(QObject::tr("Missing plugins: %1").arg(str) );
-					s0.append("\n");
-					g_free (str);
-					break;
-				case GST_DISCOVERER_OK:
-					break;
-				}	// switch
-			  
-			if (result != GST_DISCOVERER_OK) {
-				errors.append(s0);
-				errors.append(QObject::tr("This URI cannot be played") );
-				gst_discoverer_info_unref(info);
-				g_object_unref (disc);
-				return;
-			}
-			
-			// Get information not in tags
-			duration = gst_discoverer_info_get_duration(info) / (1000 * 1000 * 1000);
-			seekable = static_cast<bool>(gst_discoverer_info_get_seekable(info) ); 		
-			
-			// Get the Tags
-			tags = gst_discoverer_info_get_tags(info);
-			if (tags) {
-				gchar* str = NULL;
-				uint val = 0;			
-				
-				if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
-					if (str) title = QString(str);
-					g_free (str);
-				}
-				
-				if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
-					if (str) artist = QString(str);
-					g_free (str);
-				}
-				
-				if (gst_tag_list_get_string (tags, GST_TAG_ALBUM, &str)) {
-					if (str) album = QString(str);
-					g_free (str);
-				}
-				
-				if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &val)) {
-					if (val) sequence = val;
-				}
-			}	// if there were tags
-			
-			// Put the duration in seconds into a QTime
-			QTime n(0,0,0);
-			QTime t;
-			t = n.addSecs(duration);
-	
-			// Set the display text
 			if (duration < 0 ) {
-				if (title.isEmpty()) this->setText(text); 
+				if (title.isEmpty()) this->setText(this->text() ); 
 				else this->setText(title.simplified());
 			}	// if there is no duration
 			else {
+				// Put the duration (seconds) into a QTime
+				QTime n(0,0,0);
+				QTime t;
+				t = n.addSecs(duration);				
+				
 				if (title.isEmpty()) {
 					this->setText(QString("%1%2")
 						.arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss"), wcol1, QChar(' '))
-						.arg(text) );
+						.arg(text() ) );
 					}	// if title is empty
 				else {
 					if (artist.isEmpty() || album.isEmpty()) {
@@ -193,44 +134,202 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type, u
 					}	// else artist or album are not empty
 				}	// else title is not empty
 			}	// else	there is a duration
-			
-			// clean up discoverer stuff
-			gst_discoverer_info_unref(info);
-			g_object_unref (disc);
-	
 			break; }	// case PlaylistItem is a file
-	
-		// For DVD's display text is based the text sent as an argument and the chapter number
+		
+		case MBMP_PL::Url: {
+			break; }	// case PlaylistItem is a url
+		
+		case MBMP_PL::ACD: {
+			// Constants
+			const short wcol1 = -8;				
+			QTime n(0,0,0);
+			QTime t = n.addSecs(duration);
+			this->setText(QString("%1%2 %3")
+				.arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss"), wcol1, QChar(' '))
+				.arg(QObject::tr("Track") )
+				.arg(sequence) );
+			break; }	// case PlaylistItem is Audio CD track
+
 		case MBMP_PL::DVD: {
 			// Constants
 			const short wcol1 = -4;
-	
-			// Set the display text
-			setText(QString("%1%2-%3")
+
+			setText(QString("%1%2 %3")
 				.arg(QString::number(sequence, 10), wcol1, QChar(' ') )
-				.arg(text) 
+				.arg(QObject::tr("Chapter") ) 
 				.arg(sequence) );
 			break; }	// case PlaylistItem is a DVD chapter
-			
-		// For CD's display text is based on track duration	
-		case MBMP_PL::ACD: {
-			// Constants
-			const short wcol1 = -8;
-			
-			// Set the display text is based on text sent as an argument and duration
-			QTime n(0,0,0);
-			QTime t = n.addSecs(duration);
-			this->setText(QString("%1%2")
-				.arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss"), wcol1, QChar(' '))
-				.arg(text) );
-			break; }	// case PlaylistItem is Audio CD track
-			
-		// for URL's really just need to show the URL	
-		case MBMP_PL::Url: {
-			break; }	// case PlaylistItem is URL	
 	
+		default:
+			break;
+			
 	}	// switch
 	
+	this->makeToolTip();
+	
+	return;
+}
+
+//////////////////////////// Private Functions ////////////////////////////
+//
+// Function to set the tooltip text for the PlaylistItem
+// Called from makeDisplayText
+void PlaylistItem::makeToolTip()
+{
+	QString s_tt = QString();
+	//s_tt.prepend(QObject::tr("<p style='white-space:pre'>"));
+
+	// If the error string is not empty show the errors
+	if (! isPlayable() ) {
+		this->setToolTip(QString("<p style='white-space:pre'>%1").arg(errors));
+		return;
+	}
+			
+	// Otherwise tooltip should contain whatever information we can find about the uri
+	s_tt.append(QObject::tr("<p style='white-space:pre'>Entry:"));
+	switch (type()) {
+		case MBMP_PL::File: s_tt.append(QObject::tr("<br> Type: Local file")); break;
+		case MBMP_PL::Url: s_tt.append(QObject::tr("<br>  Type: URL")); break;
+		case MBMP_PL::ACD: s_tt.append(QObject::tr("<br>  Type: Audio CD track")); break;
+		case MBMP_PL::DVD: s_tt.append(QObject::tr("<br>  Type: DVD chapter")); break;
+	}
+	if (! uri.isEmpty() ) s_tt.append(QObject::tr("<br>  Uri: %1").arg(uri));
+	
+	s_tt.append(QObject::tr("<p style='white-space:pre'>Properties:"));
+	if (duration > 0 ) {
+		QTime n(0,0,0);
+		QTime t;
+		t = n.addSecs(duration);				
+		s_tt.append(QObject::tr("<br>  Duration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
+	}
+		
+	s_tt.append(QObject::tr("<br>  Seekable: %1").arg(seekable ? QObject::tr("yes") : QObject::tr("no")) );
+	
+	QString s_tags = QString();
+	if (! description.isEmpty()) s_tags.append(QObject::tr("<br>    description: %1").arg(description));
+	if (! artist.isEmpty()) s_tags.append(QObject::tr("<br>    artist: %1").arg(artist));
+	if (! title.isEmpty()) s_tags.append(QObject::tr("<br>    title: %1").arg(title));
+	if (! album.isEmpty()) s_tags.append(QObject::tr("<br>    album: %1").arg(album));
+	if (sequence > 0 ) s_tags.append(QObject::tr("<br>    track number: %1").arg(sequence));
+	if (! s_tags.isEmpty()) s_tt.append(QObject::tr("<br>  Tags:%1").arg(s_tags));
+	
+	this->setToolTip(s_tt);
+	
+	return;
+}
+
+//
+//
+// Function to run gstDiscoverer on the uri to try and get some information about the media.  
+// Called from the constructor
+void PlaylistItem::runDiscoverer()
+{
+	// Variables (actually pointers)
+	GstDiscoverer* disc = NULL;
+	GstDiscovererInfo* info = NULL;
+	const GstTagList* tags = NULL;
+	GError* err = NULL;
+	
+	// Create the discoverer
+	disc = gst_discoverer_new (5 * GST_SECOND, &err); // timeout is 5 seconds
+	if (! disc ) {
+		errors.append(QObject::tr("Error creating a gst_discoverer instance: %1").arg(err->message) 
+		);
+		errors.append("\n");
+		g_clear_error (&err);
+		return;
+	}
+	
+	// Run discoverer on the url
+	info = gst_discoverer_discover_uri(disc, qPrintable(uri), &err);
+	
+	// Process the dicoverer result
+	GstDiscovererResult result;
+	result = gst_discoverer_info_get_result(info);
+	QString s0 = QString(QObject::tr("Discoverer Result: " ));
+	switch (result)	{
+		case GST_DISCOVERER_URI_INVALID:
+			s0.append(QObject::tr("<br>Invalid URI: %1").arg(gst_discoverer_info_get_uri(info)) );
+			s0.append("\n");
+			break;
+		case GST_DISCOVERER_ERROR:
+			s0.append(QObject::tr("<br>Error: %1").arg(err->message) );
+			s0.append("\n");
+			g_clear_error (&err);				
+			break;
+		case GST_DISCOVERER_TIMEOUT:
+			s0.append(QObject::tr("<br>Timeout"));
+			s0.append("\n");
+			break;
+		case GST_DISCOVERER_BUSY:	
+			s0.append(QObject::tr("<br>Discoverer Busy"));
+			s0.append("\n");
+			break;
+		case GST_DISCOVERER_MISSING_PLUGINS:
+			const GstStructure *s;
+			gchar *str;
+			s = gst_discoverer_info_get_misc (info);
+			str = gst_structure_to_string (s);
+			s0.append(QObject::tr("<br>Missing plugins: %1").arg(str) );
+			s0.append("\n");
+			g_free (str);
+			break;
+		case GST_DISCOVERER_OK:
+			break;
+		}	// switch
+	  
+	if (result != GST_DISCOVERER_OK) {
+		errors.append(s0);
+		errors.append(QObject::tr("This URI may not be able to be played") );
+		gst_discoverer_info_unref(info);
+		g_object_unref (disc);
+		this->setForeground(Qt::red);
+		return;
+	}
+	
+	// Get information not in tags
+	duration = gst_discoverer_info_get_duration(info) / (1000 * 1000 * 1000);
+	seekable = static_cast<bool>(gst_discoverer_info_get_seekable(info) ); 		
+	
+	// Get tags and try to extract information from them
+	tags = gst_discoverer_info_get_tags(info);
+	if (tags) {
+		gchar* str = NULL;
+		uint val = 0;			
+		
+		if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+			if (str) title = QString(str);
+			g_free (str);
+		}
+		
+		if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
+			if (str) artist = QString(str);
+			g_free (str);
+		}
+		
+		if (gst_tag_list_get_string (tags, GST_TAG_ALBUM, &str)) {
+			if (str) album = QString(str);
+			g_free (str);
+		}
+		
+		if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &val)) {
+			if (val) sequence = val;
+		}
+		
+		if (gst_tag_list_get_string (tags, GST_TAG_DESCRIPTION, &str)) {
+			if (str) description = QString(str);
+			g_free (str);
+		}
+		
+		if (gst_tag_list_get_string (tags, GST_TAG_GENRE, &str)) {
+			if (str) genre = QString(str);
+			g_free (str);
+		}
+	}	// if there were tags
+						
+	// clean up discoverer stuff
+	gst_discoverer_info_unref(info);
+	g_object_unref (disc);	
 	
 	return;
 }

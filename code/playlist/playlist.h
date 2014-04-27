@@ -71,6 +71,7 @@ class Playlist : public QDialog
 		Playlist (QWidget*);
   
   public slots:
+		void savePlaylist();
 		bool selectItem(const short&);
 		void addMedia();
 		void addFile(QAction*);	
@@ -80,14 +81,16 @@ class Playlist : public QDialog
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
-		inline void triggerAddAudio() {ui.actionAddAudio->trigger();}
-		inline void triggerAddVideo() {ui.actionAddVideo->trigger();}
-		inline void triggerAddFiles() {ui.actionAddFiles->trigger();}
+		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
+		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}
+		inline void triggerAddPlaylist() {if (ui.actionAddPlaylist->isEnabled()) ui.actionAddPlaylist->trigger();}
+		inline void triggerAddFiles() {if (ui.actionAddFiles->isEnabled()) ui.actionAddFiles->trigger();}
 		inline int currentItemType() {return ui.listWidget_playlist->currentItem()->type();}
 		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
 		inline void clearPlaylist() {ui.listWidget_playlist->clear();}
 		inline QString getCurrentUri() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri();}
-		inline uint getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
+		inline int getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
+		inline bool isCurrentPlayable() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable();}
 	
 	public:
 		void seedPlaylist(const QStringList&);
@@ -106,7 +109,8 @@ class Playlist : public QDialog
 		QMenu* playlist_menu;
 		QMenu* media_menu;
 	       
-	// functions  
+	// functions
+		void processM3U(const QString&);
 
 };
 
