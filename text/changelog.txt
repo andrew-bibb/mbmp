@@ -1,10 +1,11 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>InProgress</b>
+<b>28 April 2014 - Playlist reworked</b>
 <ul>
 <li>Created PlaylistItems that contain data, major rework on the playlist itself to deal with them.</li>
-<li>Playlists (*.m3u) can be saved and read.</li>  
+<li>Playlists (*.m3u) can be saved and read.</li>
+<li>Fixed (really hard to find) bug where playlist would not automatically advance to next track</li>  
 </ul>
 <br>
 <b>14 April 2014 - Initial Release on GitHub</b>

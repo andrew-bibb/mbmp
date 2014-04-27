@@ -111,6 +111,7 @@ class Playlist : public QDialog
 	       
 	// functions
 		void processM3U(const QString&);
+		void updateSummary();
 
 };
 

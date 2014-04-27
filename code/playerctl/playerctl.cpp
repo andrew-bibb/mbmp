@@ -336,7 +336,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionOptions, SIGNAL(triggered()), this, SLOT(popupOptionsMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
 	connect (ui.actionPlayerStop, SIGNAL(triggered()), this, SLOT(stopPlaying()));
-	connect (ui.actionPlayerStop, SIGNAL(triggered(bool)), ui.toolButton_playpause, SLOT(setChecked(bool)));
 	connect (ui.horizontalSlider_position, SIGNAL(sliderMoved(int)), p_gstiface, SLOT(seekToPosition(int)));
 	connect (seek_group, SIGNAL(triggered(QAction*)), this, SLOT(seekToPosition(QAction*)));
 	connect (dvd_group, SIGNAL(triggered(QAction*)), this, SLOT(dvdNavigationCommand(QAction*)));
@@ -547,7 +546,7 @@ void PlayerControl::playMedia(QAction* act)
 	else if (act == ui.actionPlaylistBack )	direction = MBMP_PL::Previous;
 		else if (act == ui.actionPlaylistNext ) 	direction = MBMP_PL::Next;
 			else if (act == ui.actionPlaylistLast )	direction = MBMP_PL::Last;
-		
+	
 	// Return if the playlist item has not changed
 	if (! playlist->selectItem(direction) ) {
 		ui.actionPlayPause->setChecked(false);
@@ -567,7 +566,6 @@ void PlayerControl::playMedia(QAction* act)
 	else if (playlist->currentItemType() == MBMP_PL::DVD) {
 		p_gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
-	
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to p_gstiface to play the media
@@ -577,7 +575,7 @@ void PlayerControl::playMedia(QAction* act)
 	
 	// Set the stream volume to agree with the dial
 	changeVolume(ui.dial_volume->value()); 	
-	
+
 	return;
 }
 
@@ -587,6 +585,9 @@ void PlayerControl::playMedia(QAction* act)
 // to to stop the playback.
 void PlayerControl::stopPlaying()
 {
+	// sync the playpause action
+	ui.actionPlayPause->setChecked(false);
+	
 	// save the current media type before we reset it in the next line
 	int mt = p_gstiface->getMediaType();
 	
@@ -819,6 +820,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 				}	// loglevel switch
+			this->stopPlaying();	
 			ui.actionPlaylistNext->trigger();
 			break;
 			

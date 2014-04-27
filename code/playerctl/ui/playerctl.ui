@@ -743,7 +743,7 @@
     <string>Ahead 10 sec</string>
    </property>
    <property name="toolTip">
-    <string>Seek Forwards 10 Seconds</string>
+    <string>Seek Forward 10 Seconds</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
@@ -773,7 +773,7 @@
     <string>Ahead 1 min</string>
    </property>
    <property name="toolTip">
-    <string>Seek Forwards 1 Minute</string>
+    <string>Seek Forward 1 Minute</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
@@ -806,7 +806,7 @@
     <string>Ahead 10 min</string>
    </property>
    <property name="toolTip">
-    <string>Seek Forwards 10 Minutes</string>
+    <string>Seek Forward 10 Minutes</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>

@@ -298,7 +298,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 		// Set the video overlay and allow it to handle navigation events
 		gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(pipeline_playbin), winId);
 		gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), TRUE);                
-    		
+		
 		// Start the playback
 		gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
 	}
@@ -737,7 +737,6 @@ void GST_Interface::pollGstBus()
 			// The end of stream message. Put the player into the NULL state.
 			case GST_MESSAGE_EOS: {
 				emit busMessage(MBMP_GI::EOS, QString(tr("End of stream has been reached.")) );
-				gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
 				break; }
 			
 			// The start of stream message

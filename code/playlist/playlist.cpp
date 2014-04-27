@@ -42,6 +42,12 @@ DEALINGS IN THE SOFTWARE.
 # include <QTextStream>
 
 
+// NOTES: There are a couple of things to keep in mind if we need to expand
+// functionality in the future.  In the function seedPlaylist() we assume
+// that a url must start with "http" or "ftp", and we assume that a 
+// playlist must end with ".m3u".  Additionally in the function addFile()ffg
+// we assume that playlist must end with ".m3u"
+
 Playlist::Playlist(QWidget* parent) : QDialog(parent)
 {
   // setup the user interface
@@ -305,6 +311,9 @@ void Playlist::addFile(QAction* a)
 		}	// for
 	}	//if        
 
+	// update the summary count
+	this->updateSummary();
+
 	return;
 }
 
@@ -332,6 +341,9 @@ void Playlist::addURL()
 		}	// if
 		new PlaylistItem(s, ui.listWidget_playlist, MBMP_PL::Url);	
 	}	// if
+
+	// update the summary count
+	this->updateSummary();
 	
 	return;
 }
@@ -345,8 +357,11 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 	// return if there is nothing to process
 	if (tracks.size() <= 0 ) return;
 	
-	// clear the tracklist entries
+	// clear the tracklist entries, and initialize option boxes
 	ui.listWidget_playlist->clear();
+	ui.checkBox_wrap->setChecked(false);
+	ui.checkBox_consume->setChecked(false);
+	ui.checkBox_random->setChecked(false);
 	
 	// set the title
 	this->setWindowTitle(tr("Audio CD - Tracklist"));
@@ -379,6 +394,9 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 	ui.actionAddFiles->setDisabled(true);
 	ui.actionAddURL->setDisabled(true);	
 	ui.actionSavePlaylist->setDisabled(true);
+
+	// update the summary count
+	this->updateSummary();
 	
 	return;
 }
@@ -392,8 +410,11 @@ void Playlist::addChapters(int count)
 	// return if count is not at least one chapter
 	if (count < 1 ) return;
 	
-	// clear the tracklist entries
+	// clear the tracklist entries, and initialize option boxes
 	ui.listWidget_playlist->clear();
+	ui.checkBox_wrap->setChecked(false);
+	ui.checkBox_consume->setChecked(false);
+	ui.checkBox_random->setChecked(false);
 	
 	// set the title
 	this->setWindowTitle(tr("DVD - Chapters"));
@@ -404,6 +425,9 @@ void Playlist::addChapters(int count)
 		pli->setSequence(i + 1);
 		pli->makeDisplayText();		
 	} // for
+
+	// update the summary count
+	this->updateSummary();
 		
 	return;	
 }
@@ -415,6 +439,9 @@ void Playlist::removeItem()
 	if (ui.listWidget_playlist->currentRow() >= 0)
 		delete ui.listWidget_playlist->takeItem(ui.listWidget_playlist->currentRow() );
 		
+	
+	// update the summary count
+	this->updateSummary();
 	
 	return;
 }
@@ -459,10 +486,16 @@ void Playlist::seedPlaylist(const QStringList& sl_seed)
 		else {
 			QFileInfo fi = sl_seed.at(i);
 			if (fi.exists()) {
-				new PlaylistItem(fi.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
+				if (sl_seed.at(i).endsWith(".m3u", Qt::CaseInsensitive) )
+					this->processM3U(sl_seed.at(i));
+				else
+					new PlaylistItem(fi.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);	
 			}	// if fileinfo exists
 		}	// else does not start with ftp or http
 	}	// for
+
+	// update the summary count
+	this->updateSummary();
 	
 	return;	
 }
@@ -547,4 +580,38 @@ void Playlist::processM3U(const QString& plfile)
 	file.close();
 	return;	
 }	
+
+//
+// Function to update the summary text. Called at the end of the add functions,
+// at the end of seePlaylist(), and at the end of removeItem()
+void Playlist::updateSummary()
+{
+	// Variables
+	int totaltime = 0;
+	
+	// Blank out the summary if there are no items in the playlist
+	if (ui.listWidget_playlist->count() <= 0) {
+		ui.label_summary->clear();
+		return;
+	}
+	
+	// Walk through the playlist and get the duration for each item
+  for (int i = 0; i < ui.listWidget_playlist->count(); ++i) {
+		PlaylistItem* pli = static_cast<PlaylistItem*>(ui.listWidget_playlist->item(i));
+		totaltime = totaltime + pli->getDuration();
+	}
+	
+	if (totaltime == 0) 
+		ui.label_summary->setText(tr("%1 Playlist items").arg(ui.listWidget_playlist->count()));
+ 	else {
+		QTime n(0,0,0);
+		QTime t;
+		t = n.addSecs(totaltime);			
+		ui.label_summary->setText(tr("%1 Items, Total playing time %2") 
+						.arg(ui.listWidget_playlist->count() )
+						.arg(totaltime > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
+	}
+	
+	return;
+}
 
