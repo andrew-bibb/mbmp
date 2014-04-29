@@ -1,7 +1,12 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>28 April 2014 - Playlist reworked</b>
+<b>In Progress</b>
+<ul>
+<li>Fixed visualizer menu not activating when visualizer option is toggled</li>
+</ul>
+<br>
+<b>27 April 2014 - Playlist reworked</b>
 <ul>
 <li>Created PlaylistItems that contain data, major rework on the playlist itself to deal with them.</li>
 <li>Playlists (*.m3u) can be saved and read.</li>

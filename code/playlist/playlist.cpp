@@ -45,7 +45,7 @@ DEALINGS IN THE SOFTWARE.
 // NOTES: There are a couple of things to keep in mind if we need to expand
 // functionality in the future.  In the function seedPlaylist() we assume
 // that a url must start with "http" or "ftp", and we assume that a 
-// playlist must end with ".m3u".  Additionally in the function addFile()ffg
+// playlist must end with ".m3u".  Additionally in the function addFile()
 // we assume that playlist must end with ".m3u"
 
 Playlist::Playlist(QWidget* parent) : QDialog(parent)

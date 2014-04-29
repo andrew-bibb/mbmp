@@ -192,7 +192,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	vis_menu->setTitle(ui.actionVisualizer->text());
 	vis_menu->setIcon(ui.actionVisualizer->icon());
 	vis_menu->setTearOffEnabled(true);
-	QActionGroup* vis_group = new QActionGroup(this);	
+	vis_group = new QActionGroup(this);	
 	QList<QString> vislist = p_gstiface->getVisualizerList();
 	for (int i = 0; i < vislist.size(); ++i) {
 		QAction* act = vis_menu->addAction(vislist.at(i));
@@ -1047,8 +1047,10 @@ void PlayerControl::changeOptions(QAction* act)
 {
 	QString opt = act->text();
 	
-	if (act == action_vis)
+	if (act == action_vis) {
 		p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, act->isChecked() );
+		vis_group->setEnabled(act->isChecked());
+	}
 	else if (act == action_sub)
 		p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, act->isChecked() );  
 	

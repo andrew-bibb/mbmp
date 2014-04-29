@@ -70,6 +70,7 @@ class PlayerControl : public QDialog
 		QActionGroup* volume_group;
 		QActionGroup* seek_group;
 		QActionGroup* dvd_group;
+		QActionGroup* vis_group;
 		QMenu* control_menu;
 		QMenu* vis_menu;
 		QMenu* advanced_menu;
