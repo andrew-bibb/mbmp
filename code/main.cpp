@@ -26,8 +26,14 @@ int main(int argc, char *argv[])
 	QCommandLineParser parser;
 	parser.setApplicationDescription(QApplication::translate("main.cpp", "GStreamer based media player.") );
 	
+	QCommandLineOption streamBuffering(QStringList() << "b" << "stream-buffering", QCoreApplication::translate("main.cpp", "Enable buffering of the demuxed or parsed data in the stream (default is no stream buffering).") );
+	parser.addOption(streamBuffering);	
+	
   QCommandLineOption connectionSpeed(QStringList() << "c" << "connection-speed", QCoreApplication::translate("main.cpp", "Specify a network connection speed in kbps (default is 0)."), QCoreApplication::translate("main.cpp", "connection-speed"), "0" );  
   parser.addOption(connectionSpeed);
+  
+	QCommandLineOption downloadBuffering(QStringList() << "d" << "download-buffering", QCoreApplication::translate("main.cpp", "Enable progressive download buffering of selected formats (default is no download buffering).") );
+	parser.addOption(downloadBuffering);	  
 	
 	QCommandLineOption openFullScreen(QStringList() << "f" << "fullscreen", QCoreApplication::translate("main.cpp", "Start the player in full screen mode (default is start in window).") );
 	parser.addOption(openFullScreen);

@@ -77,6 +77,8 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 {
 	// members
 	mediatype = MBMP_GI::NotPlaying;	// the type of media playing
+	is_live = false;						// true if we are playing a live stream
+	is_buffering = false;				// true if we are currently buffering
 	vismap.clear();
 	streammap.clear();
 	mainwidget = qobject_cast<QWidget*>(parent);
@@ -105,9 +107,11 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 	g_signal_connect (GST_ELEMENT(pipeline_playbin), "source-setup", G_CALLBACK (&sourceSetup), &opticaldrive);
 	
 	// Start a timer to monitor the bus
-  timer = new QTimer(this);
-  connect(timer, SIGNAL(timeout()), this, SLOT(pollGstBus()));
-  timer->start(500); // time measured in miliseconds
+  bus_timer = new QTimer(this);
+  connect(bus_timer, SIGNAL(timeout()), this, SLOT(pollGstBus()));
+  
+  dl_timer = new QTimer(this);
+  connect(dl_timer, SIGNAL(timeout()), this, SLOT(downloadBuffer()));
     
   // Create a QMap of the available audio visualizers.  Map format is
   // QString key
@@ -142,7 +146,6 @@ GST_Interface::~GST_Interface()
   gst_object_unref (GST_OBJECT (pipeline_playbin));
   
   gst_object_unref (bus);
-  delete timer;
 }
 
 ///////////////////////////// Public Functions /////////////////////////
@@ -271,6 +274,9 @@ int GST_Interface::checkDVD(QString dev)
 // stream.
 void GST_Interface::playMedia(WId winId, QString uri, int track)
 {
+	// constants
+	const int bus_timeout = 500;	// timeout value in miliseconds
+	
 	// if we need to seek in a currently playing disk (CD or DVD)
 	if (track > 0 ) {
 		if (uri.contains("cdda", Qt::CaseInsensitive)) {
@@ -283,8 +289,12 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 	
 	// else need to set a new media source
 	else {	
-		// start with the pipeline_playbin set to NULL
+		// variables
+		GstStateChangeReturn ret;
+		
+		// start with the pipeline_playbin set to NULL, is_live to false
 		gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
+		is_live = false;
 		
 		// Set the media source. The device is set in checkCD
 		g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(uri), NULL);
@@ -299,9 +309,32 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 		gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(pipeline_playbin), winId);
 		gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), TRUE);                
 		
-		// Start the playback
-		gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
-	}
+		// Bring the pipeline to paused and see if we have a live stream (for buffering)
+		ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
+		bus_timer->start(bus_timeout);
+		
+		switch (ret) {
+	    case GST_STATE_CHANGE_SUCCESS:
+	      is_live = false;
+	      // playback will start from inside the ASYNC_DONE case in pollGstBus
+	      break;
+	
+	    case GST_STATE_CHANGE_FAILURE:
+	      gst_element_post_message (pipeline_playbin,
+					gst_message_new_application (GST_OBJECT (pipeline_playbin),
+						gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Failed to raise pipeline state from NULL to PAUSED - will not be able to play the media.", NULL))); 
+	      this->playerStop();
+	      break;
+	
+	    case GST_STATE_CHANGE_NO_PREROLL:
+	      is_live = true;
+				gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
+	      break;
+	
+	    default:
+	      break;
+	  }	// switch
+	}	// else need new media source
 	
   return;
 }
@@ -674,6 +707,7 @@ void GST_Interface::pollGstBus()
 												GST_MESSAGE_DURATION_CHANGED	|
 												GST_MESSAGE_TOC								|
 												GST_MESSAGE_TAG								|
+												GST_MESSAGE_ASYNC_DONE				|
 												GST_MESSAGE_CLOCK_LOST;
 	
 	msg = (GstMessage*)(gst_bus_pop_filtered(bus, (GstMessageType)(msgtypes)) );
@@ -794,9 +828,32 @@ void GST_Interface::pollGstBus()
 			
 			// Buffering messages, pause the playback while buffering, restart when finished
 			case GST_MESSAGE_BUFFERING: {
+				// if a live stream don't buffer
+				if (is_live) break;						
+								
+				// if download flag is set report buffering and let ASYNC_DONE deal with buffering
+				guint flags = 0;
+				g_object_get (pipeline_playbin, "flags", &flags, NULL);
+				if (  (flags & GST_PLAY_FLAG_DOWNLOAD) ) {
+					is_buffering = true;
+					break;
+				}	
+				
+				// non-download buffering
 				gint percent = 0;
 				gst_message_parse_buffering(msg, &percent);
-				percent < 100 ? gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED) : gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
+				
+				if (percent < 100) {
+					if (! is_buffering) {
+						gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED);
+						is_buffering = true;
+					}
+				}
+				else {
+					gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
+					is_buffering = false;
+				}
+				
 				emit busMessage(MBMP_GI::Buffering, QString::number(percent));
 				break; }
 					
@@ -981,14 +1038,28 @@ void GST_Interface::pollGstBus()
 					
 				gst_tag_list_free (tags);	
 				break; }	// GST_TAG case
+			
+			// Posted when elements complete an async state change.  Use to avoid rebuffering
+			// if the download flag is set. 	
+			case GST_MESSAGE_ASYNC_DONE: {
+				// only buffer if the download playflag is set 
+				guint flags = 0;
+				g_object_get (pipeline_playbin, "flags", &flags, NULL);
+				if (! (flags & GST_PLAY_FLAG_DOWNLOAD) ) break;			
 				
-			default:
-				emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message")) );
-		}	// GST_MESSAGE switch
+				// start the download or start playing
+				if (is_buffering) dl_timer->start(500);	
+				else gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);				
+
+				break; }	// ASYNC_START case		
+			
+		default:
+			emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message")) );
+		}	// switch
 		
-		gst_message_unref(msg); 	
-		msg = (GstMessage*)(gst_bus_pop_filtered(bus, (GstMessageType)(msgtypes)) );		
-	}	// while loop
+	gst_message_unref(msg); 	
+	msg = (GstMessage*)(gst_bus_pop_filtered(bus, (GstMessageType)(msgtypes)) );		
+	}	// while loop	
 		
 	return;
 }
@@ -1000,7 +1071,7 @@ void GST_Interface::toggleMute()
 	gboolean b_mute = false;
 	
 	// toggle the mute setting
-	g_object_get (G_OBJECT (pipeline_playbin), "mute", &b_mute, NULL);	 
+	 
 	b_mute ? g_object_set (G_OBJECT (pipeline_playbin), "mute", false, NULL) : g_object_set (G_OBJECT (pipeline_playbin), "mute", true, NULL);
 		
 	return;
@@ -1035,7 +1106,11 @@ void GST_Interface::playerStop()
 	opticaldrive.clear();
 	map_md_cd.clear();
 	map_md_dvd.clear();
-	mediatype = MBMP_GI::NotPlaying;	
+	mediatype = MBMP_GI::NotPlaying;
+	bus_timer->stop();	
+	is_live = false;
+	is_buffering = false;
+	dl_timer->stop();
 	
 	// reset the window title
 	mainwidget->setWindowTitle(WINDOW_TITLE);
@@ -1182,3 +1257,45 @@ bool GST_Interface::queryStreamSeek()
 	 
 	 return duration;
  } 
+ 
+ //////////////////////////// Private Slots //////////////////////////
+//
+// Slot to download a file, or most of a file to a buffer.  Called from 
+// ASYNC_DONE case of pollGstBus. I cannot get the example in chapter
+// 15 of the Gstreamer docs to work.  Anyway, download the entire
+// file before we start playback
+void GST_Interface::downloadBuffer()
+{ 	
+	// query the pipeline
+	GstQuery* query;				
+	gint64 estimated_left = 0;
+	static gint64 maximum = -1;
+	int percent = 0;	
+	
+	query = gst_query_new_buffering (GST_FORMAT_BYTES);
+	if (! gst_element_query (pipeline_playbin, query)) return;	
+	
+	gst_query_parse_buffering_range (query, NULL, NULL, NULL, &estimated_left);
+	
+	if (estimated_left == -1) return;;
+	
+	// calculate the percent downloaded
+	if (estimated_left > maximum) maximum = estimated_left;
+	if (maximum != 0 ) {
+		percent = static_cast<int>(100 * (maximum - estimated_left) / maximum);
+	}
+	else
+		percent = 0;
+	
+	if (estimated_left == 0) {
+		gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
+		dl_timer->stop();
+		is_buffering = false;
+		maximum = -1;
+		percent = 100;
+	}
+
+	emit busMessage(MBMP_GI::Buffering, QString::number(percent));
+	
+	return;
+ }

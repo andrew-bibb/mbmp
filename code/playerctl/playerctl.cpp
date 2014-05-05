@@ -67,10 +67,16 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// enable subtitles if requested
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, (parser.isSet("subtitles")) ); 
 	
+	// enable stream buffering if requested
+	p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, (parser.isSet("stream-buffering")) ); 	
+	
+	// enable download buffering if requested
+	p_gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, (parser.isSet("download-buffering")) );	
+	
 	// setup the connection speed
 	qint64 cnxnspeed = parser.value("connection-speed").toInt(&ok,10);
-	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);
-	
+	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);		
+		
 	// setup the cheatsheet message box
 	chtsht = new QMessageBox(this);
 	chtsht->setWindowTitle(tr("Key Bindings"));
@@ -220,9 +226,18 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	action_vis = options_menu->addAction(tr("Visualizer"));
 	action_vis->setCheckable(true);
 	action_vis->setChecked(parser.isSet("visualizer"));		
+	
 	action_sub = options_menu->addAction(tr("Subtitles"));
 	action_sub->setCheckable(true);
 	action_sub->setChecked(parser.isSet("subtitles"));
+	
+	action_sbuf = options_menu->addAction(tr("Stream Buffering"));
+	action_sbuf->setCheckable(true);
+	action_sbuf->setChecked(parser.isSet("stream-buffering"));
+	
+	action_dbuf = options_menu->addAction(tr("Download Buffering"));
+	action_dbuf->setCheckable(true);
+	action_dbuf->setChecked(parser.isSet("download-buffering"));	
 			
 	// create the control_menu
 	control_menu = new QMenu(this);
@@ -384,7 +399,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(pl_Act08);
 	pl_Act08->setShortcuts(getShortcuts("cmd_cyclesubtitle") );
 	connect (pl_Act08, SIGNAL(triggered()), p_gstiface, SLOT(cycleTextStream()));		
-		
+			
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
 	QTimer::singleShot(10, this, SLOT(playMedia()));
@@ -1051,8 +1066,18 @@ void PlayerControl::changeOptions(QAction* act)
 		p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, act->isChecked() );
 		vis_group->setEnabled(act->isChecked());
 	}
-	else if (act == action_sub)
-		p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, act->isChecked() );  
+	
+	else if (act == action_sub) {
+		p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, act->isChecked() );
+	}
+	
+	else if (act == action_sbuf) {
+		p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, act->isChecked() );
+	}
+	
+	else if (act == action_dbuf) {
+		p_gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, act->isChecked() );
+	}	
 	
 	return;
 }

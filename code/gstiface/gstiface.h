@@ -153,7 +153,7 @@ class GST_Interface : public QObject
 		// members
 		GstElement* pipeline_playbin;
 		GstBus* bus;
-		QTimer* timer;
+		QTimer* bus_timer;
 		QMap<QString, GstElementFactory*> vismap; 
 		QMap<QString, int> streammap;
 		StreamInfo* streaminfo;		
@@ -164,6 +164,9 @@ class GST_Interface : public QObject
 		QMap<QString, QVariant> map_md_dvd;
 		QString opticaldrive;
 		int mediatype;
+		bool is_live;
+		bool is_buffering;
+		QTimer* dl_timer;
 		
 		// functions
 		void extractTocTrack(const GstTocEntry*);
@@ -171,6 +174,9 @@ class GST_Interface : public QObject
 		void queryStreamPosition();
 		bool queryStreamSeek();
 		gint64 queryDuration();
+		
+		private slots:
+		void downloadBuffer();
 };
 		
 # endif		

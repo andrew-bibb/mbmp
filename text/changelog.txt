@@ -4,6 +4,7 @@
 <b>In Progress</b>
 <ul>
 <li>Fixed visualizer menu not activating when visualizer option is toggled</li>
+<li>Stream and Download buffering (100% download, not progressive) enabled with command line options.</li>
 </ul>
 <br>
 <b>27 April 2014 - Playlist reworked</b>
@@ -43,7 +44,7 @@
 <li>Put more information from DVD and CD into PlaylistItems</li>
 <li>Add libquvi support to parse YouTube and similar URL's</li>
 <li>Need a proper man page</li>
-<li>Improve buffering from real bad internet connections</li>
+<li>Try to figure out progressive downloading</li>
 <li>Color balance adjustments</li>
 <li>Modifiy playback speed<li>
 <li>Read subtitles from external file<li>

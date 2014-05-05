@@ -82,6 +82,8 @@ class PlayerControl : public QDialog
 		VideoWidget* videowidget;
 		QAction* action_vis;
 		QAction* action_sub;
+		QAction* action_sbuf;
+		QAction* action_dbuf;
   
   // functions
 		QString readTextFile(const char*);
