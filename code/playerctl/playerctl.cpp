@@ -675,7 +675,7 @@ void PlayerControl::playPause()
 {
 	if (p_gstiface->getState() == GST_STATE_NULL || p_gstiface->getState() == GST_STATE_READY )
 		playMedia();
-		
+				
 	else {
 		if (p_gstiface->getState() == GST_STATE_PLAYING) seek_group->setEnabled(false);
 		p_gstiface->playPause();

@@ -1045,7 +1045,10 @@ void GST_Interface::pollGstBus()
 				// only buffer if the download playflag is set 
 				guint flags = 0;
 				g_object_get (pipeline_playbin, "flags", &flags, NULL);
-				if (! (flags & GST_PLAY_FLAG_DOWNLOAD) ) break;			
+				if (! (flags & GST_PLAY_FLAG_DOWNLOAD) ) {
+					gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
+					break;
+				 }			
 				
 				// start the download or start playing
 				if (is_buffering) dl_timer->start(500);	
