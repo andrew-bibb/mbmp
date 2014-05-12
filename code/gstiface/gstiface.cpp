@@ -1045,14 +1045,13 @@ void GST_Interface::pollGstBus()
 				// only buffer if the download playflag is set 
 				guint flags = 0;
 				g_object_get (pipeline_playbin, "flags", &flags, NULL);
-				if (! (flags & GST_PLAY_FLAG_DOWNLOAD) ) {
-					gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
-					break;
-				 }			
+				if ( flags & GST_PLAY_FLAG_DOWNLOAD)  {
+					// if we are buffering start the download 
+					if (is_buffering) dl_timer->start(500);
+				}	// if download flag is set
 				
-				// start the download or start playing
-				if (is_buffering) dl_timer->start(500);	
-				else gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);				
+				// set the pipeline to playing	
+				gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);				
 
 				break; }	// ASYNC_START case		
 			
