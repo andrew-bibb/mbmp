@@ -41,7 +41,6 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/streaminfo/streaminfo.h"
 
 //  Enum's local to this program
-//  Enum's local to this program
 namespace MBMP_GI 
 {
   enum {

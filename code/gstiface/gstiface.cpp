@@ -1045,13 +1045,17 @@ void GST_Interface::pollGstBus()
 				// only buffer if the download playflag is set 
 				guint flags = 0;
 				g_object_get (pipeline_playbin, "flags", &flags, NULL);
+				// if DOWNLOAD flag is set and we are currently buffering start the
+				// download.  dl_timer is connectedto downloadBuffer() which will
+		// start the playback at the appropriate time.>> 
 				if ( flags & GST_PLAY_FLAG_DOWNLOAD)  {
-					// if we are buffering start the download 
-					if (is_buffering) dl_timer->start(500);
+					dl_timer->start(500);
 				}	// if download flag is set
 				
-				// set the pipeline to playing	
-				gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);				
+				// otherwise set the pipeline to playing	
+				else {
+					gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);				
+				}
 
 				break; }	// ASYNC_START case		
 			
@@ -1073,7 +1077,7 @@ void GST_Interface::toggleMute()
 	gboolean b_mute = false;
 	
 	// toggle the mute setting
-	 
+	g_object_get (G_OBJECT (pipeline_playbin), "mute", &b_mute, NULL);		 
 	b_mute ? g_object_set (G_OBJECT (pipeline_playbin), "mute", false, NULL) : g_object_set (G_OBJECT (pipeline_playbin), "mute", true, NULL);
 		
 	return;
