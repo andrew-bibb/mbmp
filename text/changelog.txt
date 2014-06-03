@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
@@ -6,6 +5,7 @@
 <ul>
 <li>Fixed visualizer menu not activating when visualizer option is toggled</li>
 <li>Stream and Download buffering (100% download, not progressive) enabled with command line options.</li>
+<li>Added scrolling message box for the ChangeLog and the Cheatsheet.</li>
 </ul>
 <br>
 <b>27 April 2014 - Playlist reworked</b>
@@ -49,54 +49,4 @@
 <li>Color balance adjustments</li>
 <li>Modifiy playback speed<li>
 <li>Read subtitles from external file<li>
-=======
-<b><center>Connman System Tray (CMST)</center></b>
-<b><center>Change Log</center></b>
-<br>
-<br><b>In Progress</b>
-<ul>
-<li>Option to use system icon theme if available</li>
-<li>Added MoveBefore and MoveAfter buttons to services on first page</li>
 </ul>
-<br><b>2014.03.29 - </b>Revised per input from Arch Linux Forums
-<ul>
-<li>Added command line option to wait a specified time to create the system tray</li>
-</ul>
-<br><b>2014.03.13 - </b>Revised per input from Arch Linux Forums
-<ul>
-<li>Command line options to show help, version, disable the system tray and start the program minimized.</li>
-<li>Added SSID field to the agent request information dialog.</li>
-<li>Added check to make sure a system tray exists before we try to use it.</li>
-<li>Added option to log the input request from the connman daemon.</li>
-</ul>
-<br><b>2014.01.18 - </b>Revised
-<ul>
-<li>Improved error dialog in Agent and ask for retry on bad password.</li>
-</ul>
-<br><b>2014.01.14 - </b>Revised
-<ul>
-<li>Fixed up tooltip popup on system tray icon</li>
-</ul>
-<br><b>2014.01.11 - </b>Posted to Arch Linux Forum
-<ul>
-<li>Added the counters and the Counters tab</li>
-<li>Fixed a SEGFAULT when connecting a Wifi service after the service order had changed.</li>
-<li>Added message dialogs in the logerrors function to show errors to the user (errors are still logged to the journal).</li>
-<li>Fixed SEGFAULTS if the program fails to find or connect to DBUS</li>
-<li>Added a button on the WiFi page to remove a Wifi service</li><
-/ul>
-<br>
-<b>2014.01.05 - </b>Initial Version
-<ul>
-<li>View and set global connection properties</li>
-<li>List known technologies and services</li>
-<li>View detailed information about services</li>
-<li>Basic WiFi service management</li>
-</ul>
-
-<b>To Do</b>
-<ul>
-<li>Continue working on command line options (next up are the timer intervals)</li>
-<li>Look at possibly using system icons as an option to our hard coded icons</li>
->>>>>>> a9924654cb846fa95c2a013174bb292f636f4ef7
-</ul> 

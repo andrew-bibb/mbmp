@@ -19,6 +19,7 @@
 # include "./code/keymap/keymap.h"
 # include "./code/playlist/playlist.h"
 # include "./code/videowidget/videowidget.h"
+# include "./code/scrollbox/scrollbox.h"
 
 class PlayerControl : public QDialog
 {
@@ -78,7 +79,7 @@ class PlayerControl : public QDialog
 		QCursor ncurs;
 		QFile logfile;
 		int loglevel;
-		QMessageBox* chtsht;
+		ScrollBox* chtsht;
 		VideoWidget* videowidget;
 		QAction* action_vis;
 		QAction* action_sub;

@@ -78,9 +78,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);		
 		
 	// setup the cheatsheet message box
-	chtsht = new QMessageBox(this);
+	chtsht = new ScrollBox(this);
 	chtsht->setWindowTitle(tr("Key Bindings"));
-	chtsht->setText(keymap->getCheatSheet());
+	chtsht->setDisplayText(keymap->getCheatSheet());
 	chtsht->setWindowModality(Qt::NonModal);	
 	
 	// seed the playlist with the positional arguments from the command line
@@ -796,7 +796,7 @@ void PlayerControl::showChangeLog()
 	QString s = readTextFile(":/text/text/changelog.txt");
   if ( s.isEmpty() ) s.append(tr("%1 change log is not available.").arg(PROGRAM_NAME));
 	
-	QMessageBox::about(this, tr("Change Log"), s);
+	ScrollBox::execScrollBox(tr("ChangeLog"), s, this);
 }
 
 ////////////////////////////// Private Slots ////////////////////////////

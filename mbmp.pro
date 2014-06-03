@@ -19,11 +19,13 @@ HEADERS 	+= ./code/playlist/playlistitem.h
 HEADERS 	+= ./code/gstiface/gstiface.h
 HEADERS		+= ./code/streaminfo/streaminfo.h
 HEADERS		+= ./code/videowidget/videowidget.h
+HEADERS		+= ./code/scrollbox/scrollbox.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
 FORMS		+= ./code/playlist/ui/playlist.ui
 FORMS		+= ./code/streaminfo/ui/streaminfo.ui
+FORMS		+= ./code/scrollbox/ui/scrollbox.ui
 
 #	sources
 SOURCES	+= ./code/main.cpp
@@ -34,6 +36,7 @@ SOURCES	+= ./code/playlist/playlistitem.cpp
 SOURCES	+= ./code/gstiface/gstiface.cpp
 SOURCES += ./code/streaminfo/streaminfo.cpp
 SOURCES += ./code/videowidget/videowidget.cpp
+SOURCES += ./code/scrollbox/scrollbox.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc
