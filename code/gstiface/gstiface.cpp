@@ -312,11 +312,10 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
     // Bring the pipeline to paused and see if we have a live stream (for buffering)
     ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
     bus_timer->start(bus_timeout);
-    
     switch (ret) {
-      case GST_STATE_CHANGE_SUCCESS:
+      case GST_STATE_CHANGE_SUCCESS: 
         is_live = false;
-        // playback will start from inside the ASYNC_DONE case in pollGstBus
+				gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
         break;
   
       case GST_STATE_CHANGE_FAILURE:
@@ -331,8 +330,13 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
         gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
         break;
   
-      default:
+			case GST_STATE_CHANGE_ASYNC:
+				gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
         break;
+        
+      default: // there is no default, only 4 possiblities above
+				qDebug() << "Default case hit in GST_Interface::playMedia() switch - should never happen.";
+				break;
     } // switch
   } // else need new media source
   
@@ -414,7 +418,7 @@ void GST_Interface::changeVisualizer(const QString& vis)
 }
 
 //
-//  Function to check the setting of a GstPlayFlag. Send the flag
+// Function to check the setting of a GstPlayFlag. Send the flag
 // to be checked, return true if set and false if unset
 bool GST_Interface::checkPlayFlag(const guint& checkflag)
 {
@@ -1042,25 +1046,19 @@ void GST_Interface::pollGstBus()
       // Posted when elements complete an async state change.  Use to avoid rebuffering
       // if the download flag is set.   
       case GST_MESSAGE_ASYNC_DONE: {
-        // only buffer if the download playflag is set 
-        guint flags = 0;
-        g_object_get (pipeline_playbin, "flags", &flags, NULL);
         // if DOWNLOAD flag is set and we are currently buffering start the
         // download.  dl_timer is connected to downloadBuffer() which will
-        // start the playback at the appropriate time.>> 
+        // start the playback at the appropriate time.
+        guint flags = 0;
+        g_object_get (pipeline_playbin, "flags", &flags, NULL);
         if ( (flags & GST_PLAY_FLAG_DOWNLOAD) && is_buffering )  {
           dl_timer->start(500);
-        } // if download flag is set
-        
-        // otherwise set the pipeline to playing  
-        else {
-          gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);        
-        }
-
-        break; }  // ASYNC_START case   
+        } // if download flag is set       
+        break; }  // ASYNC_DONE case   
       
-    default:
-      emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message")) );
+			default:
+				emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message")) );
+				break;
     } // switch
     
   gst_message_unref(msg);   

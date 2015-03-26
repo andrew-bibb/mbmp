@@ -34,9 +34,9 @@ DEALINGS IN THE SOFTWARE.
 
 ///////////////////////////////// Program Values ///////////////////////
 // Program Info 
-#define VERSION "14.05.11"
+#define VERSION "15.03.26"
 #define RELEASE_DATE "2014.04.27"
-#define COPYRIGHT_DATE "2014"
+#define COPYRIGHT_DATE "2014-2015"
 
 // Program Values
 #define WINDOW_TITLE "MBMP Player"
