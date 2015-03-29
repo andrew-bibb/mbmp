@@ -398,7 +398,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="audio-x-generic" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/sound.png</normaloff>:/images/images/16x16/sound.png</iconset>
    </property>
    <property name="text">
@@ -413,7 +413,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="application-exit" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/exit.png</normaloff>:/images/images/16x16/exit.png</iconset>
    </property>
    <property name="text">
@@ -428,7 +428,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="computer" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/folder_inbox.png</normaloff>:/images/images/16x16/folder_inbox.png</iconset>
    </property>
    <property name="text">
@@ -449,7 +449,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset>
+    <iconset theme="view-fullscreen">
      <normalon>:/images/images/16x16/view_fullscreen.png</normalon>
     </iconset>
    </property>
@@ -478,6 +478,9 @@
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
    <property name="text">
     <string>About</string>
    </property>
@@ -555,7 +558,7 @@
   </action>
   <action name="actionPlaylistNext">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-next" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/forward.png</normaloff>:/images/images/16x16/forward.png</iconset>
    </property>
    <property name="text">
@@ -570,7 +573,7 @@
   </action>
   <action name="actionPlaylistBack">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-previous" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/back.png</normaloff>:/images/images/16x16/back.png</iconset>
    </property>
    <property name="text">
@@ -585,7 +588,7 @@
   </action>
   <action name="actionPlaylistFirst">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-first" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/start.png</normaloff>:/images/images/16x16/start.png</iconset>
    </property>
    <property name="text">
@@ -600,7 +603,7 @@
   </action>
   <action name="actionPlaylistLast">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-last" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/finish.png</normaloff>:/images/images/16x16/finish.png</iconset>
    </property>
    <property name="text">
@@ -615,7 +618,7 @@
   </action>
   <action name="actionAddMedia">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="list-add" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/edit_add.png</normaloff>:/images/images/16x16/edit_add.png</iconset>
    </property>
    <property name="text">
@@ -633,7 +636,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="audio-volume-muted" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/kmixdocked.png</normaloff>
      <normalon>:/images/images/16x16/kmixdocked_error.png</normalon>:/images/images/16x16/kmixdocked.png</iconset>
    </property>
@@ -649,7 +652,7 @@
   </action>
   <action name="actionVolumeDecreaseStep">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-down" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/2downarrow.png</normaloff>:/images/images/16x16/2downarrow.png</iconset>
    </property>
    <property name="text">
@@ -664,7 +667,7 @@
   </action>
   <action name="actionVolumeIncreaseStep">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-up" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/2uparrow.png</normaloff>:/images/images/16x16/2uparrow.png</iconset>
    </property>
    <property name="text">
@@ -679,7 +682,7 @@
   </action>
   <action name="actionVisualizer">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="preferences-desktop-screensaver" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/kwikdisk.png</normaloff>:/images/images/16x16/kwikdisk.png</iconset>
    </property>
    <property name="text">
@@ -724,7 +727,7 @@
   </action>
   <action name="actionSeekBack10">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="media-seek-backward" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/1leftarrow.png</normaloff>:/images/images/16x16/1leftarrow.png</iconset>
    </property>
    <property name="text">
@@ -736,7 +739,7 @@
   </action>
   <action name="actionSeekFrwd10">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="media-seek-forward" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/1rightarrow.png</normaloff>:/images/images/16x16/1rightarrow.png</iconset>
    </property>
    <property name="text">
@@ -751,7 +754,7 @@
   </action>
   <action name="actionSeekBack60">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="media-skip-backward" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/2leftarrow.png</normaloff>:/images/images/16x16/2leftarrow.png</iconset>
    </property>
    <property name="text">
@@ -766,7 +769,7 @@
   </action>
   <action name="actionSeekFrwd60">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="media-skip-forward" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/2rightarrow.png</normaloff>:/images/images/16x16/2rightarrow.png</iconset>
    </property>
    <property name="text">
@@ -814,7 +817,7 @@
   </action>
   <action name="actionAVSync">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="emblem-synchronizing" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/noatunloopsong.png</normaloff>:/images/images/16x16/noatunloopsong.png</iconset>
    </property>
    <property name="text">
@@ -829,7 +832,7 @@
   </action>
   <action name="actionColorBalance">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="applications-graphics" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/blend.png</normaloff>:/images/images/16x16/blend.png</iconset>
    </property>
    <property name="text">
@@ -855,7 +858,7 @@
   </action>
   <action name="actionAudioCD">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="media-optical" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/cdaudio_unmount.png</normaloff>:/images/images/16x16/cdaudio_unmount.png</iconset>
    </property>
    <property name="text">
@@ -870,7 +873,7 @@
   </action>
   <action name="actionDVD">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="media-optical" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/dvd_mount.png</normaloff>:/images/images/16x16/dvd_mount.png</iconset>
    </property>
    <property name="text">
@@ -981,7 +984,7 @@
   </action>
   <action name="actionOptions">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="preferences-system" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/configure.png</normaloff>:/images/images/16x16/configure.png</iconset>
    </property>
    <property name="text">

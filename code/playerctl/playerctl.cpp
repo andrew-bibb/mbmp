@@ -1099,9 +1099,12 @@ void PlayerControl::writeSettings()
   settings->setValue("pos", this->pos() );
   settings->endGroup();
 
-  settings->beginGroup("StartOptions");
-  settings->setValue("icon_theme", QIcon::themeName() );
-  settings->endGroup();
+	bool saveme = false;		// TEMPORARY UNTIL WE GET A SETTINGS DIALOG
+	if (saveme) {
+	  settings->beginGroup("StartOptions");
+	  settings->setValue("icon_theme", QIcon::themeName() );
+	  settings->endGroup();
+	}
   
   return;
 }
@@ -1115,9 +1118,12 @@ void PlayerControl::readSettings()
   move(settings->value("pos", QPoint(400, 436)).toPoint() );
   settings->endGroup();
 
-  settings->beginGroup("StartOptions");
-	QIcon::setThemeName(settings->value("icon_theme").toString() );
-  settings->endGroup();
+	bool readme = false;		// TEMPORARY UNTIL WE GET A SETTINGS DIALOG
+	if (readme) {
+		settings->beginGroup("StartOptions");
+		QIcon::setThemeName(settings->value("icon_theme").toString() );
+		settings->endGroup();
+	}
   
   return;
 }
