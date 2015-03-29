@@ -42,17 +42,17 @@ KeyMap::KeyMap(QObject* parent) : QObject(parent)
 	usermap.clear();
 	
 	// set the filepath data member
-	// PROGRAM_NAME defined in resource.h
+	// APP defined in resource.h
 	filepath = QDir::homePath();
-	filepath.append(QString("/.config/%1").arg(QString(PROGRAM_NAME).toLower()) );
+	filepath.append(QString("/.config/%1").arg(QString(APP).toLower()) );
 
 	// make the local conf file if necessary
 	this->makeLocalFile();
 	
 	// Read the local file, if the returned stringlist is empty, meaning
 	// we could not read the file, fallback to the hardcoded conf file.
-	QStringList sl_rawdata = readTextFile(qPrintable(QString(filepath + "/%1.conf").arg(QString(PROGRAM_NAME).toLower())) );
-	if (sl_rawdata.isEmpty()) QStringList sl_rawdata = readTextFile(":/text/text/mbmp.conf");
+	QStringList sl_rawdata = readTextFile(qPrintable(QString(filepath + "/%1.keys").arg(QString(APP).toLower())) );
+	if (sl_rawdata.isEmpty()) QStringList sl_rawdata = readTextFile(":/text/text/mbmp.keys");
 	
 	// set up the usermap
 	for (int i =0; i < sl_rawdata.size(); ++i) {
@@ -115,7 +115,7 @@ QString KeyMap::getCheatSheet()
 void KeyMap::makeLocalFile()
 {
 	// if the conf file exists return now
-	QFile f(QString(filepath + "/%1.conf").arg(QString(PROGRAM_NAME).toLower()) );
+	QFile f(QString(filepath + "/%1.keys").arg(QString(APP).toLower()) );
 	if (f.exists() ) return;
 
 	// make the directory if it does not exist and copy the hardconded
@@ -126,7 +126,7 @@ void KeyMap::makeLocalFile()
 		
 		// copy the file line by line
 		QTextStream out(&f);
-		QStringList sl_rawdata = readTextFile(":/text/text/mbmp.conf");
+		QStringList sl_rawdata = readTextFile(":/text/text/mbmp.keys");
     for (int i = 0; i < sl_rawdata.size(); ++i) {
 			out << sl_rawdata.at(i) << "\n";
 		}	// for

@@ -33,22 +33,21 @@ DEALINGS IN THE SOFTWARE.
 #define RESOURCE_H
 
 ///////////////////////////////// Program Values ///////////////////////
-// Program Info 
-#define VERSION "15.03.26"
-#define RELEASE_DATE "2014.04.27"
-#define COPYRIGHT_DATE "2014-2015"
+//
+// Program Info (may be visible, but don't mark for tranalation) 
+#define VERSION "15.03.29-1"
+#define RELEASE_DATE "1 March 2015"
+#define COPYRIGHT_DATE "2013-2015"
 
-// Program Values
-#define WINDOW_TITLE "MBMP Player"
-#define PROGRAM_NAME "MBMP"
-#define ORG "Monkey Business Enterprises"
+// Program Values:
+//	QApplication (not user visible)
+//  QSettings (visible in filesystem only)
+//	System Logging (visible in system logs only)
+#define LONG_NAME "MBMP Player"
+#define ORG "mbmp"
+#define APP "mbmp"
+#define LOG_NAME "MBMP"
 #define PLAYER_NAME "mbmp_player"
-
-
-///////////////////////////////// Locale ///////////////////////////////
-// Change lines below as needed. 
-# define L_LANG  English
-# define L_COUNTRY UnitedStates
 
 #endif
 

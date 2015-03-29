@@ -145,9 +145,9 @@ void Playlist::savePlaylist()
 	const QString playlistfiles = "*.m3u";	
 	
 	// default file path to store the playlist  
-  // PROGRAM_NAME defined in resource.h
+  // APP defined in resource.h
 	QString filepath = QDir::homePath();
-	filepath.append(QString("/.%1/playlists").arg(QString(PROGRAM_NAME).toLower()) );    
+	filepath.append(QString("/.%1/playlists").arg(QString(APP).toLower()) );    
 	
 	// make the directory if it does not exist
 	QDir d = QDir(filepath);
@@ -286,7 +286,7 @@ void Playlist::addFile(QAction* a)
 	else if (a == ui.actionAddVideo ) s_files = tr("Video (%1);;All Files (*.*)").arg(video);
 		else if (a == ui.actionAddPlaylist) {
 			s_files = tr("Playlist (%1);;All Files (*.*)").arg(plext);
-			startdir.append(QString("/.%1/playlists").arg(QString(PROGRAM_NAME).toLower()) );
+			startdir.append(QString("/.%1/playlists").arg(QString(APP).toLower()) );
 		}
 	
 	// Open a file dialog to select media files

@@ -17,25 +17,33 @@
 PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent) 
 	: QDialog(parent)
 {
-	// set the Locale
-	QLocale::setDefault(QLocale(QLocale::L_LANG, QLocale::L_COUNTRY));	
+	// set the Locale (probably not necessary since the default is the system one anyway)
+  QLocale::setDefault(QLocale::system() );	
 	
 	// set the window title
-	this->setWindowTitle(WINDOW_TITLE);
+	this->setWindowTitle(LONG_NAME);
 	
-  // setup the user interface
-  ui.setupUi(this);	
-	ui.widget_control->setVisible(parser.isSet("gui"));
-	if (parser.isSet("fullscreen") ) this->showFullScreen();
-	
-	// members
+	// data members
+	settings = new QSettings(ORG, APP, this);
 	keymap = new KeyMap(this);
 	playlist = new Playlist(this); 
 	playlist->hide();
 	p_gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
 	videowidget = new VideoWidget(this);
-	ui.gridLayout->addWidget(videowidget, 0, 0);
+	
+	// Read saved settings 
+  this->readSettings();	
+	
+	// Set icon theme if provided on the command line
+  if (parser.isSet("icon-theme") ) QIcon::setThemeName(parser.value("icon-theme"));
+	 
+  // setup the user interface
+  ui.setupUi(this);	
+	ui.widget_control->setVisible(parser.isSet("gui"));
+	if (parser.isSet("fullscreen") ) this->showFullScreen();
+	ui.gridLayout->addWidget(videowidget, 0, 0);	
+	
 
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	
@@ -358,6 +366,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionDVD, SIGNAL (triggered()), this, SLOT(initializeDVD()));
 	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), p_gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
 	connect (options_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeOptions(QAction*)));
+	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	
 	// create actions to accept a selected few playlist and p_gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -500,14 +509,14 @@ void PlayerControl::initializeCD()
 {	
 	switch (p_gstiface->checkCD(ui.comboBox_audiocd->currentText()) ) {
 		case MBMP_GI::NoCDPipe:
-			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+			QMessageBox::warning(this, tr("%1 - Warning").arg(APP),
 				tr("<center><b>Unable to create a pipeline to read an audio CD.</b></center>"
 				"<br>Additional information may be found in the log file.  "                       
 				"Audio CD playback will be disabled."
 				) );
 			return;	
 		case MBMP_GI::BadCDRead:
-			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+			QMessageBox::warning(this, tr("%1 - Warning").arg(APP),
 				tr("<center><b>Unable to read the audio CD.</b></center>"                       
 				"<br>Make sure the audio CD is in %1.  It may still be possible to play a different CD or to "                       
 				"play this CD in a different drive.").arg(ui.comboBox_audiocd->currentText())
@@ -528,13 +537,13 @@ void PlayerControl::initializeDVD()
 {
 	switch (p_gstiface->checkDVD(ui.comboBox_dvd->currentText()) ) {
 		case MBMP_GI::NoDVDPipe:
-			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+			QMessageBox::warning(this, tr("%1 - Warning").arg(APP),
 				tr("<center><b>Unable to read the DVD.</b></center>"                       
 				"<br>Make sure the DVD is in %1 or try the DVD in a different drive").arg(ui.comboBox_dvd->currentText())
 				);
 			return;
 		case MBMP_GI::BadDVDRead:		
-			QMessageBox::warning(this, tr("%1 - Warning").arg(PROGRAM_NAME),
+			QMessageBox::warning(this, tr("%1 - Warning").arg(APP),
 				tr("<center><b>Unable to read the DVD.</b></center>"                       
 				"<br>Make sure the disk is in %1.  It may still be possible to play a different DVD or to "                       
 				"play this DVD in a different drive.").arg(ui.comboBox_dvd->currentText())
@@ -757,13 +766,13 @@ void PlayerControl::showAbout()
 // slot to display an about box for this program
 void PlayerControl::aboutMBMP()
 {
- QMessageBox::about(this, tr("About %1").arg(PROGRAM_NAME),
+ QMessageBox::about(this, tr("About %1").arg(APP),
       tr("<center>%1 is a GStreamer (1.0 series) media player."
 		  "<br><center>Version <b>%2</b>"
                   "<center>Release date: %3"                        
                   "<center>Copyright c %4\n<center>by\n"
                   "<center>Andrew J. Bibb\n"
-                  "<center>Vermont, USA").arg(PROGRAM_NAME).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
+                  "<center>Vermont, USA").arg(APP).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
 }
 
 //
@@ -784,7 +793,7 @@ void PlayerControl::aboutNuvola()
 void PlayerControl::showLicense()
 {
 	QString s = readTextFile(":/text/text/license.txt");
-  if ( s.isEmpty() ) s.append(tr("%1 license is the MIT license.").arg(PROGRAM_NAME));
+  if ( s.isEmpty() ) s.append(tr("%1 license is the MIT license.").arg(APP));
 	
 	QMessageBox::about(this, tr("License"), s);
 }
@@ -794,7 +803,7 @@ void PlayerControl::showLicense()
 void PlayerControl::showChangeLog()
 {
 	QString s = readTextFile(":/text/text/changelog.txt");
-  if ( s.isEmpty() ) s.append(tr("%1 change log is not available.").arg(PROGRAM_NAME));
+  if ( s.isEmpty() ) s.append(tr("%1 change log is not available.").arg(APP));
 	
 	ScrollBox::execScrollBox(tr("ChangeLog"), s, this);
 }
@@ -1080,6 +1089,47 @@ void PlayerControl::changeOptions(QAction* act)
 	}	
 	
 	return;
+}
+
+// Slot to save GUI settings to disk
+void PlayerControl::writeSettings()
+{
+  settings->beginGroup("MainWindow");
+  settings->setValue("size", this->size() );
+  settings->setValue("pos", this->pos() );
+  settings->endGroup();
+
+  settings->beginGroup("StartOptions");
+  settings->setValue("icon_theme", QIcon::themeName() );
+  settings->endGroup();
+  
+  return;
+}
+
+//
+// Slot to read GUI settings to disk
+void PlayerControl::readSettings()
+{
+  settings->beginGroup("MainWindow");
+  resize(settings->value("size", QSize(717, 432)).toSize() );
+  move(settings->value("pos", QPoint(400, 436)).toPoint() );
+  settings->endGroup();
+
+  settings->beginGroup("StartOptions");
+	QIcon::setThemeName(settings->value("icon_theme").toString() );
+  settings->endGroup();
+  
+  return;
+}
+
+//
+// Slot to tidy up the place at close.  Called when the QApplication::aboutToQuit() signal is emitted
+void PlayerControl::cleanUp()
+{
+  // write settings
+  this->writeSettings();
+  
+  return;
 }
 
 ////////////////////////////// Protected Functions ////////////////////////////

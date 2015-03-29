@@ -1,22 +1,34 @@
 # include <QtCore/QDebug>
 # include <QApplication>
-# include <QLocale>
 # include <QCommandLineOption>
 # include <QCommandLineParser>
 # include <QStringList>
 # include <QTime>
+# include <QTranslator>
+# include <QLibraryInfo>
+
+# include <signal.h> 
 
 # include "./code/playerctl/playerctl.h"
 # include "./code/resource.h"	
 
-// uncomment to install translation code
-//#define USE_TRANSLATIONS
+
+// Create a signal handler to catch ^C from console
+void signalhandler(int sig) {
+  if(sig == SIGINT || sig == SIGTERM) {
+    qApp->quit();
+  }
+  
+  return;
+}
 
 int main(int argc, char *argv[])
 {
-  QApplication app(argc, argv);
-  QApplication::setApplicationName(PROGRAM_NAME);
+  QApplication::setApplicationName(LONG_NAME);
   QApplication::setApplicationVersion(VERSION);
+  QApplication::setOrganizationName(ORG); 
+  QApplication::setDesktopSettingsAware(true);
+  QApplication app(argc, argv);
 
 	// Create seed for the QT random number generator
 	QTime time = QTime::currentTime();
@@ -42,6 +54,12 @@ int main(int argc, char *argv[])
 	parser.addOption(openGUI);
 	
   parser.addHelpOption();  
+  
+  QCommandLineOption useIconTheme(QStringList() << "i" << "icon-theme",
+		QCoreApplication::translate("main.cpp", "Use an icon theme from your system."),
+		QCoreApplication::translate("main.cpp", "Icon Theme Name"),
+		QString() );
+  parser.addOption(useIconTheme);   
 	
 	QCommandLineOption logLevel(QStringList() << "l" << "loglevel", QCoreApplication::translate("main.cpp", "Set the log level from 0 to 2 (default is 1)."), QCoreApplication::translate("main.cpp", "loglevel"), "1" );
 	parser.addOption(logLevel);  
@@ -62,21 +80,35 @@ int main(int argc, char *argv[])
   
 	parser.addPositionalArgument("filename", QCoreApplication::translate("main.cpp", "Media file to play."));
   
-  // setup translations 
-	#ifdef USE_TRANSLATIONS
-		QTranslator qtTranslator;
-		qtTranslator.load("qt_" + QLocale::system().name(),
-		QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-		app.installTranslator(&qtTranslator);
+  // Setup translations   
+  QTranslator qtTranslator;
+  qtTranslator.load("qt_" + QLocale::system().name(),
+  QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  app.installTranslator(&qtTranslator);
 
-		QTranslator connmanqtTranslator;
-		connmanqtTranslator.load("connmanqt_" + QLocale::system().name());
-		app.installTranslator(&connmanqtTranslator);
-  #endif
+  QTranslator cmstTranslator;
+  if (cmstTranslator.load("mbmp_" + QLocale::system().name(), ":/translations/translations" ) ) {  
+		app.installTranslator(&cmstTranslator);	
+	}
+	// else use en_US as it contains Connman strings properized and some singular/plural strings
+	else if (cmstTranslator.load("mbmp_en_US", ":/translations/translations" ) ) {
+		app.installTranslator(&cmstTranslator);	
+	}
 
-	parser.process(app);   
-	QStringList sl = parser.unknownOptionNames();
-	if (sl.size() > 0 ) parser.showHelp(1);
+
+  // Make sure all the command lines can be parsed 
+  // using parse() instead of process() as process stops on an error if an option needs a value
+  // and it is not specified, even if we provide a default.  We're supposed to catch errors if we
+  // use parse(), but parse.errorText() returns an empty string on this.  Bag the error checking
+  // for now.
+  parser.parse(QCoreApplication::arguments() );   
+  QStringList sl = parser.unknownOptionNames();
+  if (sl.size() > 0 ) parser.showHelp(1);
+  if (parser.isSet("help") ) parser.showHelp(1);	
+  
+  
+  // signal handler             
+  signal(SIGINT, signalhandler); 
   
   PlayerControl pctl(parser);
   pctl.show();

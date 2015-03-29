@@ -1,8 +1,8 @@
 <RCC>
   <qresource prefix="text">
+    <file>text/mbmp.keys</file>
     <file>text/changelog.txt</file>
     <file>text/license.txt</file>
-    <file>text/mbmp.conf</file>
   </qresource>
   <qresource prefix="images">
     <file>images/16x16/view_text.png</file>

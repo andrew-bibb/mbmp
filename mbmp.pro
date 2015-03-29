@@ -1,9 +1,11 @@
-#  We need the qt libraries, we want compiler warnings off, and this is a release version of the program  
-#CONFIG += qt warn_off release 
-CONFIG += qt warn_on release
+#  We need the qt libraries, we want compiler warnings on, and this is a release version of the program  
+CONFIG += qt
+CONFIG += warn_on
+CONFIG += release
 
 #  Widgets needed for QT5, 
 QT += widgets
+QT += core
 
 TARGET = mbmp
 TEMPLATE = app
@@ -58,6 +60,9 @@ CONFIG += link_pkgconfig
 PKGCONFIG += gstreamer-1.0
 PKGCONFIG += gstreamer-video-1.0
 PKGCONFIG += gstreamer-pbutils-1.0
+
+# translations
+TRANSLATIONS += ./translations/cmst_en_US.ts
 
 ##  Place all object files in their own directory and moc files in their own directory
 ##  This is not necessary but keeps things cleaner.

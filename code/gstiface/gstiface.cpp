@@ -1029,7 +1029,7 @@ void GST_Interface::pollGstBus()
                 else qs_artist.clear();
                 g_free (str);
               }
-              if (qs_title.isEmpty() ) mainwidget->setWindowTitle(WINDOW_TITLE);
+              if (qs_title.isEmpty() ) mainwidget->setWindowTitle(LONG_NAME);
               else {
                 if (qs_artist.isEmpty() )
                   mainwidget->setWindowTitle(QString("%1").arg(qs_title) );
@@ -1117,7 +1117,7 @@ void GST_Interface::playerStop()
   dl_timer->stop();
   
   // reset the window title
-  mainwidget->setWindowTitle(WINDOW_TITLE);
+  mainwidget->setWindowTitle(LONG_NAME);
   
   return;
 }
