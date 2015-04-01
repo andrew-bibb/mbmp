@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>717</width>
+    <width>672</width>
     <height>432</height>
    </rect>
   </property>
@@ -479,7 +479,9 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset theme="help-about"/>
+    <iconset theme="help-about">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -636,7 +638,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset theme="audio-volume-muted" resource="../../../mbmp.qrc">
+    <iconset resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/kmixdocked.png</normaloff>
      <normalon>:/images/images/16x16/kmixdocked_error.png</normalon>:/images/images/16x16/kmixdocked.png</iconset>
    </property>

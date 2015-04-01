@@ -34,16 +34,35 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// Read saved settings 
   this->readSettings();	
+  
+  // Set icon theme if provided on the command line
+  if (parser.isSet("icon-theme") ) 
+		QIcon::setThemeName(parser.value("icon-theme").isEmpty() ? "none" : parser.value("icon-theme"));
 	
-	// Set icon theme if provided on the command line
-  if (parser.isSet("icon-theme") ) QIcon::setThemeName(parser.value("icon-theme"));
-	 
   // setup the user interface
   ui.setupUi(this);	
 	ui.widget_control->setVisible(parser.isSet("gui"));
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
 	ui.gridLayout->addWidget(videowidget, 0, 0);	
 	
+	if (parser.isSet("icon-theme") && (QIcon::themeName() != "none") ) {
+		if (QIcon::hasThemeIcon("media-playback-pause") && QIcon::hasThemeIcon("media-playback-start") ) {
+			QPixmap pix01 = QIcon::fromTheme("media-playback-pause").pixmap(16, QIcon::Normal, QIcon::On);
+			QPixmap pix02 = QIcon::fromTheme("media-playback-start").pixmap(16, QIcon::Normal, QIcon::On);
+			QIcon icon = QIcon();
+			icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
+			icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);  
+			ui.actionPlayPause->setIcon(icon);
+		}	// if have ThemeIcon 
+		if (QIcon::hasThemeIcon("audio-volume-muted") && QIcon::hasThemeIcon("audio-volume-medium") ) {
+			QPixmap pix01 = QIcon::fromTheme("audio-volume-muted").pixmap(16, QIcon::Normal, QIcon::On);
+			QPixmap pix02 = QIcon::fromTheme("audio-volume-medium").pixmap(16, QIcon::Normal, QIcon::On);
+			QIcon icon = QIcon();
+			icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
+			icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);  
+			ui.actionToggleMute->setIcon(icon);
+		}	// if have ThemeIcon 
+	}	
 
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	

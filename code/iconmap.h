@@ -1,12 +1,8 @@
-/**************************** resource.h *******************************
+/**************************** iconmap.h *****************************
 
-Header file that contains program #defines.  It used to be that we kept
-all program update and version information in this single file.  Now
-we've moved a lot of that to txt files inside the /text directory which
-are compiled in as a resource.  This seems to result in a faster 
-compile, but we now have manage information in two locations.
+Code to manage the mappings from theme icons to QActions. 
 
-Copyright (C) 2013-2014
+Copyright (C) 2014-2015
 by: Andrew J. Bibb
 License: MIT 
 
@@ -29,25 +25,38 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ***********************************************************************/ 
 
-#ifndef RESOURCE_H
-#define RESOURCE_H
+# ifndef ICONMAP_H
+# define ICONMAP_H
 
-///////////////////////////////// Program Values ///////////////////////
-//
-// Program Info (may be visible, but don't mark for tranalation) 
-#define VERSION "15.03.31-1"
-#define RELEASE_DATE "1 March 2015"
-#define COPYRIGHT_DATE "2013-2015"
+# include <QObject>
+# include <QWidget>
+# include <QString>
+# include <QStringList>
+# include <QKeyEvent>
+# include <QMap>
+# include <QKeySequence>
+# include <QList>
 
-// Program Values:
-//	QApplication (not user visible)
-//  QSettings (visible in filesystem only)
-//	System Logging (visible in system logs only)
-#define LONG_NAME "MBMP Player"
-#define ORG "mbmp"
-#define APP "mbmp"
-#define LOG_NAME "MBMP"
-#define PLAYER_NAME "mbmp_player"
+
+//	This class is based on a QObject
+class IconMap : public QObject
+{
+  Q_OBJECT
+
+  public:
+    IconMap(QObject*);
+
+  public slots:
+		QIcon getIcon(const QString&);
+
+  private:
+		// members 
+		QMap<QString, QString[2] > iconmap;
+	       
+	// functions
+		QStringList readTextFile(const char*);
+
+};
 
 #endif
 
