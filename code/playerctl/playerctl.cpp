@@ -37,7 +37,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   
   // Set icon theme if provided on the command line
   if (parser.isSet("icon-theme") ) 
-		QIcon::setThemeName(parser.value("icon-theme").isEmpty() ? "none" : parser.value("icon-theme"));
+		QIcon::setThemeName(parser.value("icon-theme"));
 	
   // setup the user interface
   ui.setupUi(this);	
@@ -45,24 +45,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
 	ui.gridLayout->addWidget(videowidget, 0, 0);	
 	
-	if (parser.isSet("icon-theme") && (QIcon::themeName() != "none") ) {
-		if (QIcon::hasThemeIcon("media-playback-pause") && QIcon::hasThemeIcon("media-playback-start") ) {
-			QPixmap pix01 = QIcon::fromTheme("media-playback-pause").pixmap(16, QIcon::Normal, QIcon::On);
-			QPixmap pix02 = QIcon::fromTheme("media-playback-start").pixmap(16, QIcon::Normal, QIcon::On);
-			QIcon icon = QIcon();
-			icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
-			icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);  
-			ui.actionPlayPause->setIcon(icon);
-		}	// if have ThemeIcon 
-		if (QIcon::hasThemeIcon("audio-volume-muted") && QIcon::hasThemeIcon("audio-volume-medium") ) {
-			QPixmap pix01 = QIcon::fromTheme("audio-volume-muted").pixmap(16, QIcon::Normal, QIcon::On);
-			QPixmap pix02 = QIcon::fromTheme("audio-volume-medium").pixmap(16, QIcon::Normal, QIcon::On);
-			QIcon icon = QIcon();
-			icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
-			icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);  
-			ui.actionToggleMute->setIcon(icon);
-		}	// if have ThemeIcon 
-	}	
+	// Icons with different on and off pixmaps
+	if (parser.isSet("icon-theme") ) {
+		createThemeIcon(ui.actionPlayPause, "media-playback-pause", "media-playback-start");
+		createThemeIcon(ui.actionToggleMute, "audio-volume-muted","audio-volume-medium");
+	}
 
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	
@@ -1187,4 +1174,34 @@ QString PlayerControl::readTextFile(const char* textfile)
 	return rtnstring;
 } 
 
-
+//
+// Function to create icons from theme icons and assign them to actions.
+void PlayerControl::createThemeIcon(QAction* act, const QString& icon_on, const QString& icon_off)
+{qDebug() << "icon_on" << icon_on << "icon_off" << icon_off;
+	// Return if no icon_on provided
+	if (icon_on.isEmpty() ) return;
+	
+	// if no icon_off provided set the icon_on to the theme icon
+	if (icon_off.isEmpty() ) {
+		if (QIcon::hasThemeIcon(icon_on) )
+			act->setIcon(QIcon::fromTheme(icon_on) );
+		return;
+	}
+				
+	// both icon_on and icon_off provided, build the new icon from these parts
+	QIcon icon = QIcon();
+	QList<QSize> sizes = QIcon::fromTheme(icon_on).availableSizes(QIcon::Normal, QIcon::On);
+	for (int i = 0; i < sizes.count(); ++i) {
+		QPixmap pix01 = QIcon::fromTheme(icon_on).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
+		icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
+	}	// for
+	sizes = QIcon::fromTheme(icon_off).availableSizes(QIcon::Normal, QIcon::On);
+	for (int i = 0; i < sizes.count(); ++i) {
+		QPixmap pix02 = QIcon::fromTheme(icon_off).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
+		icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);
+	}	//for
+	act->setIcon(icon);
+	
+	return;
+}
+			

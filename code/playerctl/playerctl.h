@@ -93,7 +93,7 @@ class PlayerControl : public QDialog
   
   // functions
 		QString readTextFile(const char*);
-		void makeChapterList(int);
+		void createThemeIcon(QAction*, const QString&, const QString& = QString());
 
 };
 
