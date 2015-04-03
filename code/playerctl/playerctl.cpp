@@ -1177,7 +1177,7 @@ QString PlayerControl::readTextFile(const char* textfile)
 //
 // Function to create icons from theme icons and assign them to actions.
 void PlayerControl::createThemeIcon(QAction* act, const QString& icon_on, const QString& icon_off)
-{qDebug() << "icon_on" << icon_on << "icon_off" << icon_off;
+{
 	// Return if no icon_on provided
 	if (icon_on.isEmpty() ) return;
 	
@@ -1189,18 +1189,20 @@ void PlayerControl::createThemeIcon(QAction* act, const QString& icon_on, const 
 	}
 				
 	// both icon_on and icon_off provided, build the new icon from these parts
-	QIcon icon = QIcon();
-	QList<QSize> sizes = QIcon::fromTheme(icon_on).availableSizes(QIcon::Normal, QIcon::On);
-	for (int i = 0; i < sizes.count(); ++i) {
-		QPixmap pix01 = QIcon::fromTheme(icon_on).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
-		icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
-	}	// for
-	sizes = QIcon::fromTheme(icon_off).availableSizes(QIcon::Normal, QIcon::On);
-	for (int i = 0; i < sizes.count(); ++i) {
-		QPixmap pix02 = QIcon::fromTheme(icon_off).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
-		icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);
-	}	//for
-	act->setIcon(icon);
+	if (QIcon::hasThemeIcon(icon_on) && QIcon::hasThemeIcon(icon_off) ) {
+		QIcon icon = QIcon();
+		QList<QSize> sizes = QIcon::fromTheme(icon_on).availableSizes(QIcon::Normal, QIcon::On);
+		for (int i = 0; i < sizes.count(); ++i) {
+			QPixmap pix01 = QIcon::fromTheme(icon_on).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
+			icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
+		}	// for
+		sizes = QIcon::fromTheme(icon_off).availableSizes(QIcon::Normal, QIcon::On);
+		for (int i = 0; i < sizes.count(); ++i) {
+			QPixmap pix02 = QIcon::fromTheme(icon_off).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
+			icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);
+		}	//for
+		act->setIcon(icon);
+	}	// if
 	
 	return;
 }
