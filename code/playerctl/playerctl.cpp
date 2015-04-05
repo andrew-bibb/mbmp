@@ -22,6 +22,10 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// set the window title
 	this->setWindowTitle(LONG_NAME);
+		  
+  // Set icon theme if provided on the command line
+  if (parser.isSet("icon-theme") ) 
+		QIcon::setThemeName(parser.value("icon-theme"));
 	
 	// data members
 	settings = new QSettings(ORG, APP, this);
@@ -31,24 +35,20 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	p_gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
 	videowidget = new VideoWidget(this);
-	
-	// Read saved settings 
-  this->readSettings();	
-  
-  // Set icon theme if provided on the command line
-  if (parser.isSet("icon-theme") ) 
-		QIcon::setThemeName(parser.value("icon-theme"));
-	
+
   // setup the user interface
   ui.setupUi(this);	
 	ui.widget_control->setVisible(parser.isSet("gui"));
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
 	ui.gridLayout->addWidget(videowidget, 0, 0);	
 	
+	// Read saved settings 
+	this->readSettings();	
+
 	// Icons with different on and off pixmaps
 	if (parser.isSet("icon-theme") ) {
 		createThemeIcon(ui.actionPlayPause, "media-playback-pause", "media-playback-start");
-		createThemeIcon(ui.actionToggleMute, "audio-volume-muted","audio-volume-medium");
+		createThemeIcon(ui.actionToggleMute, "audio-volume-muted","multimedia-volume-control");
 	}
 
 	// hide the buffering progress bar

@@ -179,7 +179,7 @@
   </layout>
   <action name="actionMoveUp">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-up" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/1uparrow.png</normaloff>:/images/images/16x16/1uparrow.png</iconset>
    </property>
    <property name="text">
@@ -191,7 +191,7 @@
   </action>
   <action name="actionMoveDown">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="go-down" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/1downarrow.png</normaloff>:/images/images/16x16/1downarrow.png</iconset>
    </property>
    <property name="text">
@@ -203,7 +203,7 @@
   </action>
   <action name="actionAddMedia">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="list-add" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/edit_add.png</normaloff>:/images/images/16x16/edit_add.png</iconset>
    </property>
    <property name="text">
@@ -212,7 +212,7 @@
   </action>
   <action name="actionRemoveItem">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="list-remove" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/edit_remove.png</normaloff>:/images/images/16x16/edit_remove.png</iconset>
    </property>
    <property name="text">
@@ -224,7 +224,7 @@
   </action>
   <action name="actionHidePlaylist">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="application-exit" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/exit.png</normaloff>:/images/images/16x16/exit.png</iconset>
    </property>
    <property name="text">
@@ -236,7 +236,7 @@
   </action>
   <action name="actionAddFiles">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="folder" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/folder.png</normaloff>:/images/images/16x16/folder.png</iconset>
    </property>
    <property name="text">
@@ -248,7 +248,7 @@
   </action>
   <action name="actionAddURL">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="folder-remote" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/network.png</normaloff>:/images/images/16x16/network.png</iconset>
    </property>
    <property name="text">
@@ -257,7 +257,7 @@
   </action>
   <action name="actionAddAudio">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="audio-x-generic" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/folder_sound.png</normaloff>:/images/images/16x16/folder_sound.png</iconset>
    </property>
    <property name="text">
@@ -269,7 +269,7 @@
   </action>
   <action name="actionAddVideo">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="video-x-generic" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/folder_video.png</normaloff>:/images/images/16x16/folder_video.png</iconset>
    </property>
    <property name="text">
@@ -281,7 +281,7 @@
   </action>
   <action name="actionRemoveAll">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="edit-delete" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/editdelete.png</normaloff>:/images/images/16x16/editdelete.png</iconset>
    </property>
    <property name="text">
@@ -293,7 +293,7 @@
   </action>
   <action name="actionSavePlaylist">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="document-save" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/filesave.png</normaloff>:/images/images/16x16/filesave.png</iconset>
    </property>
    <property name="text">
@@ -305,7 +305,7 @@
   </action>
   <action name="actionAddPlaylist">
    <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
+    <iconset theme="text-x-generic" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/view_text.png</normaloff>:/images/images/16x16/view_text.png</iconset>
    </property>
    <property name="text">
