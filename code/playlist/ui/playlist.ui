@@ -281,7 +281,7 @@
   </action>
   <action name="actionRemoveAll">
    <property name="icon">
-    <iconset theme="edit-delete" resource="../../../mbmp.qrc">
+    <iconset theme="list-remove" resource="../../../mbmp.qrc">
      <normaloff>:/images/images/16x16/editdelete.png</normaloff>:/images/images/16x16/editdelete.png</iconset>
    </property>
    <property name="text">

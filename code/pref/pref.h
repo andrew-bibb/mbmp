@@ -1,10 +1,7 @@
-/**************************** resource.h *******************************
+/**************************** scrollbox.h *****************************
 
-Header file that contains program #defines.  It used to be that we kept
-all program update and version information in this single file.  Now
-we've moved a lot of that to txt files inside the /text directory which
-are compiled in as a resource.  This seems to result in a faster 
-compile, but we now have manage information in two locations.
+Dialog to display text to the user.  Kind of like a neutered QMessageBox
+except it has scroll bars built in.
 
 Copyright (C) 2013-2014
 by: Andrew J. Bibb
@@ -29,25 +26,31 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ***********************************************************************/ 
 
-#ifndef RESOURCE_H
-#define RESOURCE_H
+# ifndef SCROLLBOX_H
+# define SCROLLBOX_H
 
-///////////////////////////////// Program Values ///////////////////////
-//
-// Program Info (may be visible, but don't mark for tranalation) 
-#define VERSION "15.04.06-1"
-#define RELEASE_DATE "1 March 2015"
-#define COPYRIGHT_DATE "2013-2015"
+# include <QDialog>
 
-// Program Values:
-//	QApplication (not user visible)
-//  QSettings (visible in filesystem only)
-//	System Logging (visible in system logs only)
-#define LONG_NAME "MBMP Player"
-#define ORG "mbmp"
-#define APP "mbmp"
-#define LOG_NAME "MBMP"
-#define PLAYER_NAME "mbmp_player"
+# include "ui_scrollbox.h"
+
+
+//	The main program class based on a QDialog
+class ScrollBox : public QDialog
+{
+  Q_OBJECT
+
+  public:
+    ScrollBox(QWidget*);
+    static void execScrollBox(QString, QString, QWidget*);
+    
+  public slots:
+		void setDisplayText(const QString&);
+    
+  private:
+  // members 
+    Ui::ScrollBox ui;    
+
+};
 
 #endif
 
