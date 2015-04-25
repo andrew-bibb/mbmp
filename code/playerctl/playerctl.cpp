@@ -22,29 +22,33 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// set the window title
 	this->setWindowTitle(LONG_NAME);
+	
+	// setup the settings dialog (and read settings)
+	diag_settings = new Settings(this);
 		  
   // Set icon theme if provided on the command line
   if (parser.isSet("icon-theme") ) 
 		QIcon::setThemeName(parser.value("icon-theme"));
 	
 	// data members
-	settings = new QSettings(ORG, APP, this);
 	keymap = new KeyMap(this);
 	playlist = new Playlist(this); 
-	playlist->hide();
 	p_gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
 	videowidget = new VideoWidget(this);
 
+  // setup the cheatsheet message box
+	chtsht = new ScrollBox(this);
+	chtsht->setWindowTitle(tr("Key Bindings"));
+	chtsht->setDisplayText(keymap->getCheatSheet());
+	chtsht->setWindowModality(Qt::NonModal);	
+  
   // setup the user interface
   ui.setupUi(this);	
 	ui.widget_control->setVisible(parser.isSet("gui"));
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
-	ui.gridLayout->addWidget(videowidget, 0, 0);	
-	
-	// Read saved settings 
-	this->readSettings();	
-
+	ui.gridLayout->addWidget(videowidget, 0, 0);
+			
 	// Icons with different on and off pixmaps
 	if (parser.isSet("icon-theme") ) {
 		createThemeIcon(ui.actionPlayPause, "media-playback-pause", "media-playback-start");
@@ -90,13 +94,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// setup the connection speed
 	qint64 cnxnspeed = parser.value("connection-speed").toInt(&ok,10);
 	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);		
-		
-	// setup the cheatsheet message box
-	chtsht = new ScrollBox(this);
-	chtsht->setWindowTitle(tr("Key Bindings"));
-	chtsht->setDisplayText(keymap->getCheatSheet());
-	chtsht->setWindowModality(Qt::NonModal);	
-	
+			
 	// seed the playlist with the positional arguments from the command line
 	playlist->seedPlaylist(parser.positionalArguments() );
 	
@@ -414,6 +412,12 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(pl_Act08);
 	pl_Act08->setShortcuts(getShortcuts("cmd_cyclesubtitle") );
 	connect (pl_Act08, SIGNAL(triggered()), p_gstiface, SLOT(cycleTextStream()));		
+
+	//restore GUI elements
+	if (diag_settings->useState()) {
+		diag_settings->restoreElementGeometry("playerctl", this);
+		diag_settings->restoreElementGeometry("playlist", playlist);
+	}	// if useState
 			
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
@@ -1097,49 +1101,15 @@ void PlayerControl::changeOptions(QAction* act)
 	return;
 }
 
-// Slot to save GUI settings to disk
-void PlayerControl::writeSettings()
-{
-  settings->beginGroup("MainWindow");
-  settings->setValue("size", this->size() );
-  settings->setValue("pos", this->pos() );
-  settings->endGroup();
-
-	bool saveme = false;		// TEMPORARY UNTIL WE GET A SETTINGS DIALOG
-	if (saveme) {
-	  settings->beginGroup("StartOptions");
-	  settings->setValue("icon_theme", QIcon::themeName() );
-	  settings->endGroup();
-	}
-  
-  return;
-}
-
-//
-// Slot to read GUI settings to disk
-void PlayerControl::readSettings()
-{
-  settings->beginGroup("MainWindow");
-  resize(settings->value("size", QSize(717, 432)).toSize() );
-  move(settings->value("pos", QPoint(400, 436)).toPoint() );
-  settings->endGroup();
-
-	bool readme = false;		// TEMPORARY UNTIL WE GET A SETTINGS DIALOG
-	if (readme) {
-		settings->beginGroup("StartOptions");
-		QIcon::setThemeName(settings->value("icon_theme").toString() );
-		settings->endGroup();
-	}
-  
-  return;
-}
-
 //
 // Slot to tidy up the place at close.  Called when the QApplication::aboutToQuit() signal is emitted
 void PlayerControl::cleanUp()
 {
   // write settings
-  this->writeSettings();
+  diag_settings->saveElementGeometry("playerctl", true, this->size(), this->pos() );
+	diag_settings->saveElementGeometry("playlist", playlist->isVisible(),  playlist->size(), playlist->pos() );
+		
+  diag_settings->writeSettings();
   
   return;
 }

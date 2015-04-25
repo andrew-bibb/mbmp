@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Pref</class>
- <widget class="QDialog" name="Pref">
+ <class>Settings</class>
+ <widget class="QDialog" name="Settings">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -27,20 +27,33 @@
        <string>Preferences</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkBox_retainstate">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the GUI state, playlist, and the stream location of the media currently playing will be saved on exit. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Retain State</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QCheckBox" name="checkBox_retainsettings">
          <property name="enabled">
           <bool>true</bool>
          </property>
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the GUI will be restored from settings saved on disk. Settings include the geometry of the dialog and the state of various check boxes, such as this one. &lt;/p&gt;&lt;p&gt;These settings will be used at next boot to restore the user interface to the way it was at shutdown.&lt;/p&gt;&lt;p style='white-space:pre'&gt;The settings file is: &lt;span style=&quot; font-weight:600;&quot;&gt;${HOME}/.config/cmst/cmst.conf  &lt;/span&gt;&lt;br&gt;This is a standard ini type text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the program settings at the right will be restored on start up.&lt;/p&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The settings file is: &lt;span style=&quot; font-weight:600;&quot;&gt;${HOME}/.config/cmst/cmst.conf  &lt;/span&gt;&lt;br/&gt;This is a standard ini type text file.&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Retain Settings</string>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="3" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -52,6 +65,16 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="checkBox_playlist">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked the playlist and position of the currently playing media will be retained.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Retain Playlist</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -127,7 +150,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QCheckBox" name="checkBox_fullscrean">
+        <widget class="QCheckBox" name="checkBox_fullscreen">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-f&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--fullscreen&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Start the player in full screen mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -255,82 +278,18 @@
  <resources/>
  <connections>
   <connection>
-   <sender>checkBox_connectionspeed</sender>
+   <sender>checkBox_retainsettings</sender>
    <signal>clicked(bool)</signal>
-   <receiver>spinBox_connectionspeed</receiver>
+   <receiver>groupBox_startoptions</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>342</x>
-     <y>84</y>
+     <x>90</x>
+     <y>51</y>
     </hint>
     <hint type="destinationlabel">
-     <x>426</x>
-     <y>80</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBox_icontheme</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>lineEdit_icontheme</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>342</x>
-     <y>191</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>424</x>
-     <y>183</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBox_loglevel</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>spinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>312</x>
-     <y>219</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>425</x>
-     <y>211</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBox_audiocd</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>lineEdit_audiocd</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>278</x>
-     <y>267</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>350</x>
-     <y>269</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBox_dvd</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>lineEdit_dvd</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>273</x>
-     <y>294</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>369</x>
-     <y>294</y>
+     <x>187</x>
+     <y>21</y>
     </hint>
    </hints>
   </connection>

@@ -1,7 +1,6 @@
-/**************************** scrollbox.h *****************************
+/**************************** settings.h *****************************
 
-Dialog to display text to the user.  Kind of like a neutered QMessageBox
-except it has scroll bars built in.
+Dialog to select program settings
 
 Copyright (C) 2013-2014
 by: Andrew J. Bibb
@@ -26,29 +25,44 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ***********************************************************************/ 
 
-# ifndef SCROLLBOX_H
-# define SCROLLBOX_H
+# ifndef SETTINGS_H
+# define SETTINGS_H
 
 # include <QDialog>
+# include <QSettings>
+# include <QString>
+# include <QSize>
+# include <QPoint>
+# include <QByteArray>
+# include <QStringList>
 
-# include "ui_scrollbox.h"
+# include "ui_settings.h"
 
 
 //	The main program class based on a QDialog
-class ScrollBox : public QDialog
+class Settings : public QDialog
 {
   Q_OBJECT
 
   public:
-    ScrollBox(QWidget*);
-    static void execScrollBox(QString, QString, QWidget*);
+    Settings(QWidget*);
+    inline bool useSettings() {return usesettings;}
+    inline bool useState() {return usestate;}
+    inline bool usePlaylist() {return useplaylist;}
     
   public slots:
-		void setDisplayText(const QString&);
+  	void writeSettings();
+  	void savePlaylist(const QStringList&);
+  	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
+  	void restoreElementGeometry(const QString&, QWidget*); 	    
     
   private:
   // members 
-    Ui::ScrollBox ui;    
+    Ui::Settings ui;    
+    QSettings* settings;
+    bool usesettings;
+    bool usestate;
+    bool useplaylist;
 
 };
 

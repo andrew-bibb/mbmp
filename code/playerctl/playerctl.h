@@ -13,14 +13,15 @@
 # include <QFile>
 # include <QMenu>
 # include <QMessageBox>
-# include <QSettings>
 
 # include "ui_playerctl.h"
+
 # include "./code/gstiface/gstiface.h"
 # include "./code/keymap/keymap.h"
 # include "./code/playlist/playlist.h"
 # include "./code/videowidget/videowidget.h"
 # include "./code/scrollbox/scrollbox.h"
+# include "./code/settings/settings.h"
 
 class PlayerControl : public QDialog
 {
@@ -58,8 +59,6 @@ class PlayerControl : public QDialog
 		void popupOptionsMenu();
 		void changeVisualizer(QAction*);
 		void changeOptions(QAction*);
-		void writeSettings();
-    void readSettings();
     void cleanUp();
 
 	protected:
@@ -89,7 +88,7 @@ class PlayerControl : public QDialog
 		QAction* action_sub;
 		QAction* action_sbuf;
 		QAction* action_dbuf;
-		QSettings* settings;
+		Settings* diag_settings;
   
   // functions
 		QString readTextFile(const char*);
