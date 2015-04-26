@@ -46,6 +46,7 @@ class PlayerControl : public QDialog
 		void togglePlaylist();
 		void toggleGUI();
 		void toggleCheatsheet();
+		void toggleSettingsDialog();
 		void showAbout();
 		void aboutMBMP();
 		void aboutNuvola();

@@ -33,8 +33,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QString>
 # include <QSize>
 # include <QPoint>
-# include <QByteArray>
-# include <QStringList>
+# include <QVariant>
 
 # include "ui_settings.h"
 
@@ -49,12 +48,10 @@ class Settings : public QDialog
     inline bool useSettings() {return usesettings;}
     inline bool useState() {return usestate;}
     inline bool usePlaylist() {return useplaylist;}
-    
-  public slots:
   	void writeSettings();
-  	void savePlaylist(const QStringList&);
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
-  	void restoreElementGeometry(const QString&, QWidget*); 	    
+  	void restoreElementGeometry(const QString&, QWidget*);
+  	QVariant getStartOption(const QString&); 	    
     
   private:
   // members 

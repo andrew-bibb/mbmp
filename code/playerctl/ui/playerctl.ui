@@ -325,6 +325,13 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_settings">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="0" column="2" rowspan="3">
@@ -994,6 +1001,17 @@
    </property>
    <property name="toolTip">
     <string>Enable or disable player options</string>
+   </property>
+  </action>
+  <action name="actionShowSettingsDialog">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Settings Dialog</string>
    </property>
   </action>
  </widget>

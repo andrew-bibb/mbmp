@@ -45,8 +45,14 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   
   // setup the user interface
   ui.setupUi(this);	
-	ui.widget_control->setVisible(parser.isSet("gui"));
+  
+  ui.widget_control->setVisible(false);
+  if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
+  else if (diag_settings->getStartOption("start_gui").toBool() ) ui.widget_control->setVisible(true);
+  
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
+	else if (diag_settings->getStartOption("start_fullscreen").toBool() ) this->showFullScreen();
+	
 	ui.gridLayout->addWidget(videowidget, 0, 0);
 			
 	// Icons with different on and off pixmaps
@@ -113,6 +119,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(ui.actionToggleFullscreen);
 	this->ui.toolButton_fullscreen->setDefaultAction(ui.actionToggleFullscreen);
 	this->addAction(ui.actionShowCheatsheet);
+	this->addAction(ui.actionShowSettingsDialog);
+	this->ui.toolButton_settings->setDefaultAction(ui.actionShowSettingsDialog);
 	this->addAction(ui.actionAbout);
 	this->addAction(ui.actionAboutMBMP);
 	this->addAction(ui.actionAboutNuvola);
@@ -286,6 +294,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	control_menu->addAction(ui.actionToggleMute);
 	control_menu->addSeparator();
 	control_menu->addMenu(options_menu);
+	control_menu->addAction(ui.actionShowSettingsDialog);
 	control_menu->addAction(ui.actionAbout);
 	control_menu->addAction(ui.actionQuit);	
 	
@@ -345,6 +354,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionToggleGUI, SIGNAL (triggered()), this, SLOT(toggleGUI()));
 	connect (ui.actionToggleFullscreen, SIGNAL (triggered()), this, SLOT(toggleFullScreen()));
 	connect (ui.actionShowCheatsheet, SIGNAL (triggered()), this, SLOT(toggleCheatsheet()));
+	connect (ui.actionShowSettingsDialog, SIGNAL (triggered()), this, SLOT(toggleSettingsDialog()));
 	connect (ui.actionAbout, SIGNAL (triggered()), this, SLOT(showAbout()));
 	connect (ui.actionAboutMBMP, SIGNAL (triggered()), this, SLOT(aboutMBMP()));
 	connect (ui.actionAboutNuvola, SIGNAL (triggered()), this, SLOT(aboutNuvola()));
@@ -752,6 +762,15 @@ void PlayerControl::toggleGUI()
 void PlayerControl::toggleCheatsheet()
 {
 	chtsht->isVisible() ? chtsht->hide() : chtsht->show();
+
+	return;
+}
+
+//
+// Slot to toggle the cheatsheet up or down
+void PlayerControl::toggleSettingsDialog()
+{
+	diag_settings->isVisible() ? diag_settings->hide() : diag_settings->show();
 
 	return;
 }

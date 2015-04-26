@@ -42,19 +42,23 @@ Settings::Settings(QWidget *parent)
   // read the settings
   settings = new QSettings(ORG, APP, this);
   
+  // save the preferences in a class data member
 	settings->beginGroup("Preferences");
 	usesettings = settings->value("retain_settings").toBool();
 	usestate = settings->value("retain_state").toBool();
 	useplaylist = settings->value("retain_playlist").toBool();
 	settings->endGroup();
-
+	
+	// seed dialog values
 	settings->beginGroup("StartOptions");
-	QIcon::setThemeName(settings->value("icon_theme").toString() );
+	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
+	ui.checkBox_gui->setChecked(settings->value("start_gui").toBool() );
 	settings->endGroup();
-	  
+		
+	return;  
 }  
 
-// Slot to save GUI settings to disk
+// Function to save GUI start options and preferences
 void Settings::writeSettings()
 {
   settings->beginGroup("Preferences");
@@ -78,7 +82,7 @@ void Settings::writeSettings()
 }
 
 //
-// Slot to save the geometry of a window
+// Function to save the geometry of a window
 void Settings::saveElementGeometry(const QString& elem, const bool& vis, const QSize& size, const QPoint& point)
 {
 	settings->beginGroup("State");
@@ -89,7 +93,7 @@ void Settings::saveElementGeometry(const QString& elem, const bool& vis, const Q
 }
 
 //
-// Slot to restore the geometry of a window
+// Function to restore the geometry of a window
 void Settings::restoreElementGeometry(const QString& elem, QWidget* win)
 {
 	settings->beginGroup("State");	
@@ -101,7 +105,19 @@ void Settings::restoreElementGeometry(const QString& elem, QWidget* win)
 	settings->endGroup();
 }
 
-
+//
+// Function to return a start option as a QVariant
+QVariant Settings::getStartOption(const QString& elem)
+{
+	QVariant v;
+	v.clear();
+	
+	settings->beginGroup("StartOptions");
+	v = settings->value(elem);
+	settings->endGroup();
+	
+	return v;	
+}
 
 
 

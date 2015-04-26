@@ -92,6 +92,9 @@
        </item>
        <item row="0" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_streambuffering">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-b&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--stream-buffering&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable buffering of the demuxed or parsed data in the stream (default is no stream buffering).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -102,6 +105,9 @@
        </item>
        <item row="1" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_connectionspeed">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-c&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--connection-speed&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Set the network connection speed in kbps (0 = unknown).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -128,6 +134,9 @@
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_downloadbuffering">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-d&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--download-buffering&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable progressive download buffering of selected formats (default is no download buffering).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -138,6 +147,9 @@
        </item>
        <item row="5" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_icontheme">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="toolTip">
           <string/>
          </property>
@@ -181,6 +193,9 @@
        </item>
        <item row="6" column="0">
         <widget class="QCheckBox" name="checkBox_loglevel">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-l&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--loglevel&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Set the log level from 0 to 2 (default is 1).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -217,6 +232,9 @@
        </item>
        <item row="7" column="0">
         <widget class="QCheckBox" name="checkBox_subtitles">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-s&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--subtitles&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable display of subtitles if a subtitle stream is found (default is no subtitles).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -227,6 +245,9 @@
        </item>
        <item row="9" column="0">
         <widget class="QCheckBox" name="checkBox_dvd">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-D&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--DVD&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Specify the optical drive that will play the DVD (default is /dev/sr0).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -237,6 +258,9 @@
        </item>
        <item row="8" column="0">
         <widget class="QCheckBox" name="checkBox_audiocd">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-C&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--CD&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Specify the optical drive that will play the audio CD (default is /dev/sr0).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -254,6 +278,9 @@
        </item>
        <item row="10" column="0">
         <widget class="QCheckBox" name="checkBox_visualizer">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-V&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--visualizer&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable a visualizer when playing audio tracks (default is no visualizer).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -290,6 +317,38 @@
     <hint type="destinationlabel">
      <x>187</x>
      <y>21</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Settings</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>532</x>
+     <y>415</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>-5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Settings</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>445</x>
+     <y>409</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>490</x>
+     <y>-16</y>
     </hint>
    </hints>
   </connection>
