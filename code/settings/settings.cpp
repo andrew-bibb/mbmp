@@ -44,12 +44,16 @@ Settings::Settings(QWidget *parent)
   
   // save the preferences in a class data member
 	settings->beginGroup("Preferences");
-	usesettings = settings->value("retain_settings").toBool();
+	usestartoptions = settings->value("use_startoptions").toBool();
 	usestate = settings->value("retain_state").toBool();
 	useplaylist = settings->value("retain_playlist").toBool();
 	settings->endGroup();
 	
 	// seed dialog values
+	ui.checkBox_usestartoptions->setChecked(usestartoptions);
+	ui.checkBox_retainstate->setChecked(usestate);
+	ui.checkBox_playlist->setChecked(useplaylist);
+	
 	settings->beginGroup("StartOptions");
 	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
 	ui.checkBox_gui->setChecked(settings->value("start_gui").toBool() );
@@ -65,7 +69,7 @@ Settings::Settings(QWidget *parent)
 void Settings::writeSettings()
 {
   settings->beginGroup("Preferences");
-  settings->setValue("retain_settings", ui.checkBox_retainsettings->isChecked() );
+  settings->setValue("use_startoptions", ui.checkBox_usestartoptions->isChecked() );
   settings->setValue("retain_state", ui.checkBox_retainstate->isChecked() );
   settings->setValue("retain_playlist", ui.checkBox_playlist->isChecked() );
   settings->endGroup();

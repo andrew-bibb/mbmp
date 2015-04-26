@@ -45,7 +45,7 @@ class Settings : public QDialog
 
   public:
     Settings(QWidget*);
-    inline bool useSettings() {return usesettings;}
+    inline bool useStartOptions() {return usestartoptions;}
     inline bool useState() {return usestate;}
     inline bool usePlaylist() {return useplaylist;}
   	void writeSettings();
@@ -57,7 +57,7 @@ class Settings : public QDialog
   // members 
     Ui::Settings ui;    
     QSettings* settings;
-    bool usesettings;
+    bool usestartoptions;
     bool usestate;
     bool useplaylist;
 
