@@ -994,7 +994,7 @@
   <action name="actionOptions">
    <property name="icon">
     <iconset theme="preferences-system" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/configure.png</normaloff>:/images/images/16x16/configure.png</iconset>
+     <normaloff>:/images/images/16x16/kscd.png</normaloff>:/images/images/16x16/kscd.png</iconset>
    </property>
    <property name="text">
     <string>Options</string>
@@ -1004,8 +1004,9 @@
    </property>
   </action>
   <action name="actionShowSettingsDialog">
-   <property name="checkable">
-    <bool>true</bool>
+   <property name="icon">
+    <iconset resource="../../../mbmp.qrc">
+     <normaloff>:/images/images/16x16/configure.png</normaloff>:/images/images/16x16/configure.png</iconset>
    </property>
    <property name="text">
     <string>Settings</string>

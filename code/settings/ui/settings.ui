@@ -68,6 +68,9 @@
        </item>
        <item row="2" column="0">
         <widget class="QCheckBox" name="checkBox_playlist">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked the playlist and position of the currently playing media will be retained.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -148,7 +151,7 @@
        <item row="5" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_icontheme">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="toolTip">
           <string/>
@@ -349,6 +352,22 @@
     <hint type="destinationlabel">
      <x>490</x>
      <y>-16</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_icontheme</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>lineEdit_icontheme</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>235</x>
+     <y>181</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>181</y>
     </hint>
    </hints>
   </connection>

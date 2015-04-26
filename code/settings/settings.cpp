@@ -53,6 +53,9 @@ Settings::Settings(QWidget *parent)
 	settings->beginGroup("StartOptions");
 	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
 	ui.checkBox_gui->setChecked(settings->value("start_gui").toBool() );
+	ui.checkBox_icontheme->setChecked(settings->value("use_icon_theme").toBool() );
+	if (ui.checkBox_icontheme->isChecked() ) ui.lineEdit_icontheme->setEnabled(true);
+	ui.lineEdit_icontheme->setText(settings->value("icon_theme_name").toString() );
 	settings->endGroup();
 		
 	return;  
@@ -68,14 +71,14 @@ void Settings::writeSettings()
   settings->endGroup();
 
   settings->beginGroup("StartOptions");
-  settings->setValue("use_stream_buffering", ui.checkBox_streambuffering->isChecked() );
-  settings->setValue("use_connection_speed", ui.checkBox_connectionspeed->isChecked() );
-  settings->setValue("connection_speed", ui.spinBox_connectionspeed->value() );
-  settings->setValue("use_download_buffering", ui.checkBox_downloadbuffering->isChecked() );
+//  settings->setValue("use_stream_buffering", ui.checkBox_streambuffering->isChecked() );
+//  settings->setValue("use_connection_speed", ui.checkBox_connectionspeed->isChecked() );
+//  settings->setValue("connection_speed", ui.spinBox_connectionspeed->value() );
+//  settings->setValue("use_download_buffering", ui.checkBox_downloadbuffering->isChecked() );
   settings->setValue("start_fullscreen", ui.checkBox_fullscreen->isChecked() );
-	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );
-  
-  settings->setValue("icon_theme", QIcon::themeName() );
+	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );  
+  settings->setValue("use_icon_theme", ui.checkBox_icontheme->isChecked() );
+  settings->setValue("icon_theme_name", ui.lineEdit_icontheme->text()  );
   settings->endGroup();
   
   return;

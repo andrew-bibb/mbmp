@@ -106,7 +106,6 @@ int main(int argc, char *argv[])
   if (sl.size() > 0 ) parser.showHelp(1);
   if (parser.isSet("help") ) parser.showHelp(1);	
   
-  
   // signal handler             
   signal(SIGINT, signalhandler); 
   

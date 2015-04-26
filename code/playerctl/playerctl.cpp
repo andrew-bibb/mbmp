@@ -26,9 +26,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// setup the settings dialog (and read settings)
 	diag_settings = new Settings(this);
 		  
-  // Set icon theme if provided on the command line
-  if (parser.isSet("icon-theme") ) 
+  // Set icon theme if provided on the command line or in the settings
+  if (parser.isSet("icon-theme") )
 		QIcon::setThemeName(parser.value("icon-theme"));
+	else if (diag_settings->getStartOption("use_icon_theme").toBool() )
+		QIcon::setThemeName(diag_settings->getStartOption("icon_theme_name").toString() );
 	
 	// data members
 	keymap = new KeyMap(this);
@@ -45,15 +47,16 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   
   // setup the user interface
   ui.setupUi(this);	
+  ui.gridLayout->addWidget(videowidget, 0, 0);
   
+  // show or hide GUI
   ui.widget_control->setVisible(false);
   if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
   else if (diag_settings->getStartOption("start_gui").toBool() ) ui.widget_control->setVisible(true);
   
+  // options to start fullscreen 
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
 	else if (diag_settings->getStartOption("start_fullscreen").toBool() ) this->showFullScreen();
-	
-	ui.gridLayout->addWidget(videowidget, 0, 0);
 			
 	// Icons with different on and off pixmaps
 	if (parser.isSet("icon-theme") ) {
