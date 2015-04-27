@@ -60,6 +60,7 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_icontheme->setChecked(settings->value("use_icon_theme").toBool() );
 	if (ui.checkBox_icontheme->isChecked() ) ui.lineEdit_icontheme->setEnabled(true);
 	ui.lineEdit_icontheme->setText(settings->value("icon_theme_name").toString() );
+	ui.spinBox_loglevel->setValue(settings->value("log_level").toInt() );
 	settings->endGroup();
 		
 	return;  
@@ -83,6 +84,7 @@ void Settings::writeSettings()
 	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );  
   settings->setValue("use_icon_theme", ui.checkBox_icontheme->isChecked() );
   settings->setValue("icon_theme_name", ui.lineEdit_icontheme->text()  );
+  settings->setValue("log_level", ui.spinBox_loglevel->value() );
   settings->endGroup();
   
   return;

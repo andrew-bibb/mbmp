@@ -29,8 +29,10 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   // Set icon theme if provided on the command line or in the settings
   if (parser.isSet("icon-theme") )
 		QIcon::setThemeName(parser.value("icon-theme"));
-	else if (diag_settings->getStartOption("use_icon_theme").toBool() )
-		QIcon::setThemeName(diag_settings->getStartOption("icon_theme_name").toString() );
+	else
+		if (diag_settings->useStartOptions() && diag_settings->getStartOption("use_icon_theme").toBool() )
+			QIcon::setThemeName(diag_settings->getStartOption("icon_theme_name").toString() );
+		else QIcon::setThemeName("Internal MBMP theme");
 	
 	// data members
 	keymap = new KeyMap(this);
@@ -52,14 +54,15 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   // show or hide GUI
   ui.widget_control->setVisible(false);
   if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
-  else if (diag_settings->getStartOption("start_gui").toBool() ) ui.widget_control->setVisible(true);
+  else if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_gui").toBool() ) ui.widget_control->setVisible(true);
   
   // options to start fullscreen 
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
-	else if (diag_settings->getStartOption("start_fullscreen").toBool() ) this->showFullScreen();
+	else if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_fullscreen").toBool() ) this->showFullScreen();
 			
 	// Icons with different on and off pixmaps
-	if (parser.isSet("icon-theme") ) {
+	if (parser.isSet("icon-theme") || 
+		 (diag_settings->useStartOptions() && diag_settings->getStartOption("use_icon_theme").toBool()) ) {
 		createThemeIcon(ui.actionPlayPause, "media-playback-pause", "media-playback-start");
 		createThemeIcon(ui.actionToggleMute, "audio-volume-muted","multimedia-volume-control");
 	}
@@ -85,8 +88,10 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	logfile.setFileName("/tmp/mbmp.log");	// we don't provide an opportunity to change this
 	if (logfile.exists() ) logfile.remove();	
 	bool ok;
-	loglevel = parser.value("loglevel").toInt(&ok,10);
+	loglevel = parser.value("loglevel").toInt(&ok,10);	// default is 1
 	if (! ok) loglevel = 1;
+	if (! parser.isSet("loglevel") && diag_settings->useStartOptions() )
+		loglevel = diag_settings->getStartOption("log_level").toInt();
 	
 	// enable the visualizer if requested. 
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, (parser.isSet("visualizer")) );

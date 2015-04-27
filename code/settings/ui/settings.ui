@@ -194,23 +194,13 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="checkBox_loglevel">
+       <item row="6" column="2">
+        <widget class="QSpinBox" name="spinBox_loglevel">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-l&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--loglevel&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Set the log level from 0 to 2 (default is 1).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Log Level</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="2">
-        <widget class="QSpinBox" name="spinBox">
-         <property name="enabled">
-          <bool>false</bool>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the log level (0-2) with higher numbers displaying more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="maximum">
           <number>2</number>
@@ -292,6 +282,16 @@
          </property>
         </widget>
        </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the log level (0-2) with higher numbers displaying more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Log Level</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -314,28 +314,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>51</y>
+     <x>99</x>
+     <y>44</y>
     </hint>
     <hint type="destinationlabel">
-     <x>187</x>
-     <y>21</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Settings</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>532</x>
-     <y>415</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>-5</y>
+     <x>214</x>
+     <y>10</y>
     </hint>
    </hints>
   </connection>
@@ -346,28 +330,28 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>445</x>
-     <y>409</y>
+     <x>472</x>
+     <y>415</y>
     </hint>
     <hint type="destinationlabel">
-     <x>490</x>
-     <y>-16</y>
+     <x>184</x>
+     <y>-21</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_icontheme</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>lineEdit_icontheme</receiver>
-   <slot>setEnabled(bool)</slot>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Settings</receiver>
+   <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>235</x>
-     <y>181</y>
+     <x>528</x>
+     <y>413</y>
     </hint>
     <hint type="destinationlabel">
-     <x>353</x>
-     <y>181</y>
+     <x>499</x>
+     <y>-10</y>
     </hint>
    </hints>
   </connection>
