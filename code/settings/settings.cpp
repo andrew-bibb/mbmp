@@ -61,6 +61,8 @@ Settings::Settings(QWidget *parent)
 	if (ui.checkBox_icontheme->isChecked() ) ui.lineEdit_icontheme->setEnabled(true);
 	ui.lineEdit_icontheme->setText(settings->value("icon_theme_name").toString() );
 	ui.spinBox_loglevel->setValue(settings->value("log_level").toInt() );
+	ui.checkBox_visualizer->setChecked(settings->value("start_visualizer").toBool() );
+	 ui.checkBox_subtitles->setChecked(settings->value("start_subtitles").toBool() );
 	settings->endGroup();
 		
 	return;  
@@ -85,6 +87,8 @@ void Settings::writeSettings()
   settings->setValue("use_icon_theme", ui.checkBox_icontheme->isChecked() );
   settings->setValue("icon_theme_name", ui.lineEdit_icontheme->text()  );
   settings->setValue("log_level", ui.spinBox_loglevel->value() );
+  settings->setValue("start_visualizer", ui.checkBox_visualizer->isChecked() );
+  settings->setValue("start_subtitles", ui.checkBox_subtitles->isChecked() );
   settings->endGroup();
   
   return;

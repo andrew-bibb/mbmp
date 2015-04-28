@@ -226,7 +226,7 @@
        <item row="7" column="0">
         <widget class="QCheckBox" name="checkBox_subtitles">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-s&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--subtitles&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable display of subtitles if a subtitle stream is found (default is no subtitles).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -272,7 +272,7 @@
        <item row="10" column="0">
         <widget class="QCheckBox" name="checkBox_visualizer">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-V&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--visualizer&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable a visualizer when playing audio tracks (default is no visualizer).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

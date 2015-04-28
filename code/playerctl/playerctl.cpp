@@ -92,13 +92,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (! ok) loglevel = 1;
 	if (! parser.isSet("loglevel") && diag_settings->useStartOptions() )
 		loglevel = diag_settings->getStartOption("log_level").toInt();
-	
-	// enable the visualizer if requested. 
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, (parser.isSet("visualizer")) );
-	
-	// enable subtitles if requested
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, (parser.isSet("subtitles")) ); 
-	
+	if (loglevel < 0 ) loglevel = 0;
+	if (loglevel > 2 ) loglevel = 2; 	
+					
 	// enable stream buffering if requested
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, (parser.isSet("stream-buffering")) ); 	
 	
@@ -248,16 +244,28 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// create the options menu.  Actions are class members because we
 	// need to access them in the slot changeOptions, but they are not
 	// directly accessable from the ui (so they are not defined from there)
+	bool b_01 = false;
 	options_menu = new QMenu(this);
 	options_menu->setTitle(ui.actionOptions->text());
 	options_menu->setIcon(ui.actionOptions->icon());
-	action_vis = options_menu->addAction(tr("Visualizer"));
-	action_vis->setCheckable(true);
-	action_vis->setChecked(parser.isSet("visualizer"));		
 	
+	action_vis = options_menu->addAction(tr("Visualizer"));
+	action_vis->setCheckable(true);		
+	if (parser.isSet("visualizer") ) b_01 = true;
+	else
+		if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_visualizer").toBool() ) b_01 = true;
+		else b_01 = false;
+	p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, b_01 );
+	action_vis->setChecked(b_01);
+
 	action_sub = options_menu->addAction(tr("Subtitles"));
 	action_sub->setCheckable(true);
-	action_sub->setChecked(parser.isSet("subtitles"));
+	if (parser.isSet("subtitles") ) b_01 = true;
+	else
+		if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_subtitles").toBool() ) b_01 = true;
+		else b_01 = false;		
+	p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, b_01);
+	action_sub->setChecked(b_01);
 	
 	action_sbuf = options_menu->addAction(tr("Stream Buffering"));
 	action_sbuf->setCheckable(true);
