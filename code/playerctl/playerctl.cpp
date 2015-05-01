@@ -95,11 +95,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (loglevel < 0 ) loglevel = 0;
 	if (loglevel > 2 ) loglevel = 2; 	
 					
-	// enable stream buffering if requested
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, (parser.isSet("stream-buffering")) ); 	
-	
-	// enable download buffering if requested
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, (parser.isSet("download-buffering")) );	
 	
 	// setup the connection speed
 	qint64 cnxnspeed = parser.value("connection-speed").toInt(&ok,10);
@@ -269,12 +264,22 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	action_sbuf = options_menu->addAction(tr("Stream Buffering"));
 	action_sbuf->setCheckable(true);
-	action_sbuf->setChecked(parser.isSet("stream-buffering"));
-	
+	if (parser.isSet("stream-buffering") ) b_01 = true;
+	else
+		if (diag_settings->useStartOptions() && diag_settings->getStartOption("use_stream_buffering").toBool() ) b_01 = true;
+		else b_01 = false;		
+	p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, b_01);
+	action_sbuf->setChecked(b_01);
+		
 	action_dbuf = options_menu->addAction(tr("Download Buffering"));
 	action_dbuf->setCheckable(true);
-	action_dbuf->setChecked(parser.isSet("download-buffering"));	
-			
+	if (parser.isSet("download-buffering") ) b_01 = true;
+	else
+		if (diag_settings->useStartOptions() && diag_settings->getStartOption("use_download_buffering").toBool() ) b_01 = true;
+		else b_01 = false;		
+	p_gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, b_01);
+	action_dbuf->setChecked(b_01);	
+
 	// create the control_menu
 	control_menu = new QMenu(this);
 	control_menu->addAction(ui.actionTogglePlaylist);

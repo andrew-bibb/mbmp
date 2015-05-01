@@ -96,7 +96,7 @@
        <item row="0" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_streambuffering">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-b&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--stream-buffering&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable buffering of the demuxed or parsed data in the stream (default is no stream buffering).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -138,7 +138,7 @@
        <item row="2" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_downloadbuffering">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-d&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--download-buffering&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Enable progressive download buffering of selected formats (default is no download buffering).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

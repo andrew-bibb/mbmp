@@ -62,7 +62,9 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_icontheme->setText(settings->value("icon_theme_name").toString() );
 	ui.spinBox_loglevel->setValue(settings->value("log_level").toInt() );
 	ui.checkBox_visualizer->setChecked(settings->value("start_visualizer").toBool() );
-	 ui.checkBox_subtitles->setChecked(settings->value("start_subtitles").toBool() );
+	ui.checkBox_subtitles->setChecked(settings->value("start_subtitles").toBool() );
+	ui.checkBox_streambuffering->setChecked(settings->value("use_stream_buffering").toBool() );
+	ui.checkBox_downloadbuffering->setChecked(settings->value("use_download_buffering").toBool() );
 	settings->endGroup();
 		
 	return;  
@@ -78,10 +80,8 @@ void Settings::writeSettings()
   settings->endGroup();
 
   settings->beginGroup("StartOptions");
-//  settings->setValue("use_stream_buffering", ui.checkBox_streambuffering->isChecked() );
 //  settings->setValue("use_connection_speed", ui.checkBox_connectionspeed->isChecked() );
 //  settings->setValue("connection_speed", ui.spinBox_connectionspeed->value() );
-//  settings->setValue("use_download_buffering", ui.checkBox_downloadbuffering->isChecked() );
   settings->setValue("start_fullscreen", ui.checkBox_fullscreen->isChecked() );
 	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );  
   settings->setValue("use_icon_theme", ui.checkBox_icontheme->isChecked() );
@@ -89,6 +89,8 @@ void Settings::writeSettings()
   settings->setValue("log_level", ui.spinBox_loglevel->value() );
   settings->setValue("start_visualizer", ui.checkBox_visualizer->isChecked() );
   settings->setValue("start_subtitles", ui.checkBox_subtitles->isChecked() );
+  settings->setValue("use_stream_buffering", ui.checkBox_streambuffering->isChecked() );
+  settings->setValue("use_download_buffering", ui.checkBox_downloadbuffering->isChecked() );
   settings->endGroup();
   
   return;
