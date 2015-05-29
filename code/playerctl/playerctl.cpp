@@ -78,11 +78,38 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 			ui.comboBox_dvd->addItem(QString("/dev/sr%1").arg(i));
 		}
 		else break;
-	}// while
+	}	// for
 	
-	// set the CD and DVD devices, default for both is /dev/sr0
-	ui.comboBox_audiocd->setCurrentText(parser.value("CD"));
-	ui.comboBox_dvd->setCurrentText(parser.value("DVD"));
+	// set the CD combo box
+	if (ui.comboBox_audiocd->count() == 0) { 
+		ui.comboBox_audiocd->addItem(tr("None"));
+		ui.comboBox_audiocd->setDisabled(true);
+	}	// if
+	else {
+		QString s_cd = QString();
+		if (parser.isSet("CD")) 
+			s_cd = parser.value("CD");
+		else if (diag_settings->useStartOptions() )
+			s_cd = diag_settings->getStartOption("audio_cd_drive").toString();
+		int idx = ui.comboBox_audiocd->findText(s_cd);
+		ui.comboBox_audiocd->setCurrentIndex(idx > 0 ? idx : 0);
+	}	// else
+	
+	//set the DVD combo box	
+	if (ui.comboBox_dvd->count() == 0) { 
+		ui.comboBox_dvd->addItem(tr("None"));
+		ui.comboBox_dvd->setDisabled(true);
+	}	// if
+	else {
+		QString s_dvd = QString();
+		if (parser.isSet("DVD"))
+			s_dvd = parser.value("DVD");
+		else if (diag_settings->useStartOptions() )
+			s_dvd = diag_settings->getStartOption("dvd_drive").toString();
+		int idx = ui.comboBox_dvd->findText(s_dvd);
+		ui.comboBox_dvd->setCurrentIndex(idx > 0 ? idx : 0);
+	}	// else	
+	
 				
 	// setup the logfile and the logging level
 	logfile.setFileName("/tmp/mbmp.log");	// we don't provide an opportunity to change this

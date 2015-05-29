@@ -65,6 +65,8 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_subtitles->setChecked(settings->value("start_subtitles").toBool() );
 	ui.checkBox_streambuffering->setChecked(settings->value("use_stream_buffering").toBool() );
 	ui.checkBox_downloadbuffering->setChecked(settings->value("use_download_buffering").toBool() );
+	ui.lineEdit_audiocd->setText(settings->value("audio_cd_drive").toString() );
+	ui.lineEdit_dvd->setText(settings->value("dvd_drive").toString() );
 	settings->endGroup();
 		
 	return;  
@@ -91,6 +93,8 @@ void Settings::writeSettings()
   settings->setValue("start_subtitles", ui.checkBox_subtitles->isChecked() );
   settings->setValue("use_stream_buffering", ui.checkBox_streambuffering->isChecked() );
   settings->setValue("use_download_buffering", ui.checkBox_downloadbuffering->isChecked() );
+  settings->setValue("audio_cd_drive", ui.lineEdit_audiocd->text() );
+  settings->setValue("dvd_drive", ui.lineEdit_dvd->text() );
   settings->endGroup();
   
   return;

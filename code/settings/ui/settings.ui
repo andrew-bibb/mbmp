@@ -89,7 +89,10 @@
        <item row="8" column="2">
         <widget class="QLineEdit" name="lineEdit_audiocd">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -236,36 +239,13 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
-        <widget class="QCheckBox" name="checkBox_dvd">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-D&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--DVD&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Specify the optical drive that will play the DVD (default is /dev/sr0).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>DVD Drive</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QCheckBox" name="checkBox_audiocd">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-C&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--CD&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Specify the optical drive that will play the audio CD (default is /dev/sr0).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Audio CD Drive</string>
-         </property>
-        </widget>
-       </item>
        <item row="9" column="2">
         <widget class="QLineEdit" name="lineEdit_dvd">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -289,6 +269,35 @@
          </property>
          <property name="text">
           <string>Log Level</string>
+         </property>
+         <property name="buddy">
+          <cstring>spinBox_loglevel</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the audio cd drive.  For example: &lt;span style=&quot; font-weight:600;&quot;&gt;/dev/sr0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Audio CD Drive</string>
+         </property>
+         <property name="buddy">
+          <cstring>lineEdit_audiocd</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Specify the audio cd drive. For example: &lt;span style=&quot; font-weight:600;&quot;&gt;/dev/sr1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>DVD Drive</string>
+         </property>
+         <property name="buddy">
+          <cstring>lineEdit_dvd</cstring>
          </property>
         </widget>
        </item>
