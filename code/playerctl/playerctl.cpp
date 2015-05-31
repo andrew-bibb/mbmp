@@ -124,7 +124,15 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 					
 	
 	// setup the connection speed
-	qint64 cnxnspeed = parser.value("connection-speed").toInt(&ok,10);
+	quint64 cnxnspeed = 0;
+	ok = false;
+	if (parser.isSet("connection-speed") ) {
+		cnxnspeed = parser.value("connection-speed").toInt(&ok,10); // default is 0				
+	}
+	else if (diag_settings->useStartOptions() ) {
+		cnxnspeed = diag_settings->getStartOption("connection_speed").toInt();
+		ok = true;
+	}			
 	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);		
 			
 	// seed the playlist with the positional arguments from the command line

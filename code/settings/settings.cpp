@@ -67,6 +67,7 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_downloadbuffering->setChecked(settings->value("use_download_buffering").toBool() );
 	ui.lineEdit_audiocd->setText(settings->value("audio_cd_drive").toString() );
 	ui.lineEdit_dvd->setText(settings->value("dvd_drive").toString() );
+	ui.spinBox_connectionspeed->setValue(settings->value("connection_speed").toInt() );
 	settings->endGroup();
 		
 	return;  
@@ -82,8 +83,6 @@ void Settings::writeSettings()
   settings->endGroup();
 
   settings->beginGroup("StartOptions");
-//  settings->setValue("use_connection_speed", ui.checkBox_connectionspeed->isChecked() );
-//  settings->setValue("connection_speed", ui.spinBox_connectionspeed->value() );
   settings->setValue("start_fullscreen", ui.checkBox_fullscreen->isChecked() );
 	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );  
   settings->setValue("use_icon_theme", ui.checkBox_icontheme->isChecked() );
@@ -95,6 +94,7 @@ void Settings::writeSettings()
   settings->setValue("use_download_buffering", ui.checkBox_downloadbuffering->isChecked() );
   settings->setValue("audio_cd_drive", ui.lineEdit_audiocd->text() );
   settings->setValue("dvd_drive", ui.lineEdit_dvd->text() );
+  settings->setValue("connection_speed", ui.spinBox_connectionspeed->value() );
   settings->endGroup();
   
   return;
