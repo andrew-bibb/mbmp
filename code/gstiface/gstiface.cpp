@@ -621,11 +621,11 @@ void GST_Interface::seekToPosition(int position)
   
   // seek flags
   const int seekflags =  GST_SEEK_FLAG_FLUSH    | // flush the pipeline_playbin
-                          GST_SEEK_FLAG_SKIP      | // allow skipping frames
-                          GST_SEEK_FLAG_KEY_UNIT  ; // seek to the nearest keyframe, faster but maybe not as accurate
-  
+                          GST_SEEK_FLAG_SKIP     | // allow skipping frames
+                          GST_SEEK_FLAG_KEY_UNIT ; // seek to the nearest keyframe, faster but maybe not as accurate
+                         	 
   // now do the seek
-  gst_element_seek_simple(pipeline_playbin, GST_FORMAT_TIME, (GstSeekFlags)(seekflags) , position * GST_SECOND);
+  gst_element_seek_simple(pipeline_playbin, GST_FORMAT_TIME, (GstSeekFlags)(seekflags) , position * GST_SECOND);;
   return;
 } 
 
@@ -693,7 +693,7 @@ void GST_Interface::pollGstBus()
   // query the stream position if we are currently playing. This will
   // set the PlayerControl position widgets
   if (getState() == GST_STATE_PLAYING) queryStreamPosition();
-  
+    
   // return if there are no new messages
   if (! gst_bus_have_pending(bus)) return;
   

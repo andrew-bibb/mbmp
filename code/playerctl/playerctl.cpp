@@ -429,7 +429,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionOptions, SIGNAL(triggered()), this, SLOT(popupOptionsMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
 	connect (ui.actionPlayerStop, SIGNAL(triggered()), this, SLOT(stopPlaying()));
-	connect (ui.horizontalSlider_position, SIGNAL(sliderMoved(int)), p_gstiface, SLOT(seekToPosition(int)));
+	connect (ui.horizontalSlider_position, SIGNAL(valueChanged(int)), this, SLOT(seekToPosition()));
 	connect (seek_group, SIGNAL(triggered(QAction*)), this, SLOT(seekToPosition(QAction*)));
 	connect (dvd_group, SIGNAL(triggered(QAction*)), this, SLOT(dvdNavigationCommand(QAction*)));
 	connect (ui.actionAudioCD, SIGNAL (triggered()), this, SLOT(initializeCD()));
@@ -515,6 +515,8 @@ void PlayerControl:: setDurationWidgets(int duration, bool seek_enabled)
 		ui.label_duration->setText(t.toString("HH:mm:ss") );
 		ui.horizontalSlider_position->setMaximum(duration);
 		ui.horizontalSlider_position->setEnabled(seek_enabled);
+		ui.horizontalSlider_position->setSingleStep(duration / 100 );
+		ui.horizontalSlider_position->setPageStep(duration / 10);
 		// we are playing a DVD enable seeking only after we've got a chapter
 		if (p_gstiface->getMediaType() == MBMP_GI::DVD) {
 			if (p_gstiface->getCurrentChapter() > 0 ) seek_group->setEnabled(seek_enabled);
@@ -527,7 +529,7 @@ void PlayerControl:: setDurationWidgets(int duration, bool seek_enabled)
 		ui.label_duration->setText("00:00:00");
 		ui.label_position->setText("00:00:00");
 		ui.horizontalSlider_position->setMaximum(0);
-		ui.horizontalSlider_position->setSliderPosition(0);
+		ui.horizontalSlider_position->setSliderPosition(0); 
 		ui.horizontalSlider_position->setEnabled(false);
 		seek_group->setEnabled(false);
 	}
@@ -547,7 +549,11 @@ void PlayerControl::setPositionWidgets(int position)
 		QTime t(0,0,0);
 		t = t.addSecs(position);
 		ui.label_position->setText(t.toString("HH:mm:ss") );
-		ui.horizontalSlider_position->setSliderPosition(position);
+		
+		// assume position adjustments less than 5 seconds are from p_gstiface
+		// above that assume from a key press, or moving the slider
+		if (abs(ui.horizontalSlider_position->sliderPosition() - position) < 5fg)
+			ui.horizontalSlider_position->setSliderPosition(position);
 	}
 	// position is negative
 	else {
@@ -716,14 +722,18 @@ void PlayerControl::stopPlaying()
 // Slot to jump to a stream position, called when a QAction is triggered
 void PlayerControl::seekToPosition(QAction* act)
 {
-	int pos = 0;
-	if (act == ui.actionSeekBack10) pos = ui.horizontalSlider_position->sliderPosition() - 10; 
-	else if (act == ui.actionSeekFrwd10) pos = ui.horizontalSlider_position->sliderPosition() + 10;
-		else if (act == ui.actionSeekBack60) pos = ui.horizontalSlider_position->sliderPosition() - 60; 
-			else if (act == ui.actionSeekFrwd60) pos = ui.horizontalSlider_position->sliderPosition() + 60;
-				else if (act == ui.actionSeekBack600) pos = ui.horizontalSlider_position->sliderPosition() - 600; 
-					else if (act == ui.actionSeekFrwd600) pos = ui.horizontalSlider_position->sliderPosition() + 600;
+	// initial slider (and stream) position
+	int pos = ui.horizontalSlider_position->sliderPosition();
 	
+	if (act == ui.actionSeekBack10) pos = pos - 10; 
+	else if (act == ui.actionSeekFrwd10) pos = pos + 10;
+		else if (act == ui.actionSeekBack60) pos = pos - 60; 
+			else if (act == ui.actionSeekFrwd60) pos = pos + 60;
+				else if (act == ui.actionSeekBack600) pos = pos - 600; 
+					else if (act == ui.actionSeekFrwd600) pos = pos + 600;
+	// move the slider to agree with the position				
+	if (act != 0) ui.horizontalSlider_position->setSliderPosition(pos);
+			
 	if (pos < 0 ) pos = 0;
 	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();
 	

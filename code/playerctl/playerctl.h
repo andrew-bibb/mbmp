@@ -39,7 +39,7 @@ class PlayerControl : public QDialog
 		void initializeDVD();
 		void playMedia(QAction* act = 0);
 		void stopPlaying();
-		void seekToPosition(QAction*);
+		void seekToPosition(QAction* = 0);
 		void dvdNavigationCommand(QAction*);
 		void playPause();
 		void toggleFullScreen();
