@@ -134,8 +134,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);		
 			
 	// seed the playlist with the positional arguments from the command line
-	playlist->seedPlaylist(parser.positionalArguments() );
-	if (parser.positionalArguments().count() < 1 && diag_settings->usePlaylist() )
+	if (parser.positionalArguments().count() > 0 )
+		playlist->seedPlaylist(parser.positionalArguments() );
+	else if (diag_settings->usePlaylist() )
 		playlist->seedPlaylist(diag_settings->getPlaylist() );
 		
 	
