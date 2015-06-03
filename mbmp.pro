@@ -65,7 +65,9 @@ PKGCONFIG += gstreamer-video-1.0
 PKGCONFIG += gstreamer-pbutils-1.0
 
 # translations
-TRANSLATIONS += ./translations/cmst_en_US.ts
+TRANSLATIONS += ./translations/mbmp_en_US.ts
+TRANSLATIONS += ./translations/mbmp_ru_RU.ts
+
 
 ##  Place all object files in their own directory and moc files in their own directory
 ##  This is not necessary but keeps things cleaner.

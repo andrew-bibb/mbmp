@@ -86,13 +86,13 @@ int main(int argc, char *argv[])
   QLibraryInfo::location(QLibraryInfo::TranslationsPath));
   app.installTranslator(&qtTranslator);
 
-  QTranslator cmstTranslator;
-  if (cmstTranslator.load("mbmp_" + QLocale::system().name(), ":/translations/translations" ) ) {  
-		app.installTranslator(&cmstTranslator);	
+  QTranslator mbmpTranslator;
+  if (mbmpTranslator.load("mbmp_" + QLocale::system().name(), ":/translations/translations" ) ) {  
+		app.installTranslator(&mbmpTranslator);	
 	}
 	// else use en_US as it contains Connman strings properized and some singular/plural strings
-	else if (cmstTranslator.load("mbmp_en_US", ":/translations/translations" ) ) {
-		app.installTranslator(&cmstTranslator);	
+	else if (mbmpTranslator.load("mbmp_en_US", ":/translations/translations" ) ) {
+		app.installTranslator(&mbmpTranslator);	
 	}
 
 
