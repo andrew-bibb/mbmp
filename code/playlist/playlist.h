@@ -95,6 +95,7 @@ class Playlist : public QDialog
 	public:
 		void seedPlaylist(const QStringList&);
 		void lockControls(bool);
+		QStringList getCurrentList();
 
 	protected:
 		void hideEvent(QHideEvent*);

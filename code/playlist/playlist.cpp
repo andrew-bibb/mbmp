@@ -523,6 +523,23 @@ void Playlist::lockControls(bool b_lock)
 	ui.actionSavePlaylist->setDisabled(b_lock);
 }
 
+//
+// Function to return a QStringList containing the current items in the playlist
+QStringList Playlist::getCurrentList()
+{
+	// create our return value
+	QStringList sl;
+	sl.clear();
+	
+	// go through the playlist and get names
+  for (int i = 0; i < ui.listWidget_playlist->count(); ++i) {
+		PlaylistItem* pli = static_cast<PlaylistItem*>(ui.listWidget_playlist->item(i));
+		sl << pli->getUri().remove("file://");
+	}
+	
+	return sl;
+}
+
 //////////////////////////// Protected Functions ////////////////////////////
 //
 //	Reimplement the QHideEvent 
@@ -554,6 +571,8 @@ void Playlist::contextMenuEvent(QContextMenuEvent* e)
 //
 // Function to process a .m3u (playlist) file.  Called from addFile() when
 // a file ends with .m3u
+
+
 void Playlist::processM3U(const QString& plfile)
 {
 	// Make a QDir out of the input string, if plfile contains relative

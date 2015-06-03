@@ -109,7 +109,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		int idx = ui.comboBox_dvd->findText(s_dvd);
 		ui.comboBox_dvd->setCurrentIndex(idx > 0 ? idx : 0);
 	}	// else	
-	
 				
 	// setup the logfile and the logging level
 	logfile.setFileName("/tmp/mbmp.log");	// we don't provide an opportunity to change this
@@ -122,7 +121,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (loglevel < 0 ) loglevel = 0;
 	if (loglevel > 2 ) loglevel = 2; 	
 					
-	
 	// setup the connection speed
 	quint64 cnxnspeed = 0;
 	ok = false;
@@ -137,6 +135,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 			
 	// seed the playlist with the positional arguments from the command line
 	playlist->seedPlaylist(parser.positionalArguments() );
+	if (parser.positionalArguments().count() < 1 && diag_settings->usePlaylist() )
+		playlist->seedPlaylist(diag_settings->getPlaylist() );
+		
 	
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work provided
@@ -552,7 +553,7 @@ void PlayerControl::setPositionWidgets(int position)
 		
 		// assume position adjustments less than 5 seconds are from p_gstiface
 		// above that assume from a key press, or moving the slider
-		if (abs(ui.horizontalSlider_position->sliderPosition() - position) < 5fg)
+		if (abs(ui.horizontalSlider_position->sliderPosition() - position) < 5)
 			ui.horizontalSlider_position->setSliderPosition(position);
 	}
 	// position is negative
@@ -1195,6 +1196,8 @@ void PlayerControl::cleanUp()
 	diag_settings->saveElementGeometry("playlist", playlist->isVisible(),  playlist->size(), playlist->pos() );
 		
   diag_settings->writeSettings();
+  
+  diag_settings->savePlaylist(playlist->getCurrentList() );
   
   return;
 }

@@ -45,6 +45,7 @@ Settings::Settings(QWidget *parent)
   // save the preferences in a class data member
 	settings->beginGroup("Preferences");
 	usestartoptions = settings->value("use_startoptions").toBool();
+	ui.groupBox_startoptions->setEnabled(usestartoptions);
 	usestate = settings->value("retain_state").toBool();
 	useplaylist = settings->value("retain_playlist").toBool();
 	settings->endGroup();
@@ -52,7 +53,7 @@ Settings::Settings(QWidget *parent)
 	// seed dialog values
 	ui.checkBox_usestartoptions->setChecked(usestartoptions);
 	ui.checkBox_retainstate->setChecked(usestate);
-	ui.checkBox_playlist->setChecked(useplaylist);
+	ui.checkBox_retainplaylist->setChecked(useplaylist);
 	
 	settings->beginGroup("StartOptions");
 	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
@@ -79,7 +80,7 @@ void Settings::writeSettings()
   settings->beginGroup("Preferences");
   settings->setValue("use_startoptions", ui.checkBox_usestartoptions->isChecked() );
   settings->setValue("retain_state", ui.checkBox_retainstate->isChecked() );
-  settings->setValue("retain_playlist", ui.checkBox_playlist->isChecked() );
+  settings->setValue("retain_playlist", ui.checkBox_retainplaylist->isChecked() );
   settings->endGroup();
 
   settings->beginGroup("StartOptions");
@@ -138,6 +139,28 @@ QVariant Settings::getStartOption(const QString& elem)
 	return v;	
 }
 
+//
+// Function to save the playlist
+void Settings::savePlaylist(const QStringList& pl)
+{
+	settings->beginGroup("Playlist");
+	settings->setValue("entries", pl);
+	settings->endGroup();
+}
 
+//
+// Function to return the playlist
+QStringList Settings::getPlaylist()
+{
+	// string list to return
+	QStringList sl;
+	sl.clear();
+	
+	settings->beginGroup("Playlist");
+	sl = settings->value("entries").toStringList();
+	settings->endGroup();
+	
+	return sl;
+}
 
 

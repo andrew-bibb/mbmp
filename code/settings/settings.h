@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QSize>
 # include <QPoint>
 # include <QVariant>
+# include <QStringList>
 
 # include "ui_settings.h"
 
@@ -51,6 +52,8 @@ class Settings : public QDialog
   	void writeSettings();
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
   	void restoreElementGeometry(const QString&, QWidget*);
+  	void savePlaylist(const QStringList&);
+  	QStringList getPlaylist();
   	QVariant getStartOption(const QString&); 	    
     
   private:

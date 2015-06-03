@@ -48,9 +48,6 @@
          <property name="text">
           <string>Use Start Options</string>
          </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
         </widget>
        </item>
        <item row="3" column="0">
@@ -67,9 +64,9 @@
         </spacer>
        </item>
        <item row="2" column="0">
-        <widget class="QCheckBox" name="checkBox_playlist">
+        <widget class="QCheckBox" name="checkBox_retainplaylist">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked the playlist and position of the currently playing media will be retained.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -82,6 +79,9 @@
       </layout>
      </widget>
      <widget class="QGroupBox" name="groupBox_startoptions">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="title">
        <string>Start Options</string>
       </property>
@@ -323,34 +323,18 @@
  <resources/>
  <connections>
   <connection>
-   <sender>checkBox_usestartoptions</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>groupBox_startoptions</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>99</x>
-     <y>44</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>214</x>
-     <y>10</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
    <receiver>Settings</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>472</x>
-     <y>415</y>
+     <x>448</x>
+     <y>413</y>
     </hint>
     <hint type="destinationlabel">
-     <x>184</x>
-     <y>-21</y>
+     <x>501</x>
+     <y>-13</y>
     </hint>
    </hints>
   </connection>
@@ -361,12 +345,28 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>528</x>
-     <y>413</y>
+     <x>538</x>
+     <y>415</y>
     </hint>
     <hint type="destinationlabel">
-     <x>499</x>
-     <y>-10</y>
+     <x>525</x>
+     <y>-3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_usestartoptions</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>groupBox_startoptions</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>45</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>12</y>
     </hint>
    </hints>
   </connection>
