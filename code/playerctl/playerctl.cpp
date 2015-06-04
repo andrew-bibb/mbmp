@@ -869,7 +869,10 @@ void PlayerControl::aboutMBMP()
                   "<center>Release date: %3"                        
                   "<center>Copyright c %4\n<center>by\n"
                   "<center>Andrew J. Bibb\n"
-                  "<center>Vermont, USA").arg(APP).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
+                  "<center>Vermont, USA"
+									"<br><center><b>Translations:</b>"
+                  "<center>Ilya Shestopalov (Russian)"                  
+                  ).arg(APP).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
 }
 
 //

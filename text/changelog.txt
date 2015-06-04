@@ -1,6 +1,9 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>In Progress</b>
+<ul>
+</ul>Added Russian Translation (by Ilya Shestopalov).<li>
 <b>2 June 2015</b>
 <ul>
 <li>Fixed visualizer menu not activating when visualizer option is toggled</li>
