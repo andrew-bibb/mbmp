@@ -127,12 +127,12 @@ void Settings::restoreElementGeometry(const QString& elem, QWidget* win)
 
 //
 // Function to return a start option as a QVariant
-QVariant Settings::getStartOption(const QString& elem)
+QVariant Settings::getSetting(const QString& group, const QString& elem)
 {
 	QVariant v;
 	v.clear();
 	
-	settings->beginGroup("StartOptions");
+	settings->beginGroup(group);
 	v = settings->value(elem);
 	settings->endGroup();
 	
@@ -141,10 +141,12 @@ QVariant Settings::getStartOption(const QString& elem)
 
 //
 // Function to save the playlist
-void Settings::savePlaylist(const QStringList& pl)
+void Settings::savePlaylist(const QStringList& pl, const int& cur, const int& pos)
 {
 	settings->beginGroup("Playlist");
 	settings->setValue("entries", pl);
+	settings->setValue("current", cur);
+	settings->setValue("position", pos);
 	settings->endGroup();
 }
 

@@ -30,8 +30,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   if (parser.isSet("icon-theme") )
 		QIcon::setThemeName(parser.value("icon-theme"));
 	else
-		if (diag_settings->useStartOptions() && diag_settings->getStartOption("use_icon_theme").toBool() )
-			QIcon::setThemeName(diag_settings->getStartOption("icon_theme_name").toString() );
+		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_icon_theme").toBool() )
+			QIcon::setThemeName(diag_settings->getSetting("StartOptions", "icon_theme_name").toString() );
 		else QIcon::setThemeName("Internal MBMP theme");
 	
 	// data members
@@ -54,15 +54,15 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   // show or hide GUI
   ui.widget_control->setVisible(false);
   if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
-  else if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_gui").toBool() ) ui.widget_control->setVisible(true);
+  else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_gui").toBool() ) ui.widget_control->setVisible(true);
   
   // options to start fullscreen 
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
-	else if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_fullscreen").toBool() ) this->showFullScreen();
+	else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->showFullScreen();
 			
 	// Icons with different on and off pixmaps
 	if (parser.isSet("icon-theme") || 
-		 (diag_settings->useStartOptions() && diag_settings->getStartOption("use_icon_theme").toBool()) ) {
+		 (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_icon_theme").toBool()) ) {
 		createThemeIcon(ui.actionPlayPause, "media-playback-pause", "media-playback-start");
 		createThemeIcon(ui.actionToggleMute, "audio-volume-muted","multimedia-volume-control");
 	}
@@ -90,7 +90,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		if (parser.isSet("CD")) 
 			s_cd = parser.value("CD");
 		else if (diag_settings->useStartOptions() )
-			s_cd = diag_settings->getStartOption("audio_cd_drive").toString();
+			s_cd = diag_settings->getSetting("StartOptions", "audio_cd_drive").toString();
 		int idx = ui.comboBox_audiocd->findText(s_cd);
 		ui.comboBox_audiocd->setCurrentIndex(idx > 0 ? idx : 0);
 	}	// else
@@ -105,7 +105,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		if (parser.isSet("DVD"))
 			s_dvd = parser.value("DVD");
 		else if (diag_settings->useStartOptions() )
-			s_dvd = diag_settings->getStartOption("dvd_drive").toString();
+			s_dvd = diag_settings->getSetting("StartOptions", "dvd_drive").toString();
 		int idx = ui.comboBox_dvd->findText(s_dvd);
 		ui.comboBox_dvd->setCurrentIndex(idx > 0 ? idx : 0);
 	}	// else	
@@ -117,7 +117,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	loglevel = parser.value("loglevel").toInt(&ok,10);	// default is 1
 	if (! ok) loglevel = 1;
 	if (! parser.isSet("loglevel") && diag_settings->useStartOptions() )
-		loglevel = diag_settings->getStartOption("log_level").toInt();
+		loglevel = diag_settings->getSetting("StartOptions", "log_level").toInt();
 	if (loglevel < 0 ) loglevel = 0;
 	if (loglevel > 2 ) loglevel = 2; 	
 					
@@ -128,18 +128,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		cnxnspeed = parser.value("connection-speed").toInt(&ok,10); // default is 0				
 	}
 	else if (diag_settings->useStartOptions() ) {
-		cnxnspeed = diag_settings->getStartOption("connection_speed").toInt();
+		cnxnspeed = diag_settings->getSetting("StartOptions", "connection_speed").toInt();
 		ok = true;
 	}			
 	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);		
-			
-	// seed the playlist with the positional arguments from the command line
-	if (parser.positionalArguments().count() > 0 )
-		playlist->seedPlaylist(parser.positionalArguments() );
-	else if (diag_settings->usePlaylist() )
-		playlist->seedPlaylist(diag_settings->getPlaylist() );
-		
-	
+					
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work provided
   // the toolbutton is visible.  Since we can hide GUI in this widget
@@ -285,7 +278,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	action_vis->setCheckable(true);		
 	if (parser.isSet("visualizer") ) b_01 = true;
 	else
-		if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_visualizer").toBool() ) b_01 = true;
+		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_visualizer").toBool() ) b_01 = true;
 		else b_01 = false;
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, b_01 );
 	action_vis->setChecked(b_01);
@@ -294,7 +287,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	action_sub->setCheckable(true);
 	if (parser.isSet("subtitles") ) b_01 = true;
 	else
-		if (diag_settings->useStartOptions() && diag_settings->getStartOption("start_subtitles").toBool() ) b_01 = true;
+		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_subtitles").toBool() ) b_01 = true;
 		else b_01 = false;		
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, b_01);
 	action_sub->setChecked(b_01);
@@ -303,7 +296,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	action_sbuf->setCheckable(true);
 	if (parser.isSet("stream-buffering") ) b_01 = true;
 	else
-		if (diag_settings->useStartOptions() && diag_settings->getStartOption("use_stream_buffering").toBool() ) b_01 = true;
+		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_stream_buffering").toBool() ) b_01 = true;
 		else b_01 = false;		
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, b_01);
 	action_sbuf->setChecked(b_01);
@@ -312,7 +305,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	action_dbuf->setCheckable(true);
 	if (parser.isSet("download-buffering") ) b_01 = true;
 	else
-		if (diag_settings->useStartOptions() && diag_settings->getStartOption("use_download_buffering").toBool() ) b_01 = true;
+		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_download_buffering").toBool() ) b_01 = true;
 		else b_01 = false;		
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, b_01);
 	action_dbuf->setChecked(b_01);	
@@ -486,7 +479,16 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		diag_settings->restoreElementGeometry("playerctl", this);
 		diag_settings->restoreElementGeometry("playlist", playlist);
 	}	// if useState
-			
+
+	// seed the playlist with the positional arguments from the command line
+	if (parser.positionalArguments().count() > 0 )
+		playlist->seedPlaylist(parser.positionalArguments() );
+	else if (diag_settings->usePlaylist() ) {
+		playlist->seedPlaylist(diag_settings->getPlaylist() );
+		playlist->setCurrentRow(diag_settings->getSetting("Playlist", "current").toInt() );
+		ui.horizontalSlider_position->setSliderPosition(diag_settings->getSetting("Playlist", "position").toInt() );
+	}
+	
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
 	QTimer::singleShot(10, this, SLOT(playMedia()));
@@ -1201,7 +1203,7 @@ void PlayerControl::cleanUp()
 		
   diag_settings->writeSettings();
   
-  diag_settings->savePlaylist(playlist->getCurrentList() );
+  diag_settings->savePlaylist(playlist->getCurrentList(), playlist->getCurrentRow(), ui.horizontalSlider_position->sliderPosition() );
   
   return;
 }

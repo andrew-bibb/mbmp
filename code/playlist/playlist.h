@@ -91,6 +91,8 @@ class Playlist : public QDialog
 		inline QString getCurrentUri() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri();}
 		inline int getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
 		inline bool isCurrentPlayable() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable();}
+		inline int getCurrentRow() {return ui.listWidget_playlist->currentRow();}
+		inline void setCurrentRow(const int& row) {ui.listWidget_playlist->setCurrentRow(row);}
 	
 	public:
 		void seedPlaylist(const QStringList&);

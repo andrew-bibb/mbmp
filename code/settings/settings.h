@@ -52,9 +52,9 @@ class Settings : public QDialog
   	void writeSettings();
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
   	void restoreElementGeometry(const QString&, QWidget*);
-  	void savePlaylist(const QStringList&);
+  	void savePlaylist(const QStringList&, const int& cur = 0, const int& pos = 0);
   	QStringList getPlaylist();
-  	QVariant getStartOption(const QString&); 	    
+  	QVariant getSetting(const QString&, const QString&); 	    
     
   private:
   // members 
