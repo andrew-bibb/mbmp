@@ -8,9 +8,9 @@ QT Multi-Media packages.
 
 Becasue we use GStreamer most any media format can be played provided the GStreamer
 plugins are installed on your system.  Additionally audio CD's and DVD's can be 
-played, and for DVD's onscreen or keyboard control of the DVD menus is implemented.
-There is a basic playlist available and it is also possible to play internet media
-streams.
+played, and for DVD's control of onscreen menus is implemented with either mouse
+or keyboard control. There is a basic playlist available and it is also possible
+to play internet media  streams.
 
 There are three modes available to control the player.  The basic interface is
 an MPlayer like one with keyboard control.  Key bindings are completely cusomizable
