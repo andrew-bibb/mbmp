@@ -1226,7 +1226,7 @@ void PlayerControl::contextMenuEvent(QContextMenuEvent* e)
 //	Event filter
 bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 {
-	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonRelease )
+	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonPress )
 	{
 		QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
 		if (mouseEvent->button() == Qt::LeftButton) {
@@ -1236,10 +1236,11 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 				mouseEvent->x(),
 				ui.horizontalSlider_position->width()));
 			return true;
-		}
+		}	// if left button
 		else 
 			return false;
-	}
+	}	// if 
+	
 	return false;
 }
 
