@@ -1226,19 +1226,21 @@ void PlayerControl::contextMenuEvent(QContextMenuEvent* e)
 //	Event filter
 bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 {
-	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonPress )
+	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonRelease )
 	{
 		QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-		if (mouseEvent->button() == Qt::LeftButton)
+		if (mouseEvent->button() == Qt::LeftButton) {
 			ui.horizontalSlider_position->setValue(QStyle::sliderValueFromPosition(
 				ui.horizontalSlider_position->minimum(),
 				ui.horizontalSlider_position->maximum(),
 				mouseEvent->x(),
 				ui.horizontalSlider_position->width()));
+			return true;
+		}
+		else 
+			return false;
 	}
- 
 	return false;
- 
 }
 
 ////////////////////////////// Private Functions ////////////////////////////
