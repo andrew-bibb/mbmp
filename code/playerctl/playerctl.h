@@ -64,6 +64,7 @@ class PlayerControl : public QDialog
 
 	protected:
 		void contextMenuEvent(QContextMenuEvent*);		
+		bool eventFilter(QObject*, QEvent*);
 	
   private:
   // members 

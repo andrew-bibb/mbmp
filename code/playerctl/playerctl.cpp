@@ -70,6 +70,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	
 	
+	// set up an event filter on the position slider
+	ui.horizontalSlider_position->installEventFilter(this);
+	
 	// find the the optical drives, or at least the first five
 	for (int i = 0; i < 5; ++i) {
 		QFileInfo fi(QString("/dev/sr%1").arg(i));
@@ -481,17 +484,19 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	}	// if useState
 
 	// seed the playlist with the positional arguments from the command line
+	//int sp = 0;
 	if (parser.positionalArguments().count() > 0 )
 		playlist->seedPlaylist(parser.positionalArguments() );
 	else if (diag_settings->usePlaylist() ) {
 		playlist->seedPlaylist(diag_settings->getPlaylist() );
 		playlist->setCurrentRow(diag_settings->getSetting("Playlist", "current").toInt() );
-		ui.horizontalSlider_position->setSliderPosition(diag_settings->getSetting("Playlist", "position").toInt() );
+		//sp = diag_settings->getSetting("Playlist", "position").toInt();
 	}
 	
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
 	QTimer::singleShot(10, this, SLOT(playMedia()));
+	
 }
 
 
@@ -684,8 +689,8 @@ void PlayerControl::playMedia(QAction* act)
 	}	// else
 	
 	// Set the stream volume to agree with the dial
-	changeVolume(ui.dial_volume->value()); 	
-
+	changeVolume(ui.dial_volume->value());
+	
 	return;
 }
 
@@ -1216,6 +1221,25 @@ void PlayerControl::contextMenuEvent(QContextMenuEvent* e)
 	control_menu->popup(e->globalPos());
 }	
 
+
+//
+//	Event filter
+bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
+{
+	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonPress )
+	{
+		QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+		if (mouseEvent->button() == Qt::LeftButton)
+			ui.horizontalSlider_position->setValue(QStyle::sliderValueFromPosition(
+				ui.horizontalSlider_position->minimum(),
+				ui.horizontalSlider_position->maximum(),
+				mouseEvent->x(),
+				ui.horizontalSlider_position->width()));
+	}
+ 
+	return false;
+ 
+}
 
 ////////////////////////////// Private Functions ////////////////////////////
 //
