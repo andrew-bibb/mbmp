@@ -40,6 +40,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	p_gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
 	videowidget = new VideoWidget(this);
+	hiatus_resume = -1;
 
   // setup the cheatsheet message box
 	chtsht = new ScrollBox(this);
@@ -484,13 +485,12 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	}	// if useState
 
 	// seed the playlist with the positional arguments from the command line
-	//int sp = 0;
 	if (parser.positionalArguments().count() > 0 )
 		playlist->seedPlaylist(parser.positionalArguments() );
 	else if (diag_settings->usePlaylist() ) {
 		playlist->seedPlaylist(diag_settings->getPlaylist() );
 		playlist->setCurrentRow(diag_settings->getSetting("Playlist", "current").toInt() );
-		//sp = diag_settings->getSetting("Playlist", "position").toInt();
+		hiatus_resume = diag_settings->getSetting("Playlist", "position").toInt();
 	}
 	
 	// wait 10ms (basically give the constructor time to end) and then
@@ -558,11 +558,7 @@ void PlayerControl::setPositionWidgets(int position)
 		QTime t(0,0,0);
 		t = t.addSecs(position);
 		ui.label_position->setText(t.toString("HH:mm:ss") );
-		
-		// assume position adjustments less than 5 seconds are from p_gstiface
-		// above that assume from a key press, or moving the slider
-		if (abs(ui.horizontalSlider_position->sliderPosition() - position) < 5)
-			ui.horizontalSlider_position->setSliderPosition(position);
+		ui.horizontalSlider_position->setSliderPosition(position);	
 	}
 	// position is negative
 	else {
@@ -928,6 +924,11 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 	
 	switch (mtype) {
 		case MBMP_GI::State: 
+			// restore stream after hiatus
+			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)  && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) && hiatus_resume >= 0 ) {
+				p_gstiface->seekToPosition(hiatus_resume);
+				hiatus_resume = -1;
+		}
 			switch (loglevel) {
 				case 0:		// case 0 - surpress state change output
 					break;	

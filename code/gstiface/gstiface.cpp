@@ -1207,6 +1207,7 @@ void GST_Interface::queryStreamPosition()
        }  // if query failed
   else {
     qobject_cast<PlayerControl*>(mainwidget)->setPositionWidgets(position / (1000 * 1000 * 1000) );
+    
   } // else query succeeded       
   
   return;

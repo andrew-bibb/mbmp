@@ -91,6 +91,7 @@ class PlayerControl : public QDialog
 		QAction* action_sbuf;
 		QAction* action_dbuf;
 		Settings* diag_settings;
+		int hiatus_resume;
   
   // functions
 		QString readTextFile(const char*);
