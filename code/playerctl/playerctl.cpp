@@ -260,7 +260,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		if (i == 0 ) act->setChecked(true);
 		else if (act->text().contains(QRegExp("^GOOM: what a GOOM!$")) ) act->setChecked(true);
 	}
-	vis_group->setEnabled(parser.isSet("visualizer"));
 	
 	// create the advanced menu
 	advanced_menu = new QMenu(this);
@@ -286,6 +285,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		else b_01 = false;
 	p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, b_01 );
 	action_vis->setChecked(b_01);
+	vis_group->setEnabled(b_01);
 
 	action_sub = options_menu->addAction(tr("Subtitles"));
 	action_sub->setCheckable(true);
