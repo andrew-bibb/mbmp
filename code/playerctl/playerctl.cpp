@@ -428,7 +428,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionOptions, SIGNAL(triggered()), this, SLOT(popupOptionsMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
 	connect (ui.actionPlayerStop, SIGNAL(triggered()), this, SLOT(stopPlaying()));
-	connect (ui.horizontalSlider_position, SIGNAL(valueChanged(int)), this, SLOT(seekToPosition()));
 	connect (seek_group, SIGNAL(triggered(QAction*)), this, SLOT(seekToPosition(QAction*)));
 	connect (dvd_group, SIGNAL(triggered(QAction*)), this, SLOT(dvdNavigationCommand(QAction*)));
 	connect (ui.actionAudioCD, SIGNAL (triggered()), this, SLOT(initializeCD()));
@@ -1227,7 +1226,7 @@ void PlayerControl::contextMenuEvent(QContextMenuEvent* e)
 //	Event filter
 bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 {
-	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonPress )
+	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonRelease )
 	{
 		QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
 		if (mouseEvent->button() == Qt::LeftButton) {
@@ -1236,6 +1235,7 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 				ui.horizontalSlider_position->maximum(),
 				mouseEvent->x(),
 				ui.horizontalSlider_position->width()));
+				seekToPosition(NULL);
 			return true;
 		}	// if left button
 		else 
