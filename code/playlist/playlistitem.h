@@ -2,7 +2,7 @@
 
 Playlist items, derived from QListWidgetItem
 
-Copyright (C) 2014-2014
+Copyright (C) 2014-2015
 by: Andrew J. Bibb
 License: MIT 
 

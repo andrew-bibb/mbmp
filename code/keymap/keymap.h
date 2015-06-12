@@ -2,7 +2,7 @@
 
 Code to manage the mappings from key presses to commands. 
 
-Copyright (C) 2014-2014
+Copyright (C) 2014-2015
 by: Andrew J. Bibb
 License: MIT 
 
