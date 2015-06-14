@@ -30,10 +30,10 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QtCore/QDebug>
 # include <QTextStream>
-# include <QFile>
 # include <QRegExp>
 # include <QDir>
 # include <QFile>
+# include <QFileInfo>
 
 
 KeyMap::KeyMap(QObject* parent) : QObject(parent)
@@ -115,24 +115,21 @@ QString KeyMap::getCheatSheet()
 void KeyMap::makeLocalFile()
 {
 	// if the conf file exists return now
-	QFile f(QString(filepath + "/%1.keys").arg(QString(APP).toLower()) );
-	if (f.exists() ) return;
-
+	if (QFileInfo::exists(qPrintable(QString(filepath + "/%1.keys").arg(QString(APP).toLower()))) )
+		return;	
+	
 	// make the directory if it does not exist and copy the hardconded
 	// conf file to the directory
 	QDir d;
 	if (d.mkpath(filepath)) {
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) return;
-		
-		// copy the file line by line
-		QTextStream out(&f);
-		QStringList sl_rawdata = readTextFile(":/text/text/mbmp.keys");
-    for (int i = 0; i < sl_rawdata.size(); ++i) {
-			out << sl_rawdata.at(i) << "\n";
-		}	// for
+		QFile s(qPrintable(QString(":/text/text/mbmp.keys")) );	
+		if (s.copy(qPrintable(QString(filepath + "/%1.keys").arg(QString(APP).toLower()))) )
+			QFile::setPermissions(qPrintable(QString(filepath + "/%1.keys").arg(QString(APP).toLower())), QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+		else	
+			qDebug("Failed copying the key definition file");
 	}	// if mkpath returned ture
   
-	return;
+	return;	
 }
 
 //
