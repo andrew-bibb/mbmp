@@ -106,7 +106,8 @@ class GST_Interface : public QObject
   public:
     GST_Interface(QObject*);
     ~GST_Interface();
-      
+    
+    void rankElement(const QString&, bool);  
     int checkCD(QString); 
     int checkDVD(QString);      
     void playMedia(WId, QString, int track = 0);

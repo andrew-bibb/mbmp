@@ -150,6 +150,42 @@ GST_Interface::~GST_Interface()
 
 ///////////////////////////// Public Functions /////////////////////////
 //
+// Function to raise or lower the ranking of a GStreamer element
+// name is the GStreamer element to to operate on, if enable is true raise
+// the rank, if false lower the rank
+// 
+void GST_Interface::rankElement (const QString& (name) , bool enable) {
+	// variables
+	GstRegistry* registry = NULL;
+	GstElementFactory* factory = NULL;
+	
+	// get the registry and element 
+	registry = gst_registry_get();
+	if (!registry) return;
+	 
+	factory = gst_element_factory_find (qPrintable(name) );
+	if (!factory) return;
+	 
+	// change the rank 
+	if (enable) {
+		gst_plugin_feature_set_rank (GST_PLUGIN_FEATURE (factory), GST_RANK_PRIMARY + 1);
+		qDebug() << "Raised element " << name << "rank to " << GST_RANK_PRIMARY + 1;	
+	}
+	else {
+		gst_plugin_feature_set_rank (GST_PLUGIN_FEATURE (factory), GST_RANK_NONE);
+		qDebug() << "Lowered element " << "rank to " << GST_RANK_NONE;
+	}
+	 
+	if (gst_registry_add_feature (registry, GST_PLUGIN_FEATURE (factory)) )
+		qDebug() << "registry add feature returned true";
+	else
+		qDebug() << "registry add feature returned false";
+	
+	return;
+}
+
+
+//
 // Slot to query an audio CD for the number of audio tracks on it.
 // If the query succeeds assume we can play the CD.  Also used to set
 // or clear the opticaldrive data element

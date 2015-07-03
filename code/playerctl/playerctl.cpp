@@ -516,6 +516,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		hiatus_resume = diag_settings->getSetting("Playlist", "position").toInt();
 	}
 	
+	// adjust element ranks
+	p_gstiface->rankElement("avdec_mp3float", true);
+	
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
 	QTimer::singleShot(10, this, SLOT(playMedia()));
