@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="text">
+    <file>text/icon_def.txt</file>
     <file>text/mbmp.keys</file>
     <file>text/changelog.txt</file>
     <file>text/license.txt</file>
@@ -47,7 +48,7 @@
     <file>images/16x16/edit_remove.png</file>
   </qresource>
   <qresource prefix="translations">
-     <file>translations/mbmp_ru_RU.qm</file>
-     <file>translations/mbmp_en_US.qm</file>
-   </qresource>
+    <file>translations/mbmp_ru_RU.qm</file>
+    <file>translations/mbmp_en_US.qm</file>
+  </qresource>
 </RCC>

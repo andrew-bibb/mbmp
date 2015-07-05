@@ -153,8 +153,8 @@ GST_Interface::~GST_Interface()
 // Function to raise or lower the ranking of a GStreamer element
 // name is the GStreamer element to to operate on, if enable is true raise
 // the rank, if false lower the rank
-// 
-void GST_Interface::rankElement (const QString& (name) , bool enable) {
+void GST_Interface::rankElement (const QString& (name) , bool enable)
+{
 	// variables
 	GstRegistry* registry = NULL;
 	GstElementFactory* factory = NULL;

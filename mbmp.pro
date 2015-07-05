@@ -23,6 +23,7 @@ HEADERS		+= ./code/streaminfo/streaminfo.h
 HEADERS		+= ./code/videowidget/videowidget.h
 HEADERS		+= ./code/scrollbox/scrollbox.h
 HEADERS		+= ./code/settings/settings.h
+HEADERS		+= ./code/iconman/iconman.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
@@ -42,6 +43,7 @@ SOURCES += ./code/streaminfo/streaminfo.cpp
 SOURCES += ./code/videowidget/videowidget.cpp
 SOURCES += ./code/scrollbox/scrollbox.cpp
 SOURCES += ./code/settings/settings.cpp
+SOURCES += ./code/iconman/iconman.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc

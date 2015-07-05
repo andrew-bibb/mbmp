@@ -49,6 +49,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// setup the settings dialog (and read settings)
 	diag_settings = new Settings(this);
+	
+	// setup the icon manager
+	iconman = new IconManager(this);
 		  
   // Set icon theme if provided on the command line or in the settings
   if (parser.isSet("icon-theme") )
@@ -56,7 +59,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	else
 		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_icon_theme").toBool() )
 			QIcon::setThemeName(diag_settings->getSetting("StartOptions", "icon_theme_name").toString() );
-		else QIcon::setThemeName("Internal MBMP theme");
+		else QIcon::setThemeName(INTERNAL_THEME);
 	
 	// data members
 	keymap = new KeyMap(this);
@@ -85,12 +88,21 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
 	else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->showFullScreen();
 			
-	// Icons with different on and off pixmaps
-	if (parser.isSet("icon-theme") || 
-		 (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_icon_theme").toBool()) ) {
-		createThemeIcon(ui.actionPlayPause, "media-playback-pause", "media-playback-start");
-		createThemeIcon(ui.actionToggleMute, "audio-volume-muted","multimedia-volume-control");
-	}
+	// assign icons to actions
+	ui.actionPlaylistNext->setIcon(iconman->getIcon("playlist_next"));
+	ui.actionPlaylistBack->setIcon(iconman->getIcon("playlist_back"));
+	ui.actionTogglePlaylist->setIcon(iconman->getIcon("toggle_playlist"));
+	ui.actionPlaylistFirst->setIcon(iconman->getIcon("playlist_first"));
+	ui.actionPlaylistLast->setIcon(iconman->getIcon("playlist_last"));
+	
+	ui.actionQuit->setIcon(iconman->getIcon("quit"));
+	ui.actionToggleGUI->setIcon(iconman->getIcon("toggle_gui"));
+	ui.actionToggleFullscreen->setIcon(iconman->getIcon("toggle_fullscreen"));
+	ui.actionOptions->setIcon(iconman->getIcon("options"));
+	ui.actionShowSettingsDialog->setIcon(iconman->getIcon("settings"));	
+	ui.actionAddMedia->setIcon(iconman->getIcon("add_media"));
+	ui.actionPlayPause->setIcon(iconman->getIcon("playpause"));
+	ui.actionToggleMute->setIcon(iconman->getIcon("mute"));
 
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	
@@ -1292,37 +1304,3 @@ QString PlayerControl::readTextFile(const char* textfile)
 	
 	return rtnstring;
 } 
-
-//
-// Function to create icons from theme icons and assign them to actions.
-void PlayerControl::createThemeIcon(QAction* act, const QString& icon_on, const QString& icon_off)
-{
-	// Return if no icon_on provided
-	if (icon_on.isEmpty() ) return;
-	
-	// if no icon_off provided set the icon_on to the theme icon
-	if (icon_off.isEmpty() ) {
-		if (QIcon::hasThemeIcon(icon_on) )
-			act->setIcon(QIcon::fromTheme(icon_on) );
-		return;
-	}
-				
-	// both icon_on and icon_off provided, build the new icon from these parts
-	if (QIcon::hasThemeIcon(icon_on) && QIcon::hasThemeIcon(icon_off) ) {
-		QIcon icon = QIcon();
-		QList<QSize> sizes = QIcon::fromTheme(icon_on).availableSizes(QIcon::Normal, QIcon::On);
-		for (int i = 0; i < sizes.count(); ++i) {
-			QPixmap pix01 = QIcon::fromTheme(icon_on).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
-			icon.addPixmap(pix01, QIcon::Normal, QIcon::On);
-		}	// for
-		sizes = QIcon::fromTheme(icon_off).availableSizes(QIcon::Normal, QIcon::On);
-		for (int i = 0; i < sizes.count(); ++i) {
-			QPixmap pix02 = QIcon::fromTheme(icon_off).pixmap(sizes.at(i), QIcon::Normal, QIcon::On);
-			icon.addPixmap(pix02, QIcon::Normal, QIcon::Off);
-		}	//for
-		act->setIcon(icon);
-	}	// if
-	
-	return;
-}
-			

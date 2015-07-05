@@ -419,10 +419,6 @@
    </property>
   </action>
   <action name="actionQuit">
-   <property name="icon">
-    <iconset theme="application-exit" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/exit.png</normaloff>:/images/images/16x16/exit.png</iconset>
-   </property>
    <property name="text">
     <string>Quit</string>
    </property>
@@ -433,10 +429,6 @@
   <action name="actionToggleGUI">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset theme="computer" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/folder_inbox.png</normaloff>:/images/images/16x16/folder_inbox.png</iconset>
    </property>
    <property name="text">
     <string>Toggle GUI</string>
@@ -454,11 +446,6 @@
    </property>
    <property name="enabled">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset theme="view-fullscreen">
-     <normalon>:/images/images/16x16/view_fullscreen.png</normalon>
-    </iconset>
    </property>
    <property name="text">
     <string>Toggle Fullscreen</string>
@@ -487,8 +474,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset theme="help-about">
-     <normaloff/>
-    </iconset>
+     <normaloff>../../../../../../.designer/backup</normaloff>../../../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -553,11 +539,6 @@
    <property name="checked">
     <bool>false</bool>
    </property>
-   <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/player_play.png</normaloff>
-     <normalon>:/images/images/16x16/player_pause.png</normalon>:/images/images/16x16/player_play.png</iconset>
-   </property>
    <property name="text">
     <string>Play/Pause</string>
    </property>
@@ -566,10 +547,6 @@
    </property>
   </action>
   <action name="actionPlaylistNext">
-   <property name="icon">
-    <iconset theme="go-next" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/forward.png</normaloff>:/images/images/16x16/forward.png</iconset>
-   </property>
    <property name="text">
     <string>Next Item</string>
    </property>
@@ -581,10 +558,6 @@
    </property>
   </action>
   <action name="actionPlaylistBack">
-   <property name="icon">
-    <iconset theme="go-previous" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/back.png</normaloff>:/images/images/16x16/back.png</iconset>
-   </property>
    <property name="text">
     <string>Previous Item</string>
    </property>
@@ -596,10 +569,6 @@
    </property>
   </action>
   <action name="actionPlaylistFirst">
-   <property name="icon">
-    <iconset theme="go-first" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/start.png</normaloff>:/images/images/16x16/start.png</iconset>
-   </property>
    <property name="text">
     <string>First Item </string>
    </property>
@@ -612,8 +581,7 @@
   </action>
   <action name="actionPlaylistLast">
    <property name="icon">
-    <iconset theme="go-last" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/finish.png</normaloff>:/images/images/16x16/finish.png</iconset>
+    <iconset theme="go-last"/>
    </property>
    <property name="text">
     <string>Last Item</string>
@@ -643,11 +611,6 @@
   <action name="actionToggleMute">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/kmixdocked.png</normaloff>
-     <normalon>:/images/images/16x16/kmixdocked_error.png</normalon>:/images/images/16x16/kmixdocked.png</iconset>
    </property>
    <property name="text">
     <string>Mute</string>
@@ -993,8 +956,8 @@
   </action>
   <action name="actionOptions">
    <property name="icon">
-    <iconset theme="preferences-system" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/kscd.png</normaloff>:/images/images/16x16/kscd.png</iconset>
+    <iconset theme="preferences-system">
+     <normaloff>../../../../../../.designer/backup</normaloff>../../../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Options</string>
@@ -1004,10 +967,6 @@
    </property>
   </action>
   <action name="actionShowSettingsDialog">
-   <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/configure.png</normaloff>:/images/images/16x16/configure.png</iconset>
-   </property>
    <property name="text">
     <string>Settings</string>
    </property>

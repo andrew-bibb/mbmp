@@ -47,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/videowidget/videowidget.h"
 # include "./code/scrollbox/scrollbox.h"
 # include "./code/settings/settings.h"
+# include "./code/iconman/iconman.h"
 
 class PlayerControl : public QDialog
 {
@@ -117,10 +118,10 @@ class PlayerControl : public QDialog
 		QAction* action_dbuf;
 		Settings* diag_settings;
 		int hiatus_resume;
+		IconManager* iconman;
   
   // functions
 		QString readTextFile(const char*);
-		void createThemeIcon(QAction*, const QString&, const QString& = QString());
 
 };
 
