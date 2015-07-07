@@ -1,4 +1,4 @@
-# cmst.icon
+# mbmp.icon
 #
 # This icon definition file, located in the user's home directory, can be
 # edited.  The purpose of this file is to facilitate the use of theme icons
