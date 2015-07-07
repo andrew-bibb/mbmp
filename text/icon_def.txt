@@ -90,6 +90,74 @@ fdo_name = go-last
 #
 # interface icons
 [icon]
+icon_name = visualizer 
+resource = :/images/images/16x16/kwikdisk.png
+fdo_name = preferences-desktop-screensaver
+theme_names = view-media-visualization
+
+[icon]
+icon_name = stream-info
+resource = :/images/images/16x16/view_choose.png
+fdo_name = text-x-generic
+theme_names = view-list-text, ascii 
+
+icon_name = cd_drive 
+resource = :/images/images/16x16/cdaudio_unmount.png
+fdo_name = media-optical
+theme_names = media-optical-audio
+
+[icon]
+icon_name = dvd_drive
+resource = :/images/images/16x16/dvd_mount.png
+fdo_name = media-optical
+theme_names = drive-optical, media-optical-dvd
+
+[icon]
+icon_name = back_10
+resource = :/images/images/16x16/1leftarrow.png
+theme_names = draw-triangle1, media-playback-start-rtl
+
+[icon]
+icon_name = forward_10
+resource = :/images/images/16x16/1rightarrow.png
+theme_names = draw-triangle2, media-playback-start
+
+[icon]
+icon_name = back_60
+resource = :/images/images/16x16/2leftarrow.png
+fdo_name = media-seek-backward
+
+[icon]
+icon_name = forward_60
+resource = :/images/images/16x16/2rightarrow.png
+fdo_name = media-seek-forward
+
+[icon]
+icon_name = back_600
+resource = :/images/images/16x16/player_rev.png
+fdo_name = media-skip-backward
+
+[icon]
+icon_name = forward_600
+resource = :/images/images/16x16/player_fwd.png
+fdo_name = media-skip-forward
+
+[icon]
+icon_name = player_stop
+resource = :/images/images/16x16/player_stop.png
+fdo_name = media-playback-stop
+
+[icon]
+icon_name = volume_step_down 
+resource = :/images/images/16x16/2downarrow.png
+fdo_name = go-down
+
+[icon]
+icon_name = volume_step_up
+resource = :/images/images/16x16/2uparrow.png
+fdo_name = go-up
+
+[icon]
 icon_name = quit
 resource = :/images/images/16x16/exit.png
 fdo_name = application-exit

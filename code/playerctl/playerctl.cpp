@@ -95,14 +95,29 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionPlaylistFirst->setIcon(iconman->getIcon("playlist_first"));
 	ui.actionPlaylistLast->setIcon(iconman->getIcon("playlist_last"));
 	
+	ui.actionVisualizer->setIcon(iconman->getIcon("visualizer"));
+	ui.actionToggleStreamInfo->setIcon(iconman->getIcon("stream-info"));
+	ui.actionAudioCD->setIcon(iconman->getIcon("cd_drive"));
+	ui.actionDVD->setIcon(iconman->getIcon("dvd_drive"));
+	ui.actionSeekBack10->setIcon(iconman->getIcon("back_10"));
+	ui.actionSeekFrwd10->setIcon(iconman->getIcon("forward_10"));
+	ui.actionSeekBack60->setIcon(iconman->getIcon("back_60"));
+	ui.actionSeekFrwd60->setIcon(iconman->getIcon("forward_60"));
+	ui.actionSeekBack600->setIcon(iconman->getIcon("back_600"));
+	ui.actionSeekFrwd600->setIcon(iconman->getIcon("forward_600"));
+	ui.actionPlayerStop->setIcon(iconman->getIcon("player_stop"));
+	ui.actionVolumeDecreaseStep->setIcon(iconman->getIcon("volume_step_down"));
+	ui.actionVolumeIncreaseStep->setIcon(iconman->getIcon("volume_step_up"));
 	ui.actionQuit->setIcon(iconman->getIcon("quit"));
 	ui.actionToggleGUI->setIcon(iconman->getIcon("toggle_gui"));
 	ui.actionToggleFullscreen->setIcon(iconman->getIcon("toggle_fullscreen"));
 	ui.actionOptions->setIcon(iconman->getIcon("options"));
 	ui.actionShowSettingsDialog->setIcon(iconman->getIcon("settings"));	
 	ui.actionAddMedia->setIcon(iconman->getIcon("add_media"));
+	
 	ui.actionPlayPause->setIcon(iconman->getIcon("playpause"));
 	ui.actionToggleMute->setIcon(iconman->getIcon("mute"));
+
 
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	

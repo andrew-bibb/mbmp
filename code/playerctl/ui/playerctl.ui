@@ -404,10 +404,6 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset theme="audio-x-generic" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/sound.png</normaloff>:/images/images/16x16/sound.png</iconset>
-   </property>
    <property name="text">
     <string>Toggle Playlist</string>
    </property>
@@ -472,10 +468,6 @@
    </property>
   </action>
   <action name="actionAbout">
-   <property name="icon">
-    <iconset theme="help-about">
-     <normaloff>../../../../../../.designer/backup</normaloff>../../../../../../.designer/backup</iconset>
-   </property>
    <property name="text">
     <string>About</string>
    </property>
@@ -580,9 +572,6 @@
    </property>
   </action>
   <action name="actionPlaylistLast">
-   <property name="icon">
-    <iconset theme="go-last"/>
-   </property>
    <property name="text">
     <string>Last Item</string>
    </property>
@@ -594,10 +583,6 @@
    </property>
   </action>
   <action name="actionAddMedia">
-   <property name="icon">
-    <iconset theme="list-add" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/edit_add.png</normaloff>:/images/images/16x16/edit_add.png</iconset>
-   </property>
    <property name="text">
     <string>Add Media</string>
    </property>
@@ -623,10 +608,6 @@
    </property>
   </action>
   <action name="actionVolumeDecreaseStep">
-   <property name="icon">
-    <iconset theme="go-down" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/2downarrow.png</normaloff>:/images/images/16x16/2downarrow.png</iconset>
-   </property>
    <property name="text">
     <string>Volume Decrease</string>
    </property>
@@ -638,10 +619,6 @@
    </property>
   </action>
   <action name="actionVolumeIncreaseStep">
-   <property name="icon">
-    <iconset theme="go-up" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/2uparrow.png</normaloff>:/images/images/16x16/2uparrow.png</iconset>
-   </property>
    <property name="text">
     <string>Volume Increase</string>
    </property>
@@ -653,10 +630,6 @@
    </property>
   </action>
   <action name="actionVisualizer">
-   <property name="icon">
-    <iconset theme="preferences-desktop-screensaver" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/kwikdisk.png</normaloff>:/images/images/16x16/kwikdisk.png</iconset>
-   </property>
    <property name="text">
     <string>Visualizer</string>
    </property>
@@ -668,10 +641,6 @@
    </property>
   </action>
   <action name="actionPlayerStop">
-   <property name="icon">
-    <iconset theme="media-playback-stop" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/player_stop.png</normaloff>:/images/images/16x16/player_stop.png</iconset>
-   </property>
    <property name="text">
     <string>Stop</string>
    </property>
@@ -683,10 +652,6 @@
    </property>
   </action>
   <action name="actionToggleStreamInfo">
-   <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/view_choose.png</normaloff>:/images/images/16x16/view_choose.png</iconset>
-   </property>
    <property name="text">
     <string>Stream Information</string>
    </property>
@@ -698,10 +663,6 @@
    </property>
   </action>
   <action name="actionSeekBack10">
-   <property name="icon">
-    <iconset theme="media-seek-backward" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/1leftarrow.png</normaloff>:/images/images/16x16/1leftarrow.png</iconset>
-   </property>
    <property name="text">
     <string>Back 10 sec</string>
    </property>
@@ -710,10 +671,6 @@
    </property>
   </action>
   <action name="actionSeekFrwd10">
-   <property name="icon">
-    <iconset theme="media-seek-forward" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/1rightarrow.png</normaloff>:/images/images/16x16/1rightarrow.png</iconset>
-   </property>
    <property name="text">
     <string>Ahead 10 sec</string>
    </property>
@@ -725,10 +682,6 @@
    </property>
   </action>
   <action name="actionSeekBack60">
-   <property name="icon">
-    <iconset theme="media-skip-backward" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/2leftarrow.png</normaloff>:/images/images/16x16/2leftarrow.png</iconset>
-   </property>
    <property name="text">
     <string>Back 1 min</string>
    </property>
@@ -740,10 +693,6 @@
    </property>
   </action>
   <action name="actionSeekFrwd60">
-   <property name="icon">
-    <iconset theme="media-skip-forward" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/2rightarrow.png</normaloff>:/images/images/16x16/2rightarrow.png</iconset>
-   </property>
    <property name="text">
     <string>Ahead 1 min</string>
    </property>
@@ -755,10 +704,6 @@
    </property>
   </action>
   <action name="actionSeekBack600">
-   <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/player_rev.png</normaloff>:/images/images/16x16/player_rev.png</iconset>
-   </property>
    <property name="text">
     <string>Back 10 min</string>
    </property>
@@ -772,10 +717,6 @@
   <action name="actionSeekFrwd600">
    <property name="enabled">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/player_fwd.png</normaloff>:/images/images/16x16/player_fwd.png</iconset>
    </property>
    <property name="text">
     <string>Ahead 10 min</string>
@@ -829,10 +770,6 @@
    </property>
   </action>
   <action name="actionAudioCD">
-   <property name="icon">
-    <iconset theme="media-optical" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/cdaudio_unmount.png</normaloff>:/images/images/16x16/cdaudio_unmount.png</iconset>
-   </property>
    <property name="text">
     <string>Audio CD</string>
    </property>
@@ -844,10 +781,6 @@
    </property>
   </action>
   <action name="actionDVD">
-   <property name="icon">
-    <iconset theme="media-optical" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/dvd_mount.png</normaloff>:/images/images/16x16/dvd_mount.png</iconset>
-   </property>
    <property name="text">
     <string>DVD</string>
    </property>
@@ -957,7 +890,7 @@
   <action name="actionOptions">
    <property name="icon">
     <iconset theme="preferences-system">
-     <normaloff>../../../../../../.designer/backup</normaloff>../../../../../../.designer/backup</iconset>
+     <normaloff>../../../../../../../../../../../../../../.designer/backup</normaloff>../../../../../../../../../../../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Options</string>
