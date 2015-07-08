@@ -178,10 +178,6 @@
    </item>
   </layout>
   <action name="actionMoveUp">
-   <property name="icon">
-    <iconset theme="go-up" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/1uparrow.png</normaloff>:/images/images/16x16/1uparrow.png</iconset>
-   </property>
    <property name="text">
     <string>Move Up</string>
    </property>
@@ -190,10 +186,6 @@
    </property>
   </action>
   <action name="actionMoveDown">
-   <property name="icon">
-    <iconset theme="go-down" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/1downarrow.png</normaloff>:/images/images/16x16/1downarrow.png</iconset>
-   </property>
    <property name="text">
     <string>Move Down</string>
    </property>
@@ -202,19 +194,11 @@
    </property>
   </action>
   <action name="actionAddMedia">
-   <property name="icon">
-    <iconset theme="list-add" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/edit_add.png</normaloff>:/images/images/16x16/edit_add.png</iconset>
-   </property>
    <property name="text">
     <string>Add Media</string>
    </property>
   </action>
   <action name="actionRemoveItem">
-   <property name="icon">
-    <iconset theme="list-remove" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/edit_remove.png</normaloff>:/images/images/16x16/edit_remove.png</iconset>
-   </property>
    <property name="text">
     <string>Remove Item</string>
    </property>
@@ -223,10 +207,6 @@
    </property>
   </action>
   <action name="actionHidePlaylist">
-   <property name="icon">
-    <iconset theme="application-exit" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/exit.png</normaloff>:/images/images/16x16/exit.png</iconset>
-   </property>
    <property name="text">
     <string>Hide Playlist</string>
    </property>
@@ -235,10 +215,6 @@
    </property>
   </action>
   <action name="actionAddFiles">
-   <property name="icon">
-    <iconset theme="folder" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/folder.png</normaloff>:/images/images/16x16/folder.png</iconset>
-   </property>
    <property name="text">
     <string>Add Files</string>
    </property>
@@ -247,19 +223,11 @@
    </property>
   </action>
   <action name="actionAddURL">
-   <property name="icon">
-    <iconset theme="folder-remote" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/network.png</normaloff>:/images/images/16x16/network.png</iconset>
-   </property>
    <property name="text">
     <string>Add URL</string>
    </property>
   </action>
   <action name="actionAddAudio">
-   <property name="icon">
-    <iconset theme="audio-x-generic" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/folder_sound.png</normaloff>:/images/images/16x16/folder_sound.png</iconset>
-   </property>
    <property name="text">
     <string>Add Audio</string>
    </property>
@@ -268,10 +236,6 @@
    </property>
   </action>
   <action name="actionAddVideo">
-   <property name="icon">
-    <iconset theme="video-x-generic" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/folder_video.png</normaloff>:/images/images/16x16/folder_video.png</iconset>
-   </property>
    <property name="text">
     <string>Add Video</string>
    </property>
@@ -280,10 +244,6 @@
    </property>
   </action>
   <action name="actionRemoveAll">
-   <property name="icon">
-    <iconset theme="list-remove" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/editdelete.png</normaloff>:/images/images/16x16/editdelete.png</iconset>
-   </property>
    <property name="text">
     <string>Remove All</string>
    </property>
@@ -292,10 +252,6 @@
    </property>
   </action>
   <action name="actionSavePlaylist">
-   <property name="icon">
-    <iconset theme="document-save" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/filesave.png</normaloff>:/images/images/16x16/filesave.png</iconset>
-   </property>
    <property name="text">
     <string>Save Playlist</string>
    </property>
@@ -305,8 +261,7 @@
   </action>
   <action name="actionAddPlaylist">
    <property name="icon">
-    <iconset theme="text-x-generic" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/view_text.png</normaloff>:/images/images/16x16/view_text.png</iconset>
+    <iconset theme="text-x-generic"/>
    </property>
    <property name="text">
     <string>Add Playlist</string>

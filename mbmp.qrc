@@ -6,6 +6,7 @@
     <file>text/license.txt</file>
   </qresource>
   <qresource prefix="images">
+    <file>images/16x16/help.png</file>
     <file>images/16x16/kscd.png</file>
     <file>images/16x16/view_text.png</file>
     <file>images/16x16/filesave.png</file>

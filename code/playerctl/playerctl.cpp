@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QTime>
 # include <QFileInfo>
 
+# include "./code/iconman/iconman.h"
 # include "./code/playerctl/playerctl.h"	
 # include "./code/resource.h"
 
@@ -49,9 +50,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// setup the settings dialog (and read settings)
 	diag_settings = new Settings(this);
-	
-	// setup the icon manager
-	iconman = new IconManager(this);
 		  
   // Set icon theme if provided on the command line or in the settings
   if (parser.isSet("icon-theme") )
@@ -68,6 +66,16 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ncurs = this->cursor();
 	videowidget = new VideoWidget(this);
 	hiatus_resume = -1;
+	notifyclient = NULL;
+	
+	
+	// Create the notifyclient, make four tries; first immediately in constructor, then
+  // at 1/2 second, 2 seconds and finally at 8 seconds
+  notifyclient = new NotifyClient(this);
+  this->connectNotifyClient();
+  QTimer::singleShot(500, this, SLOT(connectNotifyClient()));
+  QTimer::singleShot(2 * 1000, this, SLOT(connectNotifyClient()));
+  QTimer::singleShot(8 * 1000, this, SLOT(connectNotifyClient()));
 
   // setup the cheatsheet message box
 	chtsht = new ScrollBox(this);
@@ -89,36 +97,37 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->showFullScreen();
 			
 	// assign icons to actions
-	ui.actionPlaylistNext->setIcon(iconman->getIcon("playlist_next"));
-	ui.actionPlaylistBack->setIcon(iconman->getIcon("playlist_back"));
-	ui.actionTogglePlaylist->setIcon(iconman->getIcon("toggle_playlist"));
-	ui.actionPlaylistFirst->setIcon(iconman->getIcon("playlist_first"));
-	ui.actionPlaylistLast->setIcon(iconman->getIcon("playlist_last"));
+	IconManager iconman(this);
+	ui.actionPlaylistNext->setIcon(iconman.getIcon("playlist_next"));
+	ui.actionPlaylistBack->setIcon(iconman.getIcon("playlist_back"));
+	ui.actionTogglePlaylist->setIcon(iconman.getIcon("toggle_playlist"));
+	ui.actionPlaylistFirst->setIcon(iconman.getIcon("playlist_first"));
+	ui.actionPlaylistLast->setIcon(iconman.getIcon("playlist_last"));	
+	ui.actionAbout->setIcon(iconman.getIcon("help_about"));
+	ui.actionVisualizer->setIcon(iconman.getIcon("visualizer"));
+	ui.actionToggleStreamInfo->setIcon(iconman.getIcon("stream_info"));
+	ui.actionAudioCD->setIcon(iconman.getIcon("cd_drive"));
+	ui.actionDVD->setIcon(iconman.getIcon("dvd_drive"));
+	ui.actionSeekBack10->setIcon(iconman.getIcon("back_10"));
+	ui.actionSeekFrwd10->setIcon(iconman.getIcon("forward_10"));
+	ui.actionSeekBack60->setIcon(iconman.getIcon("back_60"));
+	ui.actionSeekFrwd60->setIcon(iconman.getIcon("forward_60"));
+	ui.actionSeekBack600->setIcon(iconman.getIcon("back_600"));
+	ui.actionSeekFrwd600->setIcon(iconman.getIcon("forward_600"));
+	ui.actionPlayerStop->setIcon(iconman.getIcon("player_stop"));
+	ui.actionVolumeDecreaseStep->setIcon(iconman.getIcon("volume_step_down"));
+	ui.actionVolumeIncreaseStep->setIcon(iconman.getIcon("volume_step_up"));
+	ui.actionQuit->setIcon(iconman.getIcon("quit"));
+	ui.actionToggleGUI->setIcon(iconman.getIcon("toggle_gui"));
+	ui.actionToggleFullscreen->setIcon(iconman.getIcon("toggle_fullscreen"));
+	ui.actionOptions->setIcon(iconman.getIcon("options"));
+	ui.actionShowSettingsDialog->setIcon(iconman.getIcon("settings"));	
+	ui.actionAddMedia->setIcon(iconman.getIcon("add_media"));
+	ui.actionAVSync->setIcon(iconman.getIcon("av_sync"));
+	ui.actionColorBalance->setIcon(iconman.getIcon("color_balance"));
+	ui.actionPlayPause->setIcon(iconman.getIcon("playpause"));
+	ui.actionToggleMute->setIcon(iconman.getIcon("mute"));
 	
-	ui.actionVisualizer->setIcon(iconman->getIcon("visualizer"));
-	ui.actionToggleStreamInfo->setIcon(iconman->getIcon("stream-info"));
-	ui.actionAudioCD->setIcon(iconman->getIcon("cd_drive"));
-	ui.actionDVD->setIcon(iconman->getIcon("dvd_drive"));
-	ui.actionSeekBack10->setIcon(iconman->getIcon("back_10"));
-	ui.actionSeekFrwd10->setIcon(iconman->getIcon("forward_10"));
-	ui.actionSeekBack60->setIcon(iconman->getIcon("back_60"));
-	ui.actionSeekFrwd60->setIcon(iconman->getIcon("forward_60"));
-	ui.actionSeekBack600->setIcon(iconman->getIcon("back_600"));
-	ui.actionSeekFrwd600->setIcon(iconman->getIcon("forward_600"));
-	ui.actionPlayerStop->setIcon(iconman->getIcon("player_stop"));
-	ui.actionVolumeDecreaseStep->setIcon(iconman->getIcon("volume_step_down"));
-	ui.actionVolumeIncreaseStep->setIcon(iconman->getIcon("volume_step_up"));
-	ui.actionQuit->setIcon(iconman->getIcon("quit"));
-	ui.actionToggleGUI->setIcon(iconman->getIcon("toggle_gui"));
-	ui.actionToggleFullscreen->setIcon(iconman->getIcon("toggle_fullscreen"));
-	ui.actionOptions->setIcon(iconman->getIcon("options"));
-	ui.actionShowSettingsDialog->setIcon(iconman->getIcon("settings"));	
-	ui.actionAddMedia->setIcon(iconman->getIcon("add_media"));
-	
-	ui.actionPlayPause->setIcon(iconman->getIcon("playpause"));
-	ui.actionToggleMute->setIcon(iconman->getIcon("mute"));
-
-
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	
 	
@@ -726,7 +735,7 @@ void PlayerControl::playMedia(QAction* act)
 		p_gstiface->playMedia(videowidget->winId(), "cdda://", playlist->getCurrentSeq());
 	}	// if we are playing a disk
 	
-	// if we are playing a DVD send the chapter to p_gstifacd 
+	// if we are playing a DVD send the chapter to p_gstiface
 	else if (playlist->currentItemType() == MBMP_PL::DVD) {
 		p_gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
@@ -739,7 +748,7 @@ void PlayerControl::playMedia(QAction* act)
 	
 	// Set the stream volume to agree with the dial
 	changeVolume(ui.dial_volume->value());
-	
+		
 	return;
 }
 
@@ -1143,6 +1152,13 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
+			// in TAG p_gstiface changes window title, read it hear and display
+			//if(diag_settings->usenotifications() ) {
+				notifyclient->init();
+				notifyclient->setSummary(tr("Now Playing"));
+				notifyclient->setBody(this->windowTitle() );
+				notifyclient->sendNotification();
+			//}
 		break;
 		
 		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count
@@ -1264,6 +1280,60 @@ void PlayerControl::cleanUp()
   
   diag_settings->savePlaylist(playlist->getCurrentList(), playlist->getCurrentRow(), ui.horizontalSlider_position->sliderPosition() );
   
+  return;
+}
+
+// Slot to connect to the notification client. Called from QTimers to give time for the notification server
+// to start up if this program is started automatically at boot.  We make four attempts at finding the
+// notification server.  First is in the constructor of NotifyClient, following we call the connectToServer()
+// function.
+void PlayerControl::connectNotifyClient()
+{
+   //initialize the counter
+   static short count = 0;
+   ++count;
+
+  if (count > 1 ) {
+    // if we have a valid notifyclient return now
+    if (notifyclient->isValid() )
+      return;
+    // else try to connect again
+    else
+      notifyclient->connectToServer();
+  } // if count > 1
+
+  // setup the notify server label if we were successful in finding and connecting to a server
+  if (notifyclient->isValid() ) {
+    QString name = notifyclient->getServerName().toLower();
+    name = name.replace(0, 1, name.left(1).toUpper() );
+    QString vendor = notifyclient->getServerVendor();
+    vendor = vendor.replace(0, 1, vendor.left(1).toUpper() );
+    QString lab = tr("%1 version %2 by %3 has been detected on this system.<p>This server supports desktop Notification Specification version %4")
+      .arg(name)
+      .arg(notifyclient->getServerVersion() )
+      .arg(vendor)
+      .arg(notifyclient->getServerSpecVersion() );
+    //ui.label_serverstatus->clear();
+    //ui.label_serverstatus->setDisabled(true);
+    //ui.groupBox_notfications->setToolTip(tr("%1 detected").arg(name) );
+    //ui.groupBox_notfications->setWhatsThis(lab);
+  }
+  // not successful, try again or abandon if counter is at limit
+  else {
+    if (count < 4) {
+      //ui.label_serverstatus->setText(tr("Attempt %1 of 4 looking for notification server.").arg(count));
+      qDebug() << "connect try " << count;
+    } // try again
+    else {
+      //ui.label_serverstatus->setText(tr("Unable to find or connect to a Notification server."));
+      //ui.checkBox_notifydaemon->setChecked(false);
+      //ui.checkBox_notifydaemon->setEnabled(false);
+      qDebug() << "failed to connect";
+    } // else last time
+  //ui.groupBox_notfications->setToolTip("");
+  //ui.groupBox_notfications->setWhatsThis("");
+  } // else we don't have a valid client.
+
   return;
 }
 

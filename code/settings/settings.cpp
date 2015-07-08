@@ -48,12 +48,14 @@ Settings::Settings(QWidget *parent)
 	ui.groupBox_startoptions->setEnabled(usestartoptions);
 	usestate = settings->value("retain_state").toBool();
 	useplaylist = settings->value("retain_playlist").toBool();
+	usenotifications = settings->value("use_notifications").toBool();
 	settings->endGroup();
 	
 	// seed dialog values
 	ui.checkBox_usestartoptions->setChecked(usestartoptions);
 	ui.checkBox_retainstate->setChecked(usestate);
 	ui.checkBox_retainplaylist->setChecked(useplaylist);
+	ui.checkBox_notifydaemon->setChecked(usenotifications);
 	
 	settings->beginGroup("StartOptions");
 	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
@@ -81,6 +83,10 @@ void Settings::writeSettings()
   settings->setValue("use_startoptions", ui.checkBox_usestartoptions->isChecked() );
   settings->setValue("retain_state", ui.checkBox_retainstate->isChecked() );
   settings->setValue("retain_playlist", ui.checkBox_retainplaylist->isChecked() );
+  settings->endGroup();
+  
+  settings->beginGroup("Notifications");
+  settings->setValue("use_notifications", ui.checkBox_notifydaemon->isChecked() );
   settings->endGroup();
 
   settings->beginGroup("StartOptions");

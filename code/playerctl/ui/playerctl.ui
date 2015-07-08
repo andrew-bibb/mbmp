@@ -729,10 +729,6 @@
    </property>
   </action>
   <action name="actionAVSync">
-   <property name="icon">
-    <iconset theme="emblem-synchronizing" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/noatunloopsong.png</normaloff>:/images/images/16x16/noatunloopsong.png</iconset>
-   </property>
    <property name="text">
     <string>A/V Sync</string>
    </property>
@@ -744,10 +740,6 @@
    </property>
   </action>
   <action name="actionColorBalance">
-   <property name="icon">
-    <iconset theme="applications-graphics" resource="../../../mbmp.qrc">
-     <normaloff>:/images/images/16x16/blend.png</normaloff>:/images/images/16x16/blend.png</iconset>
-   </property>
    <property name="text">
     <string>Color Balance</string>
    </property>

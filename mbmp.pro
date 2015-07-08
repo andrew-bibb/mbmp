@@ -6,6 +6,7 @@ CONFIG += release
 #  Widgets needed for QT5, 
 QT += widgets
 QT += core
+QT += dbus
 
 TARGET = mbmp
 TEMPLATE = app
@@ -24,6 +25,7 @@ HEADERS		+= ./code/videowidget/videowidget.h
 HEADERS		+= ./code/scrollbox/scrollbox.h
 HEADERS		+= ./code/settings/settings.h
 HEADERS		+= ./code/iconman/iconman.h
+HEADERS		+= ./code/notify/notify.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
@@ -44,6 +46,7 @@ SOURCES += ./code/videowidget/videowidget.cpp
 SOURCES += ./code/scrollbox/scrollbox.cpp
 SOURCES += ./code/settings/settings.cpp
 SOURCES += ./code/iconman/iconman.cpp
+SOURCES += ./code/notify/notify.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc

@@ -17,7 +17,7 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0">
+   <item row="5" column="0">
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -27,15 +27,18 @@
        <string>Preferences</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="checkBox_retainstate">
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the state of various windows will be saved on exit and restored on next use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <item row="3" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="text">
-          <string>Retain State</string>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>317</height>
+          </size>
          </property>
-        </widget>
+        </spacer>
        </item>
        <item row="0" column="0">
         <widget class="QCheckBox" name="checkBox_usestartoptions">
@@ -50,18 +53,15 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkBox_retainstate">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the state of various windows will be saved on exit and restored on next use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>317</height>
-          </size>
+         <property name="text">
+          <string>Retain State</string>
          </property>
-        </spacer>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QCheckBox" name="checkBox_retainplaylist">
@@ -74,6 +74,44 @@
          <property name="text">
           <string>Retain Playlist</string>
          </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Notifications</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBox_notifydaemon">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the system desktop notification daemon will popup a notify message when a significant connman related event is received.&lt;/p&gt;&lt;p&gt;Notifications can be handled by the System Tray Icon, or by a Notification daemon if one is installed. Both can not be active at the same time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Notification Daemon</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_serverstatus">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Server Status</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -311,7 +349,7 @@
      </widget>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="6" column="0">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>

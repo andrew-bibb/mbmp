@@ -63,6 +63,73 @@
 #
 # playlist icons
 [icon]
+icon_name = move_up
+resource = :/images/images/16x16/1uparrow.png
+fdo_name = go-up
+
+[icon]
+icon_name = move_down 
+resource = :/images/images/16x16/1downarrow.png
+fdo_name = go-down
+
+[icon]
+icon_name = add_media 
+resource = :/images/images/16x16/edit_add.png
+fdo_name = list-add
+
+[icon]
+icon_name = remove_item 
+resource = :/images/images/16x16/edit_remove.png
+fdo_name = list-remove
+
+[icon]
+icon_name = hide_playlist 
+resource = :/images/images/16x16/exit.png
+fdo_name = application-exit
+
+[icon]
+icon_name = add_files 
+resource = :/images/images/16x16/folder.png
+fdo_name = folder
+
+[icon]
+icon_name = add_url
+resource = :/images/images/16x16/network.png
+fdo_name = folder-remote
+
+[icon]
+icon_name = add_audio 
+resource = :/images/images/16x16/folder_sound.png
+fdo_name = audio-x-generic
+
+[icon]
+icon_name = add_video 
+resource = :/images/images/16x16/folder_video.png
+fdo_name = video-x-generic
+
+[icon]
+icon_name = remove_all 
+resource = :/images/images/16x16/editdelete.png
+fdo_name = edit-delete
+
+[icon]
+icon_name = save_playlist 
+resource = :/images/images/16x16/filesave.png
+fdo_name = document-save
+
+[icon]
+icon_name = add_playlist 
+resource = :/images/images/16x16/view_text.png
+fdo_name = text-x-generic
+
+#
+# interface icons
+[icon]
+icon_name = help_about
+resource = :/images/images/16x16/help.png
+fdo_name = help-about
+
+[icon]
 icon_name = playlist_next
 resource = :/images/images/16x16/forward.png
 fdo_name = go-next
@@ -87,8 +154,6 @@ icon_name = playlist_last
 resource = :/images/images/16x16/finish.png
 fdo_name = go-last
 
-#
-# interface icons
 [icon]
 icon_name = visualizer 
 resource = :/images/images/16x16/kwikdisk.png
@@ -96,7 +161,7 @@ fdo_name = preferences-desktop-screensaver
 theme_names = view-media-visualization
 
 [icon]
-icon_name = stream-info
+icon_name = stream_info
 resource = :/images/images/16x16/view_choose.png
 fdo_name = text-x-generic
 theme_names = view-list-text, ascii 
@@ -187,6 +252,16 @@ theme_names = configure
 icon_name = add_media
 resource = :/images/images/16x16/edit_add.png
 fdo_name = list-add
+
+[icon]
+icon_name = av_sync
+resource = :/images/images/16x16/noatunloopsong.png
+fdo_name = emblem-synchronizing
+
+[icon]
+icon_name = color_balance
+resource = :/images/images/16x16/blend.png
+fdo_name = applications-graphics
 
 #
 # on/off (toggle action) icons

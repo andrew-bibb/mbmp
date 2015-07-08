@@ -28,6 +28,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/playlist/playlist.h"
 # include "./code/playerctl/playerctl.h"
 # include "./code/resource.h"
+# include "./code/iconman/iconman.h"
 
 # include <QtCore/QDebug>
 # include <QFileDialog>
@@ -56,6 +57,21 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // initialize class members
   geometry = QRect();
   ui.listWidget_playlist->clear();
+  
+  // assign icons to actions
+	IconManager iconman(this);
+	ui.actionMoveUp->setIcon(iconman.getIcon("move_up"));
+	ui.actionMoveDown->setIcon(iconman.getIcon("move_down"));
+	ui.actionAddMedia->setIcon(iconman.getIcon("add_media"));
+	ui.actionRemoveItem->setIcon(iconman.getIcon("remove_item"));
+	ui.actionHidePlaylist->setIcon(iconman.getIcon("hide_playlist"));
+	ui.actionAddFiles->setIcon(iconman.getIcon("add_files"));
+	ui.actionAddURL->setIcon(iconman.getIcon("add_url"));
+	ui.actionAddAudio->setIcon(iconman.getIcon("add_audio"));
+	ui.actionAddVideo->setIcon(iconman.getIcon("add_video"));
+	ui.actionRemoveAll->setIcon(iconman.getIcon("remove_all"));
+	ui.actionSavePlaylist->setIcon(iconman.getIcon("save_playlist"));
+	ui.actionAddPlaylist->setIcon(iconman.getIcon("add_playlist"));
   
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work.  If there

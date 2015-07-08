@@ -49,6 +49,7 @@ class Settings : public QDialog
     inline bool useStartOptions() {return usestartoptions;}
     inline bool useState() {return usestate;}
     inline bool usePlaylist() {return useplaylist;}
+    inline bool useNotifications() {return usenotifications;}
   	void writeSettings();
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
   	void restoreElementGeometry(const QString&, QWidget*);
@@ -63,6 +64,7 @@ class Settings : public QDialog
     bool usestartoptions;
     bool usestate;
     bool useplaylist;
+    bool usenotifications;
 
 };
 
