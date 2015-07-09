@@ -723,6 +723,7 @@ void PlayerControl::playMedia(QAction* act)
 	// Return if the playlist item has not changed
 	if (! playlist->selectItem(direction) ) {
 		ui.actionPlayPause->setChecked(false);
+		this->stopPlaying();
 		return;
 	}
 	
@@ -781,6 +782,7 @@ void PlayerControl::stopPlaying()
 		
 	// Set duration labels to zero, will also disable seek ui elements
 	this->setDurationWidgets(-1);
+	this->setPositionWidgets(0);
 	
 	return;
 }	
@@ -1014,7 +1016,6 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 				}	// loglevel switch
-			this->stopPlaying();	
 			ui.actionPlaylistNext->trigger();
 			break;
 			

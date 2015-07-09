@@ -166,6 +166,7 @@ resource = :/images/images/16x16/view_choose.png
 fdo_name = text-x-generic
 theme_names = view-list-text, ascii 
 
+[icon]
 icon_name = cd_drive 
 resource = :/images/images/16x16/cdaudio_unmount.png
 fdo_name = media-optical
