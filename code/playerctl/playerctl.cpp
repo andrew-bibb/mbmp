@@ -1197,7 +1197,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			}	// loglevel switch		
 		
 			// Set the window title and notifications
-			if (playlist->currentItemType() == MBMP_PL::DVD)
+			if (p_gstiface->getMediaType() == MBMP_GI::DVD)
 				this->setWindowTitle(msg);
 			else {
 				this->setWindowTitle(playlist->getWindowTitle() );
@@ -1218,7 +1218,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 								notifyclient->setSummary(playlist->getCurrentTitle() );
 								QString s;
 								if (! playlist->getCurrentArtist().isEmpty() )
-									s.append(tr("\nBy: %1").arg(playlist->getCurrentArtist()) );
+									s.append(tr("\nArtist: %1").arg(playlist->getCurrentArtist()) );
 								if (duration > 0)
 									s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
 							notifyclient->setBody(s);
@@ -1228,7 +1228,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					}	// if useNotifications
 				}	// if media type we want notifications for
 			}	// else not DVD
-			break;		
+		break;		
 								
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;

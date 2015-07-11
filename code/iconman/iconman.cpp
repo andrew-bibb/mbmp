@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 // Constructor
 IconManager::IconManager(QObject* parent) : QObject(parent) 
 {
-	// Set the cfg member (path to ${home}/.config/cmst
+	// Set the cfg member (path to ${home}/.config/mbmp
 	// APP defined in resource.h
 	cfg = QString(qPrintable(QDir::homePath().append(QString("/.config/%1/%1.icon").arg(QString(APP).toLower()))) );	
 	
@@ -236,7 +236,7 @@ bool IconManager::buildThemeIcon(QIcon& icon, const QString& name)
 //
 // Function to return the resource name of an icon. Read from the resource file
 // and only used in case the user has totally messed up his local copy of the
-// cmst.icon file
+// mbmp.icon file
 QString IconManager::getFallback(const QString& name)
 {
 	// Variables

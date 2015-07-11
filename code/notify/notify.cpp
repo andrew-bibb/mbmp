@@ -190,7 +190,7 @@ void NotifyClient::sendNotification ()
 			// check needs to be done in the calling program.
 			else app_icon = s_icon;
 		} // if s_icon is not empty
-    
+  
   QDBusReply<quint32> reply = notifyclient->call(QLatin1String("Notify"), app_name, replaces_id, app_icon, summary, body, actions, hints, expire_timeout);
   
   if (reply.isValid() ) {

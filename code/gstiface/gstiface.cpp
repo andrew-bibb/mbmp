@@ -251,7 +251,7 @@ int GST_Interface::checkCD(QString dev)
 // used to set or clear the opticaldrive data element (used in the 
 // gstreamer callback to set a device source)
 int GST_Interface::checkDVD(QString dev)
-{
+{;
   // set the optical device and clear the dvd tag map
   opticaldrive = dev;
   map_md_dvd.clear();
@@ -264,7 +264,7 @@ int GST_Interface::checkDVD(QString dev)
   g_object_set (G_OBJECT (source), "device", qPrintable(opticaldrive), NULL);
   sink = gst_element_factory_make ("fakesink", "dvd_sink");  
   pipeline_dvd = gst_pipeline_new ("dvd");
-  
+ 
   // Check that all elements were created properly    
   if (!pipeline_dvd || !source || !sink) {
     gst_element_post_message (pipeline_playbin,
@@ -302,6 +302,7 @@ int GST_Interface::checkDVD(QString dev)
   
   // So far so go, return no error
   return 0;
+  
 }
 
 // Play the media.  For local files and URL's only need the WinId and uri
@@ -348,6 +349,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
     // Bring the pipeline to paused and see if we have a live stream (for buffering)
     ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
     bus_timer->start(bus_timeout);
+
     switch (ret) {
       case GST_STATE_CHANGE_SUCCESS: 
         is_live = false;
@@ -367,7 +369,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
         break;
   
 			case GST_STATE_CHANGE_ASYNC:
-				gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING);
+				gst_element_set_state(pipeline_playbin, GST_STATE_PLAYING); 
         break;
         
       default: // there is no default, only 4 possiblities above
@@ -729,11 +731,10 @@ void GST_Interface::pollGstBus()
   // query the stream position if we are currently playing. This will
   // set the PlayerControl position widgets
   if (getState() == GST_STATE_PLAYING) queryStreamPosition();
-    
+
   // return if there are no new messages
   if (! gst_bus_have_pending(bus)) return;
-  
-  
+   
   // variables and constants
   GstMessage* msg = 0;  
   const int msgtypes = GST_MESSAGE_EOS              |
@@ -751,6 +752,7 @@ void GST_Interface::pollGstBus()
                         GST_MESSAGE_CLOCK_LOST;
   
   msg = (GstMessage*)(gst_bus_pop_filtered(bus, (GstMessageType)(msgtypes)) );
+ 
   while (msg != NULL) {   
     switch (GST_MESSAGE_TYPE (msg)) {
       
@@ -1008,7 +1010,7 @@ void GST_Interface::pollGstBus()
               if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
                 if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
                   map_md_dvd[GST_TAG_TITLE] = QString(str);
-                  emit busMessage(MBMP_GI::NewTrack, QString(str)); 
+                  emit busMessage(MBMP_GI::NewTrack, QString(str));
                   g_free (str);
                 } // if we have a new title
               } // if we have a new DVD title
@@ -1050,7 +1052,10 @@ void GST_Interface::pollGstBus()
             break; }  // dvd case
             
           default:   
-						emit busMessage(MBMP_GI::NewTrack); 
+						if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+							if (str) emit busMessage(MBMP_GI::NewTrack, QString(str) );
+             g_free (str);
+						}
             break;   // default media type case
           } // mediatype switch
           
