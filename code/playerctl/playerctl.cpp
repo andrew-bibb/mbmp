@@ -749,21 +749,7 @@ void PlayerControl::playMedia(QAction* act)
 	
 	// Set the stream volume to agree with the dial
 	changeVolume(ui.dial_volume->value());
-	
-	// Set the window title and notifications
-	if (playlist->currentItemType() != MBMP_PL::DVD) {
-		this->setWindowTitle(playlist->getWindowTitle() );
-	
-		if (playlist->currentItemType() == MBMP_PL::File || playlist->currentItemType() == MBMP_PL::Url) {
-			if(diag_settings->useNotifications() ) {
-					notifyclient->init();
-					notifyclient->setSummary(tr("Now Playing"));
-					notifyclient->setBody(playlist->getNowPlaying() );
-					notifyclient->sendNotification();
-			}	// if useNotifications
-		}	// if media is a file
-	}	// if not DVD
-					
+						
 	return;
 }
 
@@ -794,9 +780,10 @@ void PlayerControl::stopPlaying()
 		playlist->lockControls(false);
 	}
 		
-	// Set duration labels to zero, will also disable seek ui elements
+	// Set window title and duration labels to zero, will also disable seek ui elements
 	this->setDurationWidgets(-1);
 	this->setPositionWidgets(0);
+	this->setWindowTitle(LONG_NAME);
 	
 	return;
 }	
@@ -1195,16 +1182,59 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
 			playlist->setCurrentChapter(p_gstiface->getCurrentChapter() );
-			/////////FIXME/////////////////////////
-			/// NOT ALWAYS IN SYNC HERE///////////
-			this->setWindowTitle(p_gstiface->getDVDTitle());
-		break;		
-						
+		break;
+		
+		case MBMP_GI::NewTrack:	// a New Track signal was emitted
+			switch (loglevel) {
+				case 0: // case 0 supress output
+					break;
+				case 1:	// case 1 supress output
+					break;
+				default: // case 2 and above record the message
+					msg = "New track signal emitted";
+					stream1 << msg << endl;
+					if (logtofile) stream2 << msg << endl;
+			}	// loglevel switch		
+		
+			// Set the window title and notifications
+			if (playlist->currentItemType() == MBMP_PL::DVD)
+				this->setWindowTitle(msg);
+			else {
+				this->setWindowTitle(playlist->getWindowTitle() );
+					
+				if (playlist->currentItemType() == MBMP_PL::File || playlist->currentItemType() == MBMP_PL::Url) {
+					if(diag_settings->useNotifications() ) {
+							// collect some data
+							qint16 duration = playlist->getCurrentDuration();
+							QTime n(0,0,0);
+							QTime t;
+							t = n.addSecs(duration);
+							
+							// build the notification
+							notifyclient->init();
+							if (playlist->getCurrentTitle().isEmpty() ) 
+								notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
+							else {
+								notifyclient->setSummary(playlist->getCurrentTitle() );
+								QString s;
+								if (! playlist->getCurrentArtist().isEmpty() )
+									s.append(tr("\nBy: %1").arg(playlist->getCurrentArtist()) );
+								if (duration > 0)
+									s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
+							notifyclient->setBody(s);
+						}	// else have title
+						notifyclient->setIcon("audio-x-generic");
+						notifyclient->sendNotification();
+					}	// if useNotifications
+				}	// if media type we want notifications for
+			}	// else not DVD
+			break;		
+								
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
-			break;
-		
+			break;		
+			
 		}	// mtype switch
 			
 	if (logtofile) logfile.close();

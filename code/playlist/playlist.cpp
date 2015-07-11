@@ -572,44 +572,16 @@ QString Playlist::getWindowTitle()
 	// for DVD's playerctl will get title from p_gstiface
 	if (this->currentItemType() == MBMP_PL::DVD) 
 		return QString();
-	
-	else {
-		QString title = "";
-		QString artist = "";
-		
-		title = pli->getTitle();
-		artist = pli->getArtist();
-		if (! title.isEmpty() ) 
-			return (artist.isEmpty() ? title : QString("%1 - %2").arg(artist).arg(title) );
-		else return (pli->getUri()).section("//", 1, 1);
-	}	// if 
 
-}
-
-//
-// Function to return a QString containing a description of the item currently playing
-QString Playlist::getNowPlaying()
-{
-	PlaylistItem* pli = static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem());	
+	// default (not CD or DVD)	
+	QString title = "";
+	QString artist = "";
 	
-	qint16 duration = pli->getDuration();
-	QTime n(0,0,0);
-	QTime t;
-	t = n.addSecs(duration);
-	
-
-				
-//.arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss"), wcol1, QChar(' '))	
-	if ( pli->getTitle().isEmpty() ) 
-		return (pli->getUri()).section("//", 1, 1);
-	else {
-		QString rtnstr = pli->getTitle();
-		if (! pli->getArtist().isEmpty() )
-			rtnstr.append(tr("\nBy: %1").arg(pli->getArtist()) );
-		if (duration > 0)
-			rtnstr.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
-		return rtnstr;
-	}	//else
+	title = pli->getTitle();
+	artist = pli->getArtist();
+	if (! title.isEmpty() ) 
+		return (artist.isEmpty() ? title : QString("%1 - %2").arg(artist).arg(title) );
+	else return (pli->getUri()).section("//", 1, 1);
 }
 
 //////////////////////////// Protected Functions ////////////////////////////

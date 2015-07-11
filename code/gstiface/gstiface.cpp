@@ -979,7 +979,8 @@ void GST_Interface::pollGstBus()
             }
             if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &num)) {
               if (num != map_md_cd.value(GST_TAG_TRACK_NUMBER)) {
-                map_md_cd[GST_TAG_TRACK_NUMBER] = num;    
+                map_md_cd[GST_TAG_TRACK_NUMBER] = num; 
+                emit busMessage(MBMP_GI::NewTrack);   
               } // if we have a new track number
               num = 0;
             }
@@ -1007,6 +1008,7 @@ void GST_Interface::pollGstBus()
               if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
                 if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
                   map_md_dvd[GST_TAG_TITLE] = QString(str);
+                  emit busMessage(MBMP_GI::NewTrack, QString(str)); 
                   g_free (str);
                 } // if we have a new title
               } // if we have a new DVD title
@@ -1048,6 +1050,7 @@ void GST_Interface::pollGstBus()
             break; }  // dvd case
             
           default:   
+						emit busMessage(MBMP_GI::NewTrack); 
             break;   // default media type case
           } // mediatype switch
           

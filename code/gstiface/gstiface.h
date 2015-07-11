@@ -60,6 +60,7 @@ namespace MBMP_GI
     Tag         = 0x0d,   // received a TAG message
     TagCL       = 0x0e,   // received a TAG and extracted a new chapter list
     TagCC       = 0x0f,   // received a TAG and extracted a new current chapter
+    NewTrack		= 0x10,		// tags indicate a new track
     Unhandled   = 0x2f,   // an unhandled message
     // return codes
     NoCDPipe    = 0x31,   // not able to create an Audio CD pipe
