@@ -48,6 +48,10 @@ Settings::Settings(QWidget *parent)
 	ui.groupBox_startoptions->setEnabled(usestartoptions);
 	usestate = settings->value("retain_state").toBool();
 	useplaylist = settings->value("retain_playlist").toBool();
+	settings->endGroup();
+	
+	// save notification settings in data member
+	settings->beginGroup("Notifications");
 	usenotifications = settings->value("use_notifications").toBool();
 	settings->endGroup();
 	
@@ -143,6 +147,40 @@ QVariant Settings::getSetting(const QString& group, const QString& elem)
 	settings->endGroup();
 	
 	return v;	
+}
+
+//
+// Function to set ui elements while trying to connect to a notification daemon
+void Settings::setNotificationsTrying(const QString& s)
+{
+	ui.label_serverstatus->setText(s);
+	ui.groupBox_notifications->setToolTip("");
+  ui.groupBox_notifications->setWhatsThis("");
+	
+	return;
+}
+
+//
+// Function to set ui elements if a notification daemon is connected
+void Settings::setNotificationsConnected(const QString& tt, const QString& wt)
+{
+	ui.label_serverstatus->clear();
+  ui.label_serverstatus->setDisabled(true);
+  ui.groupBox_notifications->setToolTip(tt);
+  ui.checkBox_notifydaemon->setWhatsThis(wt);
+	return;
+}
+
+//
+// function to set ui elements if we failed to connect to a notification daemon
+void Settings::setNotificationsFailed()
+{
+	ui.checkBox_notifydaemon->setChecked(false);
+  ui.checkBox_notifydaemon->setEnabled(false);
+  ui.groupBox_notifications->setToolTip("");
+  ui.groupBox_notifications->setWhatsThis("");
+	
+	return;
 }
 
 //

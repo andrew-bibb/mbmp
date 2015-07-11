@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>577</width>
+    <width>591</width>
     <height>433</height>
    </rect>
   </property>
@@ -77,7 +77,10 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="groupBox_notifications">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the system desktop notification daemon will popup a notify message when a significant connman related event is received.&lt;/p&gt;&lt;p&gt;Notifications can be handled by the System Tray Icon, or by a Notification daemon if one is installed. Both can not be active at the same time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="title">
           <string>Notifications</string>
          </property>
@@ -88,7 +91,7 @@
              <bool>true</bool>
             </property>
             <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the system desktop notification daemon will popup a notify message when a significant connman related event is received.&lt;/p&gt;&lt;p&gt;Notifications can be handled by the System Tray Icon, or by a Notification daemon if one is installed. Both can not be active at the same time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>Notification Daemon</string>

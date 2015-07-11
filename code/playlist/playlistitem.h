@@ -40,16 +40,18 @@ class PlaylistItem : public QListWidgetItem
 		PlaylistItem (const QString&, QListWidget*, int);
 		
 		// get functions
-		inline int getSequence() {return sequence;};
-		inline QString getUri() {return uri;};
-		inline QString getArtist() {return artist;};
-		inline QString getTitle() {return title;};
-		inline qint16 getDuration() {return duration;};
-		inline bool isPlayable() {return errors.isEmpty() ? true : false;};
+		inline int getSequence() {return sequence;}
+		inline QString getUri() {return uri;}
+		inline QString getArtist() {return artist;}
+		inline QString getTitle() {return title;}
+		inline qint16 getDuration() {return duration;}
+		inline bool isPlayable() {return errors.isEmpty() ? true : false;}
 		
 		// set functions
 		inline void setSequence(uint seq) {sequence = seq;};
 		inline void setDuration(qint16 dur) {duration = dur;};
+		inline void setTitle(QString ttl) {title = ttl;};
+		inline void setArtist(QString art) {artist = art;};
 		
 		// functions
 		void makeDisplayText();

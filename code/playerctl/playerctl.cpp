@@ -743,13 +743,27 @@ void PlayerControl::playMedia(QAction* act)
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to p_gstiface to play the media
-		if (playlist->isCurrentPlayable() )
-			p_gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());
+		if (playlist->isCurrentPlayable() ) 
+			p_gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());	
 	}	// else
 	
 	// Set the stream volume to agree with the dial
 	changeVolume(ui.dial_volume->value());
-		
+	
+	// Set the window title and notifications
+	if (playlist->currentItemType() != MBMP_PL::DVD) {
+		this->setWindowTitle(playlist->getWindowTitle() );
+	
+		if (playlist->currentItemType() == MBMP_PL::File || playlist->currentItemType() == MBMP_PL::Url) {
+			if(diag_settings->useNotifications() ) {
+					notifyclient->init();
+					notifyclient->setSummary(tr("Now Playing"));
+					notifyclient->setBody(playlist->getNowPlaying() );
+					notifyclient->sendNotification();
+			}	// if useNotifications
+		}	// if media is a file
+	}	// if not DVD
+					
 	return;
 }
 
@@ -992,7 +1006,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)  && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) && hiatus_resume >= 0 ) {
 				p_gstiface->seekToPosition(hiatus_resume);
 				hiatus_resume = -1;
-		}
+			}
 			switch (loglevel) {
 				case 0:		// case 0 - surpress state change output
 					break;	
@@ -1153,13 +1167,6 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
-			// in TAG p_gstiface changes window title, read it hear and display
-			//if(diag_settings->usenotifications() ) {
-				notifyclient->init();
-				notifyclient->setSummary(tr("Now Playing"));
-				notifyclient->setBody(this->windowTitle() );
-				notifyclient->sendNotification();
-			//}
 		break;
 		
 		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count
@@ -1172,7 +1179,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
-			playlist->addChapters(p_gstiface->getChapterCount());
+			playlist->addChapters(p_gstiface->getChapterCount() );
 			playlist->lockControls(true);
 			if (playlist->isHidden()) playlist->show();	
 		break;
@@ -1188,8 +1195,11 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
 			playlist->setCurrentChapter(p_gstiface->getCurrentChapter() );
+			/////////FIXME/////////////////////////
+			/// NOT ALWAYS IN SYNC HERE///////////
+			this->setWindowTitle(p_gstiface->getDVDTitle());
 		break;		
-				
+						
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
@@ -1314,25 +1324,16 @@ void PlayerControl::connectNotifyClient()
       .arg(notifyclient->getServerVersion() )
       .arg(vendor)
       .arg(notifyclient->getServerSpecVersion() );
-    //ui.label_serverstatus->clear();
-    //ui.label_serverstatus->setDisabled(true);
-    //ui.groupBox_notfications->setToolTip(tr("%1 detected").arg(name) );
-    //ui.groupBox_notfications->setWhatsThis(lab);
+    diag_settings->setNotificationsConnected(tr("%1 detected").arg(name), lab);
   }
   // not successful, try again or abandon if counter is at limit
   else {
     if (count < 4) {
-      //ui.label_serverstatus->setText(tr("Attempt %1 of 4 looking for notification server.").arg(count));
-      qDebug() << "connect try " << count;
+			diag_settings->setNotificationsTrying(tr("Attempt %1 of 4 looking for notification server.").arg(count) );
     } // try again
     else {
-      //ui.label_serverstatus->setText(tr("Unable to find or connect to a Notification server."));
-      //ui.checkBox_notifydaemon->setChecked(false);
-      //ui.checkBox_notifydaemon->setEnabled(false);
-      qDebug() << "failed to connect";
+      diag_settings->setNotificationsFailed();
     } // else last time
-  //ui.groupBox_notfications->setToolTip("");
-  //ui.groupBox_notfications->setWhatsThis("");
   } // else we don't have a valid client.
 
   return;

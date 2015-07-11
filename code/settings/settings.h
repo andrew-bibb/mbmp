@@ -55,7 +55,10 @@ class Settings : public QDialog
   	void restoreElementGeometry(const QString&, QWidget*);
   	void savePlaylist(const QStringList&, const int& cur = 0, const int& pos = 0);
   	QStringList getPlaylist();
-  	QVariant getSetting(const QString&, const QString&); 	    
+  	QVariant getSetting(const QString&, const QString&);
+  	void setNotificationsTrying(const QString&); 
+  	void setNotificationsConnected(const QString&, const QString&);
+  	void setNotificationsFailed(); 	    
     
   private:
   // members 

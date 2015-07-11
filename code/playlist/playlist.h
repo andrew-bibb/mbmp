@@ -98,6 +98,9 @@ class Playlist : public QDialog
 		void seedPlaylist(const QStringList&);
 		void lockControls(bool);
 		QStringList getCurrentList();
+		QString getWindowTitle();
+		QString getNowPlaying();
+		
 
 	protected:
 		void hideEvent(QHideEvent*);

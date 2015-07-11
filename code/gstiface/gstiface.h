@@ -126,6 +126,7 @@ class GST_Interface : public QObject
     inline QMap<QString, int> getStreamMap() {return streammap;} 
     inline int getChapterCount() {return map_md_dvd.value("chaptercount").toInt();}
     inline int getCurrentChapter() {return map_md_dvd.value("currentchapter").toInt();}
+    inline QString getDVDTitle() {return map_md_dvd.value(GST_TAG_TITLE).toString();}
     inline int getMediaType() {return mediatype;};
         
     public slots:

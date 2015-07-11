@@ -153,7 +153,6 @@ void PlaylistItem::makeDisplayText()
 		case MBMP_PL::DVD: {
 			// Constants
 			const short wcol1 = -4;
-
 			setText(QString("%1%2 %3")
 				.arg(QString::number(sequence, 10), wcol1, QChar(' ') )
 				.arg(QObject::tr("Chapter") ) 

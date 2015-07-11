@@ -608,7 +608,7 @@ QString GST_Interface::getTextStreamInfo()
 
 //////////////////////////// Public Slots ////////////////////////////
 //
-// Slot to process a mouse navigation event.  Out VideoWidget emits a signal
+// Slot to process a mouse navigation event.  Our VideoWidget emits a signal
 // (via PlayerCtl) containing the mouse event data. The signal is connected
 // to this function which then injects the mouse event into the stream
 void GST_Interface::mouseNavEvent(QString event, int button, int x, int y)
@@ -979,8 +979,7 @@ void GST_Interface::pollGstBus()
             }
             if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &num)) {
               if (num != map_md_cd.value(GST_TAG_TRACK_NUMBER)) {
-                map_md_cd[GST_TAG_TRACK_NUMBER] = num;
-                mainwidget->setWindowTitle(tr("Audio CD - Track %1").arg(map_md_cd.value(GST_TAG_TRACK_NUMBER).toString()) );         
+                map_md_cd[GST_TAG_TRACK_NUMBER] = num;    
               } // if we have a new track number
               num = 0;
             }
@@ -1008,7 +1007,6 @@ void GST_Interface::pollGstBus()
               if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
                 if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
                   map_md_dvd[GST_TAG_TITLE] = QString(str);
-                  mainwidget->setWindowTitle(map_md_dvd.value(GST_TAG_TITLE).toString());
                   g_free (str);
                 } // if we have a new title
               } // if we have a new DVD title
@@ -1049,31 +1047,8 @@ void GST_Interface::pollGstBus()
               } // if we could extract the currenttitle                         
             break; }  // dvd case
             
-          default: {  
-            // if we are not playing a CD or DVD try to get title and artist to set the player
-            // window title
-            if (map_md_cd.isEmpty() && map_md_dvd.isEmpty() ) {
-              QString qs_title = QString();
-              QString qs_artist = QString();
-              if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
-                if (str) qs_title = QString(str);
-                else qs_title.clear();
-                g_free (str);
-              }     
-              if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
-                if (str) qs_artist = QString(str);
-                else qs_artist.clear();
-                g_free (str);
-              }
-              if (qs_title.isEmpty() ) mainwidget->setWindowTitle(LONG_NAME);
-              else {
-                if (qs_artist.isEmpty() )
-                  mainwidget->setWindowTitle(QString("%1").arg(qs_title) );
-                else
-                  mainwidget->setWindowTitle(QString("%1 - %2").arg(qs_title).arg(qs_artist) );
-              } // else
-            } // if both maps are empty (were're playing something other than a CD or DVD)
-            break; }  // default media type case
+          default:   
+            break;   // default media type case
           } // mediatype switch
           
         gst_tag_list_free (tags); 
@@ -1151,9 +1126,6 @@ void GST_Interface::playerStop()
   is_live = false;
   is_buffering = false;
   dl_timer->stop();
-  
-  // reset the window title
-  mainwidget->setWindowTitle(LONG_NAME);
   
   return;
 }
