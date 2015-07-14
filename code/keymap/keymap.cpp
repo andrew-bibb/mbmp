@@ -58,7 +58,7 @@ KeyMap::KeyMap(QObject* parent) : QObject(parent)
 	for (int i =0; i < sl_rawdata.size(); ++i) {
 		QString s = sl_rawdata.at(i);
 		s = s.simplified();
-		s = s.left(s.indexOf('#'));
+		s = s.section("#", 0, 0);
 		if (s.size() > 0 ) {	
 			QString cmd = s.section(' ', 0, 0);
 			QStringList sl_shortcuts = s.section(' ', 1, 1).split(',');	

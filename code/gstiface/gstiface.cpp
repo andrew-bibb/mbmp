@@ -333,7 +333,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
     gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
     is_live = false;
     
-    // Set the media source. The device is set in checkCD
+    // Set the media source. 
     g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(uri), NULL);
     
     // Set our media type variable
