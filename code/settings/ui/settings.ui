@@ -361,10 +361,13 @@
        <item row="12" column="1" colspan="2">
         <widget class="QLineEdit" name="lineEdit_blacklisted">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--blacklist [elements]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Specify GStreamer elements to be blacklisted. Blacklisted elements will never be used to create a pipeline. Elements should be entered as a comma separated list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -381,10 +384,13 @@
        <item row="11" column="1" colspan="2">
         <widget class="QLineEdit" name="lineEdit_promoted">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--promote [elements]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Specify GStreamer elements to be promoted in rank. When more than one element can be used in a stream an element which has been promoted will be selected first. Elements should be entered as a comma separated list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="clearButtonEnabled">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

@@ -75,6 +75,8 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_audiocd->setText(settings->value("audio_cd_drive").toString() );
 	ui.lineEdit_dvd->setText(settings->value("dvd_drive").toString() );
 	ui.spinBox_connectionspeed->setValue(settings->value("connection_speed").toInt() );
+	ui.lineEdit_promoted->setText(settings->value("promoted-elements").toString() );
+	ui.lineEdit_blacklisted->setText(settings->value("blacklisted-elements").toString() );
 	settings->endGroup();
 		
 	return;  
@@ -106,6 +108,8 @@ void Settings::writeSettings()
   settings->setValue("audio_cd_drive", ui.lineEdit_audiocd->text() );
   settings->setValue("dvd_drive", ui.lineEdit_dvd->text() );
   settings->setValue("connection_speed", ui.spinBox_connectionspeed->value() );
+  settings->setValue("promoted-elements", ui.lineEdit_promoted->text() );
+  settings->setValue("blacklisted-elements", ui.lineEdit_blacklisted->text() );
   settings->endGroup();
   
   return;

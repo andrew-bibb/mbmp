@@ -77,7 +77,13 @@ int main(int argc, char *argv[])
   
   QCommandLineOption enableVisualizer(QStringList() << "V" << "visualizer", QCoreApplication::translate("main.cpp", "Enable a visualizer when playing audio tracks (default is no visualizer).") );
   parser.addOption(enableVisualizer);  
+
+  QCommandLineOption promoteElement(QStringList() << "promote", QCoreApplication::translate("main.cpp", "List of GStreamer elements (comma separated) to be promoted."), QCoreApplication::translate("main.cpp", "element list"), "" );  
+  parser.addOption(promoteElement);
   
+  QCommandLineOption blacklistElement(QStringList() << "blacklist", QCoreApplication::translate("main.cpp", "List (comma separated) of GStreamer elements to be blacklisted."), QCoreApplication::translate("main.cpp", "element list"), "" );  
+  parser.addOption(blacklistElement);
+    
 	parser.addPositionalArgument("filename", QCoreApplication::translate("main.cpp", "Media file to play."));
   
   // Setup translations   

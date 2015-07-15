@@ -167,20 +167,11 @@ void GST_Interface::rankElement (const QString& (name) , bool enable)
 	if (!factory) return;
 	 
 	// change the rank 
-	if (enable) {
+	if (enable) 
 		gst_plugin_feature_set_rank (GST_PLUGIN_FEATURE (factory), GST_RANK_PRIMARY + 1);
-		qDebug() << "Raised element " << name << "rank to " << GST_RANK_PRIMARY + 1;	
-	}
-	else {
+	else 
 		gst_plugin_feature_set_rank (GST_PLUGIN_FEATURE (factory), GST_RANK_NONE);
-		qDebug() << "Lowered element " << "rank to " << GST_RANK_NONE;
-	}
 	 
-	if (gst_registry_add_feature (registry, GST_PLUGIN_FEATURE (factory)) )
-		qDebug() << "registry add feature returned true";
-	else
-		qDebug() << "registry add feature returned false";
-	
 	return;
 }
 

@@ -553,7 +553,34 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	}
 	
 	// adjust element ranks
-	p_gstiface->rankElement("avdec_mp3float", true);
+	//p_gstiface->rankElement("avdec_mp3float", true);
+	QString el;
+	if (parser.isSet("promote") ) el = parser.value("promote");
+  else if (diag_settings->useStartOptions() ) el = diag_settings->getSetting("StartOptions", "promoted-elements").toString();
+	if (! el.isEmpty() ) {		// undocumented feature, we accept separator
+		el.replace(',', ' ');		// characters of , ; or space.  We
+    el.replace(';', ' ');		// only advertise the comma.
+    el = el.simplified();
+    el.replace(' ', ',');
+    QStringList el_list = el.split(',');
+    for (int i = 0; i < el_list.count(); ++i) {
+			p_gstiface->rankElement(el_list.at(i), true);
+		}
+	}	// if
+	
+	el.clear();
+	if (parser.isSet("blacklist") ) el = parser.value("blacklist");
+  else if (diag_settings->useStartOptions() ) el = diag_settings->getSetting("StartOptions", "blacklisted-elements").toString();
+	if (! el.isEmpty() ) {		// undocumented feature, we accept separator
+		el.replace(',', ' ');		// characters of , ; or space.  We
+    el.replace(';', ' ');		// only advertise the comma.
+    el = el.simplified();
+    el.replace(' ', ',');
+    QStringList el_list = el.split(',');
+    for (int i = 0; i < el_list.count(); ++i) {
+			p_gstiface->rankElement(el_list.at(i), false);
+		}
+	}	// if	
 	
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
