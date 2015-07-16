@@ -1087,8 +1087,8 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 				case 0:		// case 0 supress output
 					break;	
 				default: // otherwise print output
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
+					stream1 << "MBMP[Application]: " << msg << endl;
+					if (logtofile) stream2 << "MBMP[Application]: " << msg << endl;
 			}	// loglevel switch
 			break;
 		

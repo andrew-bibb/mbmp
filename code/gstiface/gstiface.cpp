@@ -167,11 +167,18 @@ void GST_Interface::rankElement (const QString& (name) , bool enable)
 	if (!factory) return;
 	 
 	// change the rank 
-	if (enable) 
+	if (enable) { 
 		gst_plugin_feature_set_rank (GST_PLUGIN_FEATURE (factory), GST_RANK_PRIMARY + 1);
-	else 
+		emit busMessage(MBMP_GI::Application, QString(tr("Promoting GStreamer element %1 to rank of %2")).arg(name).arg(GST_RANK_PRIMARY + 1) );
+	}
+	else {
 		gst_plugin_feature_set_rank (GST_PLUGIN_FEATURE (factory), GST_RANK_NONE);
+		emit busMessage(MBMP_GI::Application, QString(tr("Blacklisting GStreamer element %1 (rank = %2)")).arg(name).arg(GST_RANK_NONE) );
+	}
 	 
+	if (! gst_registry_add_feature (registry, GST_PLUGIN_FEATURE (factory)) )
+		emit busMessage(MBMP_GI::Application, QString(tr("GStreamer registry failed to add GStreamer element %1")).arg(name) );
+
 	return;
 }
 
@@ -1107,6 +1114,7 @@ void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
 { 
   // change the connection soeed to the ui64 sent to the function
   g_object_set (G_OBJECT (pipeline_playbin), "connection-speed", ui64_speed, NULL);
+  emit busMessage(MBMP_GI::Application, QString(tr("Changing connection speed to %1")).arg(ui64_speed) );
     
   return;
 }
