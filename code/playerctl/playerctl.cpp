@@ -62,7 +62,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// data members
 	keymap = new KeyMap(this);
 	playlist = new Playlist(this); 
-	p_gstiface = new GST_Interface(this);
+	gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
 	videowidget = new VideoWidget(this);
 	hiatus_resume = -1;
@@ -195,7 +195,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		cnxnspeed = diag_settings->getSetting("StartOptions", "connection_speed").toInt();
 		ok = true;
 	}			
-	if (ok) p_gstiface->changeConnectionSpeed(cnxnspeed);		
+	if (ok) gstiface->changeConnectionSpeed(cnxnspeed);		
 					
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work provided
@@ -312,7 +312,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	vis_menu->setIcon(ui.actionVisualizer->icon());
 	vis_menu->setTearOffEnabled(true);
 	vis_group = new QActionGroup(this);	
-	QList<QString> vislist = p_gstiface->getVisualizerList();
+	QList<QString> vislist = gstiface->getVisualizerList();
 	for (int i = 0; i < vislist.size(); ++i) {
 		QAction* act = vis_menu->addAction(vislist.at(i));
 		act->setCheckable(true);
@@ -343,7 +343,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	else
 		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_visualizer").toBool() ) b_01 = true;
 		else b_01 = false;
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, b_01 );
+	gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, b_01 );
 	action_vis->setChecked(b_01);
 	vis_group->setEnabled(b_01);
 
@@ -353,7 +353,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	else
 		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_subtitles").toBool() ) b_01 = true;
 		else b_01 = false;		
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, b_01);
+	gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, b_01);
 	action_sub->setChecked(b_01);
 	
 	action_sbuf = options_menu->addAction(tr("Stream Buffering"));
@@ -362,7 +362,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	else
 		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_stream_buffering").toBool() ) b_01 = true;
 		else b_01 = false;		
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, b_01);
+	gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, b_01);
 	action_sbuf->setChecked(b_01);
 		
 	action_dbuf = options_menu->addAction(tr("Download Buffering"));
@@ -371,7 +371,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	else
 		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_download_buffering").toBool() ) b_01 = true;
 		else b_01 = false;		
-	p_gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, b_01);
+	gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, b_01);
 	action_dbuf->setChecked(b_01);	
 
 	// create the control_menu
@@ -464,7 +464,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
   // connect signals to slots 
   connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
-  connect (ui.actionToggleStreamInfo, SIGNAL (triggered()), p_gstiface, SLOT(toggleStreamInfo()));
+  connect (ui.actionToggleStreamInfo, SIGNAL (triggered()), gstiface, SLOT(toggleStreamInfo()));
 	connect (ui.actionQuit, SIGNAL (triggered()), qApp, SLOT(quit()));
 	connect (ui.actionToggleGUI, SIGNAL (triggered()), this, SLOT(toggleGUI()));
 	connect (ui.actionToggleFullscreen, SIGNAL (triggered()), this, SLOT(toggleFullScreen()));
@@ -479,9 +479,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionPlayPause, SIGNAL (triggered()), this, SLOT(playPause()));
 	connect (ui.toolButton_playpause, SIGNAL(toggled(bool)), options_menu, SLOT(setDisabled(bool)));
 	connect (playlist_group, SIGNAL(triggered(QAction*)), this, SLOT(playMedia(QAction*)));
-	connect (p_gstiface, SIGNAL(busMessage(int, QString)), this, SLOT(processBusMessages(int, QString)));
+	connect (gstiface, SIGNAL(busMessage(int, QString)), this, SLOT(processBusMessages(int, QString)));
 	connect (ui.actionAddMedia, SIGNAL (triggered()), playlist, SLOT(addMedia()));
-	connect (ui.actionToggleMute, SIGNAL (triggered()), p_gstiface, SLOT(toggleMute())); 
+	connect (ui.actionToggleMute, SIGNAL (triggered()), gstiface, SLOT(toggleMute())); 
 	connect (volume_group, SIGNAL(triggered(QAction*)), this, SLOT(changeVolumeDialStep(QAction*)));
 	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));	
 	connect (ui.actionVisualizer, SIGNAL(triggered()), this, SLOT(popupVisualizerMenu()));
@@ -492,11 +492,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (dvd_group, SIGNAL(triggered(QAction*)), this, SLOT(dvdNavigationCommand(QAction*)));
 	connect (ui.actionAudioCD, SIGNAL (triggered()), this, SLOT(initializeCD()));
 	connect (ui.actionDVD, SIGNAL (triggered()), this, SLOT(initializeDVD()));
-	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), p_gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
+	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
 	connect (options_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeOptions(QAction*)));
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	
-	// create actions to accept a selected few playlist and p_gstiface shortcuts
+	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
 	this->addAction(pl_Act01);
 	pl_Act01->setShortcuts(getShortcuts("cmd_addaudio") );
@@ -525,17 +525,17 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	QAction* pl_Act06 = new QAction(this);
 	this->addAction(pl_Act06);
 	pl_Act06->setShortcuts(getShortcuts("cmd_cycleaudio") );
-	connect (pl_Act06, SIGNAL(triggered()), p_gstiface, SLOT(cycleAudioStream()));		
+	connect (pl_Act06, SIGNAL(triggered()), gstiface, SLOT(cycleAudioStream()));		
 		
 	QAction* pl_Act07 = new QAction(this);
 	this->addAction(pl_Act07);
 	pl_Act07->setShortcuts(getShortcuts("cmd_cyclevideo") );
-	connect (pl_Act07, SIGNAL(triggered()), p_gstiface, SLOT(cycleVideoStream()));
+	connect (pl_Act07, SIGNAL(triggered()), gstiface, SLOT(cycleVideoStream()));
 		
 	QAction* pl_Act08 = new QAction(this);
 	this->addAction(pl_Act08);
 	pl_Act08->setShortcuts(getShortcuts("cmd_cyclesubtitle") );
-	connect (pl_Act08, SIGNAL(triggered()), p_gstiface, SLOT(cycleTextStream()));		
+	connect (pl_Act08, SIGNAL(triggered()), gstiface, SLOT(cycleTextStream()));		
 
 	//restore GUI elements
 	if (diag_settings->useState()) {
@@ -553,7 +553,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	}
 	
 	// adjust element ranks
-	//p_gstiface->rankElement("avdec_mp3float", true);
+	//gstiface->rankElement("avdec_mp3float", true);
 	QString el;
 	if (parser.isSet("promote") ) el = parser.value("promote");
   else if (diag_settings->useStartOptions() ) el = diag_settings->getSetting("StartOptions", "promoted-elements").toString();
@@ -564,7 +564,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
     el.replace(' ', ',');
     QStringList el_list = el.split(',');
     for (int i = 0; i < el_list.count(); ++i) {
-			p_gstiface->rankElement(el_list.at(i), true);
+			gstiface->rankElement(el_list.at(i), true);
 		}
 	}	// if
 	
@@ -578,7 +578,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
     el.replace(' ', ',');
     QStringList el_list = el.split(',');
     for (int i = 0; i < el_list.count(); ++i) {
-			p_gstiface->rankElement(el_list.at(i), false);
+			gstiface->rankElement(el_list.at(i), false);
 		}
 	}	// if	
 	
@@ -601,7 +601,7 @@ QList<QKeySequence> PlayerControl::getShortcuts(const QString& cmd)
 }
 
 //
-// Function to set the stream duration stream label.  Called from p_gstiface
+// Function to set the stream duration stream label.  Called from gstiface
 // when a new stream duration is found.  Int value sent as the argument
 // is the stream duration in seconds.
 void PlayerControl:: setDurationWidgets(int duration, bool seek_enabled)
@@ -616,8 +616,8 @@ void PlayerControl:: setDurationWidgets(int duration, bool seek_enabled)
 		ui.horizontalSlider_position->setSingleStep(duration / 100 );
 		ui.horizontalSlider_position->setPageStep(duration / 10);
 		// we are playing a DVD enable seeking only after we've got a chapter
-		if (p_gstiface->getMediaType() == MBMP_GI::DVD) {
-			if (p_gstiface->getCurrentChapter() > 0 ) seek_group->setEnabled(seek_enabled);
+		if (gstiface->getMediaType() == MBMP_GI::DVD) {
+			if (gstiface->getCurrentChapter() > 0 ) seek_group->setEnabled(seek_enabled);
 		}
 		else 
 			seek_group->setEnabled(seek_enabled);
@@ -637,7 +637,7 @@ void PlayerControl:: setDurationWidgets(int duration, bool seek_enabled)
 
 //
 // Function to set the stream position.  This will set both the text
-// label and the slider. Called from p_gstiface at the beginning of
+// label and the slider. Called from gstiface at the beginning of
 // pollGstBus before any other bus message is processed. Position
 // is the stream position in seconds.
 void PlayerControl::setPositionWidgets(int position)
@@ -659,7 +659,7 @@ void PlayerControl::setPositionWidgets(int position)
 
 ////////////////////////////// Public Slots ////////////////////////////
 //
-//	Slot to change the volume in p_gstiface in response to the volume dial being changed
+//	Slot to change the volume in gstiface in response to the volume dial being changed
 void PlayerControl::changeVolume(int vol)
 {
 	// Gstreamer volume ranges are doubles in the range of 0.0 to 10.0
@@ -674,7 +674,7 @@ void PlayerControl::changeVolume(int vol)
 	double d_vol = 0.0;
 	d_vol = (static_cast<double>(vol) / 10.0);
 	
-	p_gstiface->changeVolume(d_vol);
+	gstiface->changeVolume(d_vol);
 	
 	return;
 }
@@ -683,7 +683,7 @@ void PlayerControl::changeVolume(int vol)
 // Check the audio CD and if we can read it start playing.
 void PlayerControl::initializeCD()
 {	
-	switch (p_gstiface->checkCD(ui.comboBox_audiocd->currentText()) ) {
+	switch (gstiface->checkCD(ui.comboBox_audiocd->currentText()) ) {
 		case MBMP_GI::NoCDPipe:
 			QMessageBox::warning(this, tr("%1 - Warning").arg(APP),
 				tr("<center><b>Unable to create a pipeline to read an audio CD.</b></center>"
@@ -702,7 +702,7 @@ void PlayerControl::initializeCD()
 
 	// if we are here checkCD passed, start playing the CD. This will
 	// send a TOC to the bus which will trigger filling in the tracklist.
-	p_gstiface->playMedia(videowidget->winId(), "cdda://" );
+	gstiface->playMedia(videowidget->winId(), "cdda://" );
 				
 	return;
 }
@@ -711,7 +711,7 @@ void PlayerControl::initializeCD()
 // For now just play it
 void PlayerControl::initializeDVD()
 {
-	switch (p_gstiface->checkDVD(ui.comboBox_dvd->currentText()) ) {
+	switch (gstiface->checkDVD(ui.comboBox_dvd->currentText()) ) {
 		case MBMP_GI::NoDVDPipe:
 			QMessageBox::warning(this, tr("%1 - Warning").arg(APP),
 				tr("<center><b>Unable to read the DVD.</b></center>"                       
@@ -728,13 +728,13 @@ void PlayerControl::initializeDVD()
 	}	// switch			
 	
 	// if we are here checkDVD passed, disable the addmedia menu and
-	p_gstiface->playMedia(videowidget->winId(), "dvd://" );
+	gstiface->playMedia(videowidget->winId(), "dvd://" );
 	
 	return;
 }
 
 // Slot to query the playlist for the next media item, and then send
-// it to p_gstiface to play it.  There are two ways into this, primary way
+// it to gstiface to play it.  There are two ways into this, primary way
 // is when ui.actionPlayPause is toggled.  It is also called from playlist
 // when a playlist item is double clicked.  This bypasses the action so
 // we need to keep the action in sync with setChecked
@@ -758,20 +758,20 @@ void PlayerControl::playMedia(QAction* act)
 	// come here directly so handle that case
 	ui.actionPlayPause->setChecked(true);
 		
-	// if we are playing a CD send the track to p_gstiface
+	// if we are playing a CD send the track to gstiface
 	if (playlist->currentItemType() == MBMP_PL::ACD) {
-		p_gstiface->playMedia(videowidget->winId(), "cdda://", playlist->getCurrentSeq());
+		gstiface->playMedia(videowidget->winId(), "cdda://", playlist->getCurrentSeq());
 	}	// if we are playing a disk
 	
-	// if we are playing a DVD send the chapter to p_gstiface
+	// if we are playing a DVD send the chapter to gstiface
 	else if (playlist->currentItemType() == MBMP_PL::DVD) {
-		p_gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
+		gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
 	else {
 		// Get the window ID to render the media on and the next item in 
-		// the playlist, then send both to p_gstiface to play the media
+		// the playlist, then send both to gstiface to play the media
 		if (playlist->isCurrentPlayable() ) 
-			p_gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());	
+			gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());	
 	}	// else
 	
 	// Set the stream volume to agree with the dial
@@ -790,10 +790,10 @@ void PlayerControl::stopPlaying()
 	ui.actionPlayPause->setChecked(false);
 	
 	// save the current media type before we reset it in the next line
-	int mt = p_gstiface->getMediaType();
+	int mt = gstiface->getMediaType();
 	
-	// Let p_gstiface know about it, this will set the playerstate to NULL
-	p_gstiface->playerStop();	
+	// Let gstiface know about it, this will set the playerstate to NULL
+	gstiface->playerStop();	
 	
 	// If we're playing a DVD
 	if (mt == MBMP_GI::DVD) {
@@ -834,7 +834,7 @@ void PlayerControl::seekToPosition(QAction* act)
 	if (pos < 0 ) pos = 0;
 	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();
 	
-	p_gstiface->seekToPosition(pos);
+	gstiface->seekToPosition(pos);
 	
 	return;
 }
@@ -858,19 +858,19 @@ void PlayerControl::dvdNavigationCommand(QAction* act)
 										else if (act == ui.actionDVDDown) cmd = GST_NAVIGATION_COMMAND_DOWN;
 											else if (act == ui.actionDVDActivate) cmd = GST_NAVIGATION_COMMAND_ACTIVATE;
 	
-	p_gstiface->keyNavEvent(cmd);
+	gstiface->keyNavEvent(cmd);
 	return;
 }
 
 // Slot to toggle pause and play on the media
 void PlayerControl::playPause()
 {
-	if (p_gstiface->getState() == GST_STATE_NULL || p_gstiface->getState() == GST_STATE_READY )
+	if (gstiface->getState() == GST_STATE_NULL || gstiface->getState() == GST_STATE_READY )
 		playMedia();
 				
 	else {
-		if (p_gstiface->getState() == GST_STATE_PLAYING) seek_group->setEnabled(false);
-		p_gstiface->playPause();
+		if (gstiface->getState() == GST_STATE_PLAYING) seek_group->setEnabled(false);
+		gstiface->playPause();
 	}
 		
 }
@@ -1018,7 +1018,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 		case MBMP_GI::State: 
 			// restore stream after hiatus
 			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)  && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) && hiatus_resume >= 0 ) {
-				p_gstiface->seekToPosition(hiatus_resume);
+				gstiface->seekToPosition(hiatus_resume);
 				hiatus_resume = -1;
 			}
 			switch (loglevel) {
@@ -1167,7 +1167,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
 			// send the tracklist to the playlist to create playlist entries
-			playlist->addTracks(p_gstiface->getTrackList());
+			playlist->addTracks(gstiface->getTrackList());
 			if (playlist->isHidden()) playlist->show();
 			break;
 			
@@ -1193,7 +1193,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
-			playlist->addChapters(p_gstiface->getChapterCount() );
+			playlist->addChapters(gstiface->getChapterCount() );
 			playlist->lockControls(true);
 			if (playlist->isHidden()) playlist->show();	
 		break;
@@ -1208,7 +1208,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
 			}	// loglevel switch
-			playlist->setCurrentChapter(p_gstiface->getCurrentChapter() );
+			playlist->setCurrentChapter(gstiface->getCurrentChapter() );
 		break;
 		
 		case MBMP_GI::NewTrack:	// a New Track signal was emitted
@@ -1224,7 +1224,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			}	// loglevel switch		
 		
 			// Set the window title and notifications
-			if (p_gstiface->getMediaType() == MBMP_GI::DVD)
+			if (gstiface->getMediaType() == MBMP_GI::DVD)
 				this->setWindowTitle(msg);
 			else {
 				this->setWindowTitle(playlist->getWindowTitle() );
@@ -1301,11 +1301,11 @@ void PlayerControl::popupOptionsMenu()
 
 //
 // Slot to select or change the audio visualizer. Extract the visualizer
-// name from the QAction and send it to p_gstiface. 
+// name from the QAction and send it to gstiface. 
 void PlayerControl::changeVisualizer(QAction* act)
 {
 		QString vis = act->text();
-		p_gstiface->changeVisualizer(vis);
+		gstiface->changeVisualizer(vis);
 	
 	return;
 }
@@ -1317,20 +1317,20 @@ void PlayerControl::changeOptions(QAction* act)
 	QString opt = act->text();
 	
 	if (act == action_vis) {
-		p_gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, act->isChecked() );
+		gstiface->setPlayFlag(GST_PLAY_FLAG_VIS, act->isChecked() );
 		vis_group->setEnabled(act->isChecked());
 	}
 	
 	else if (act == action_sub) {
-		p_gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, act->isChecked() );
+		gstiface->setPlayFlag(GST_PLAY_FLAG_TEXT, act->isChecked() );
 	}
 	
 	else if (act == action_sbuf) {
-		p_gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, act->isChecked() );
+		gstiface->setPlayFlag(GST_PLAY_FLAG_BUFFERING, act->isChecked() );
 	}
 	
 	else if (act == action_dbuf) {
-		p_gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, act->isChecked() );
+		gstiface->setPlayFlag(GST_PLAY_FLAG_DOWNLOAD, act->isChecked() );
 	}	
 	
 	return;
@@ -1418,7 +1418,7 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 				ui.horizontalSlider_position->maximum(),
 				mouseEvent->x(),
 				ui.horizontalSlider_position->width()));
-				p_gstiface->seekToPosition(ui.horizontalSlider_position->value() );
+				gstiface->seekToPosition(ui.horizontalSlider_position->value() );
 			return true;
 		}	// if left button
 		else 

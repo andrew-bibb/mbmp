@@ -96,7 +96,7 @@ class PlayerControl : public QDialog
   private:
   // members 
     Ui::PlayerControl ui;
-    GST_Interface* p_gstiface;
+    GST_Interface* gstiface;
     KeyMap* keymap;
     Playlist* playlist;
 		QActionGroup* playlist_group;    
