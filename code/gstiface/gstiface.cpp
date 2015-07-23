@@ -54,7 +54,7 @@ static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data)
 }
 
 // Callback Function: Set the opticaldrive if necessary
-static void sourceSetup(void* bin, GstElement* src, QString* opticaldrive)
+static void sourceSetup(GstElement* bin, GstElement* src, QString* opticaldrive)
 { 
   (void) bin;
   gchar* device = NULL;
@@ -69,8 +69,20 @@ static void sourceSetup(void* bin, GstElement* src, QString* opticaldrive)
   // otherwise set the device on the source element
   else 
     g_object_set(G_OBJECT (src), "device", opticaldrive->toLocal8Bit().data(), NULL);   
+    
+	return;
 }
 
+// Callback Function: Call bus message processor
+static gboolean busCallback(GstBus* bus, GstMessage* msg, gpointer data)
+{
+	(void) bus;
+	
+	GST_Interface* gstif = (GST_Interface*) data;
+	gstif->busHandler(msg);
+	
+	return TRUE;
+}
 
 // Constructor
 GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
@@ -100,15 +112,17 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   // Create the playbin pipeline, call it PLAYER_NAME defined in resource.h
   pipeline_playbin = gst_element_factory_make("playbin", PLAYER_NAME);
   
-  // Create the playbin bus
+  // Create the playbin bus and add a watch
   bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline_playbin));
+  gst_bus_add_watch(bus, busCallback, this);
+  gst_object_unref (bus);
   
   // Monitor the playbin source-setup signal
   g_signal_connect (GST_ELEMENT(pipeline_playbin), "source-setup", G_CALLBACK (&sourceSetup), &opticaldrive);
   
-  // Start a timer to monitor the bus
-  bus_timer = new QTimer(this);
-  connect(bus_timer, SIGNAL(timeout()), this, SLOT(pollGstBus()));
+  // Create the timers we need and connect them to slots
+  pos_timer = new QTimer(this);
+  connect(pos_timer, SIGNAL(timeout()), this, SLOT(queryStreamPosition()));
   
   dl_timer = new QTimer(this);
   connect(dl_timer, SIGNAL(timeout()), this, SLOT(downloadBuffer()));
@@ -309,9 +323,6 @@ int GST_Interface::checkDVD(QString dev)
 // stream.
 void GST_Interface::playMedia(WId winId, QString uri, int track)
 {
-  // constants
-  const int bus_timeout = 500;  // timeout value in miliseconds
-  
   // if we need to seek in a currently playing disk (CD or DVD)
   if (track > 0 ) {
     if (uri.contains("cdda", Qt::CaseInsensitive)) {
@@ -332,7 +343,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
     is_live = false;
     
     // Set the media source. 
-    g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(uri), NULL);
+    g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(uri), NULL);    
     
     // Set our media type variable
     if (uri.startsWith("cdda://", Qt::CaseInsensitive)) mediatype = MBMP_GI::CD;
@@ -346,7 +357,6 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
     
     // Bring the pipeline to paused and see if we have a live stream (for buffering)
     ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
-    bus_timer->start(bus_timeout);
 
     switch (ret) {
       case GST_STATE_CHANGE_SUCCESS: 
@@ -606,6 +616,346 @@ QString GST_Interface::getTextStreamInfo()
   return s; 
 }
 
+// Function to process bus messages and eemit signals for messages we 
+// choose to deal with. Called by busCallback().  Do minimal processing here
+// and emit the busMessage signal for PlayerControl::processBusMessage
+// to pickup and complete the processing.  Basically anything that needs
+// to operate immediately on the stream do here, anything that the user
+// needs to know about do in PlayerControl. 
+void GST_Interface::busHandler(GstMessage* msg)
+{
+  
+	switch (GST_MESSAGE_TYPE (msg)) {
+		
+		// An ERROR message generated somewhere in the pipeline_playbin.  Gstreamer docs say the pipeline_playbin should be taken out down if an ERROR
+		// message is sent, however I've found this does not seem to be the behavior when using the commandline gst-launch-1.0 utility.
+		// I've remove the command to take down the pipeline_playbin from here to match that behavior. 
+		case GST_MESSAGE_ERROR: {
+			GError* err = NULL;
+			gchar* dbg_info = NULL;
+			
+			gst_message_parse_error (msg, &err, &dbg_info);
+			emit busMessage(MBMP_GI::Error, QString(tr("ERROR from element %1: %2\n  Debugging information: %3\n  The pipeline_playbin has been shut down"))
+					.arg(GST_OBJECT_NAME (msg->src))
+					.arg(err->message)
+					.arg( (dbg_info) ? dbg_info : "none") );
+			
+			g_error_free (err);
+			g_free (dbg_info);    
+			break; }
+	
+	// A WARNING message generated somewhere in the pipeline_playbin
+		case GST_MESSAGE_WARNING: {
+			GError* err = NULL;
+			gchar* dbg_info = NULL;
+			
+			gst_message_parse_warning (msg, &err, &dbg_info);
+			emit busMessage(MBMP_GI::Warning, QString(tr("WARNING MESSAGE from element %1: %2\n  Debugging information: %3"))
+					.arg(GST_OBJECT_NAME (msg->src))
+					.arg(err->message)
+					.arg( (dbg_info) ? dbg_info : "none") );
+			
+			g_error_free (err);
+			g_free (dbg_info);    
+			break; }
+		
+		// An INFO message generated somewhere in the pipeline_playbin
+		case GST_MESSAGE_INFO: {
+			GError* err = NULL;
+			gchar* dbg_info = NULL;
+			
+			gst_message_parse_info (msg, &err, &dbg_info);
+			emit busMessage(MBMP_GI::Info, QString(tr("INFOMATION MESSAGE from element %1: %2\n  Debugging information: %3"))
+					.arg(GST_OBJECT_NAME (msg->src))
+					.arg(err->message)
+					.arg( (dbg_info) ? dbg_info : "none") );
+			
+			g_error_free (err);
+			g_free (dbg_info);    
+			break; }
+		
+		// A clock_lost message, try to reset the clock by pausing then restarting the player
+		case GST_MESSAGE_CLOCK_LOST : {
+			emit busMessage(MBMP_GI::ClockLost, QString(tr("Pipeline clock has become unusable, trying to reset...")) );
+			gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED);
+			gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
+			break;  }
+
+		// The end of stream message. Put the player into the NULL state.
+		case GST_MESSAGE_EOS: {
+			emit busMessage(MBMP_GI::EOS, QString(tr("End of stream has been reached.")) );
+			break; }
+		
+		// The start of stream message
+		case GST_MESSAGE_STREAM_START: {
+			emit busMessage(MBMP_GI::SOS, QString(tr("Start of a stream has been detected.")) );
+			break; }
+		
+		// Player state changed.  Do a bunch of processing here to analyze the stream and
+		// set the streaminfo dialog accordingly.
+		case GST_MESSAGE_STATE_CHANGED: {
+			GstState old_state;
+			GstState new_state;
+			
+			gst_message_parse_state_changed (msg, &old_state, &new_state, NULL);
+			emit busMessage(MBMP_GI::State, QString(tr("%1 has changed state from %2 to %3."))
+																					.arg(GST_OBJECT_NAME (msg->src))
+																					.arg(gst_element_state_get_name (old_state))
+																					.arg(gst_element_state_get_name (new_state)) ); 
+			// set the streammap based on what state changed                                                                              
+			if (QString(GST_OBJECT_NAME (msg->src)).contains(PLAYER_NAME, Qt::CaseSensitive)) {                                   
+				switch (new_state) {
+					case GST_STATE_PLAYING:
+						pos_timer->start(500);
+						analyzeStream();
+						streaminfo->updateAudioBox(getAudioStreamInfo());
+						streaminfo->updateVideoBox(getVideoStreamInfo());
+						streaminfo->updateSubtitleBox(getTextStreamInfo());
+						streaminfo->setComboBoxes(streammap); 
+						streaminfo->setSubtitleBoxEnabled(checkPlayFlag(GST_PLAY_FLAG_TEXT));
+						streaminfo->enableAll(true);
+						qobject_cast<PlayerControl*>(mainwidget)->setDurationWidgets(queryDuration() / (1000 * 1000 * 1000), queryStreamSeek() );
+						break;
+					case GST_STATE_PAUSED:
+						streaminfo->enableAll(false);
+						break;
+					default:
+						streaminfo->updateAudioBox(tr("Audio Information"));
+						streaminfo->updateVideoBox(tr("Video Information"));
+						streaminfo->updateSubtitleBox(tr("Subtitle Information"));
+						streammap.clear();
+						streaminfo->setComboBoxes(streammap); 
+						streaminfo->enableAll(false);
+						qobject_cast<PlayerControl*>(mainwidget)->setDurationWidgets(-1);
+						b_positionenabled = true;
+				} // state switch
+			} // if           
+			break; }    
+		
+		// A message we generate
+		case GST_MESSAGE_APPLICATION: {
+			gchar* payload = NULL;
+			gst_structure_get(gst_message_get_structure(msg), "MBMP_GI", G_TYPE_STRING, &payload, NULL); 
+			emit busMessage(MBMP_GI::Application, QString(payload));
+			g_free(payload);
+			break; }
+		
+		// Buffering messages, pause the playback while buffering, restart when finished
+		case GST_MESSAGE_BUFFERING: {
+			// if a live stream don't buffer
+			if (is_live) break;           
+							
+			// if download flag is set report buffering and let ASYNC_DONE deal with buffering
+			guint flags = 0;
+			g_object_get (pipeline_playbin, "flags", &flags, NULL);
+			if (  (flags & GST_PLAY_FLAG_DOWNLOAD) ) {
+				is_buffering = true;
+				break;
+			} 
+			
+			// non-download buffering
+			gint percent = 0;
+			gst_message_parse_buffering(msg, &percent);
+			
+			if (percent < 100) {
+				if (! is_buffering) {
+					gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED);
+					is_buffering = true;
+				}
+			}
+			else {
+				gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
+				is_buffering = false;
+			}
+			
+			emit busMessage(MBMP_GI::Buffering, QString::number(percent));
+			break; }
+				
+		// Duration changed message.  These are typically only created for streams that have a variable bit rate
+		// where the pipeline_playbin calculates a duration based on some average bitrate.  Only report the duration changed
+		// using the emit, we activate or disactivate the position widgets from the STATE_CHANGED case above.     
+		case GST_MESSAGE_DURATION_CHANGED: {
+			QTime t(0,0,0);
+			t = t.addSecs(queryDuration() / (1000 * 1000 * 1000));
+			emit busMessage(MBMP_GI::Duration, QString(tr("New stream duration: %1")).arg(t.toString("HH:mm:ss")) );
+			break; }
+			
+		// TOC message, for instance from an audio CD or DVD      
+		case GST_MESSAGE_TOC: {
+			GstToc* toc;
+			gboolean updated = false;
+			
+			// parse the TOC
+			gst_message_parse_toc (msg, &toc, &updated);
+				
+			// if updated just send on the message, don't do any processing here
+			if (updated) {
+				emit busMessage(MBMP_GI::TOC, QString(tr("Received an updated table of contents for the media.")) );
+			 }
+			 
+			// TOC is new, process as appropriate 
+			else {
+				// create a new track list if the TOC contains tracklists
+				GList* entry = gst_toc_get_entries(toc);
+				if (gst_toc_entry_get_entry_type((GstTocEntry*) g_list_nth_data(entry, 0)) == GST_TOC_ENTRY_TYPE_TRACK ) {
+					tracklist.clear();  
+					for (uint i = 0; i < g_list_length(entry); ++i) {
+						this->extractTocTrack((GstTocEntry*) g_list_nth_data(entry, i));
+					} // for
+					emit busMessage(MBMP_GI::TOCTL, QString(tr("Received a new table of contents and tracklist.")) ); 
+				} // if
+				else {
+					emit busMessage(MBMP_GI::TOC, QString(tr("Received a new table of contents for the media.")) );
+				} // else
+			} // else
+						
+			gst_toc_unref(toc); 
+			break; }
+		
+		// TAG message.  Can be used to signal we need to query CDDB or MUSICBRAINZ
+		// we have not implemented these as of yet, so for now just send a notification
+		// to PlayerCtl that we got a tag
+		case GST_MESSAGE_TAG: {
+			gchar* str = NULL;
+			guint num = 0;
+			GstTagList* tags = NULL;
+			gst_message_parse_tag (msg, &tags);
+			
+			// Get tags and emit a message listing the tags we've got with their values
+			str = gst_tag_list_to_string(tags);
+			emit busMessage(MBMP_GI::Tag, QString(tr("Stream contains this taglist: %1")).arg(QString(str)) );
+			g_free(str);
+			
+			// Process tags appropriate to each media type
+			switch (mediatype) {
+				case MBMP_GI::CD: {
+					// Get Audio CD tags. map_md_cd has already been cleared in function check_CD 
+					// May need a new emit when we actually want to use some of this data, which right now we don't.
+					if (!map_md_cd.contains(GST_TAG_CDDA_CDDB_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID, &str)) {
+						map_md_cd[GST_TAG_CDDA_CDDB_DISCID] = QString(str);
+						g_free (str);
+					}
+					if (!map_md_cd.contains(GST_TAG_CDDA_CDDB_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID_FULL, &str)) {
+						map_md_cd[GST_TAG_CDDA_CDDB_DISCID_FULL] = QString(str);
+						g_free (str);
+					}
+					if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID, &str)) {
+						map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID] = QString(str);
+						g_free (str);
+					}
+					if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL, &str)) {
+						map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL] = QString(str);
+						g_free (str);
+					}
+					if (!map_md_cd.contains(GST_TAG_TRACK_COUNT) && gst_tag_list_get_uint (tags, GST_TAG_TRACK_COUNT, &num)) {
+						map_md_cd[GST_TAG_TRACK_COUNT] = num;
+						num = 0;
+					}
+					if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &num)) {
+						if (num != map_md_cd.value(GST_TAG_TRACK_NUMBER)) {
+							map_md_cd[GST_TAG_TRACK_NUMBER] = num; 
+							emit busMessage(MBMP_GI::NewTrack);   
+						} // if we have a new track number
+						num = 0;
+					}
+					break; }  // cd case
+			
+				case MBMP_GI::DVD: {
+					// Get DVD tags. map_md_dvd has already been cleared in function check_DVD. 
+					// As with Audio CD we don't really do much with any of this (yet)
+						if (!map_md_dvd.contains(GST_TAG_VIDEO_CODEC) && gst_tag_list_get_string (tags, GST_TAG_VIDEO_CODEC, &str)) {
+							map_md_dvd[GST_TAG_VIDEO_CODEC] = QString(str);
+							g_free (str);
+						}
+						if (!map_md_dvd.contains(GST_TAG_MINIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MINIMUM_BITRATE, &num)) {
+							map_md_dvd[GST_TAG_MINIMUM_BITRATE] = num;
+							num = 0;
+						}
+						if (!map_md_dvd.contains(GST_TAG_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_BITRATE, &num)) {
+							map_md_dvd[GST_TAG_BITRATE] = num;
+							num = 0;
+						}
+						if (!map_md_dvd.contains(GST_TAG_MAXIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MAXIMUM_BITRATE, &num)) {
+							map_md_dvd[GST_TAG_MAXIMUM_BITRATE] = num;
+							num = 0;
+						}
+						if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+							if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
+								map_md_dvd[GST_TAG_TITLE] = QString(str);
+								emit busMessage(MBMP_GI::NewTrack, QString(str));
+								g_free (str);
+							} // if we have a new title
+						} // if we have a new DVD title
+						
+						// not actually tag information, but see if we can extract some metadata from the dvd stream
+						gint64 chaptercount = 0;
+						gint64 currentchapter = 0;
+						GstFormat fmt = gst_format_get_by_nick("chapter");
+						if (gst_element_query_duration(pipeline_playbin, fmt, &chaptercount) ) {
+							if (map_md_dvd.value("chaptercount") != static_cast<int>(chaptercount))  {
+								map_md_dvd["chaptercount"] = static_cast<int>(chaptercount);
+								emit busMessage(MBMP_GI::TagCL, QString(tr("DVD chapter count changed to %1")).arg(map_md_dvd.value("chaptercount").toInt()) );
+								chaptercount = 0;
+							} // if there is a new chaptercount
+						} // if we could extract the chaptercount             
+						if (gst_element_query_position(pipeline_playbin, fmt, &currentchapter) ) {
+							if (map_md_dvd.value("currentchapter") != static_cast<int>(currentchapter))  {
+								map_md_dvd["currentchapter"] = static_cast<int>(currentchapter);
+								emit busMessage(MBMP_GI::TagCC, QString(tr("DVD current chapter changed to %1")).arg(map_md_dvd.value("currentchapter").toInt()) );                 
+								currentchapter = 0;
+							} // if there is a new chapter
+						} // if we could extract the chapter                
+										
+						gint64 titlecount = 0;                      
+						gint64 currenttitle = 0;
+						fmt = gst_format_get_by_nick("title");
+						if (gst_element_query_duration(pipeline_playbin, fmt, &titlecount) ) {
+							if (map_md_dvd.value("titlecount") != static_cast<int>(titlecount))  {
+								map_md_dvd["titlecount"] = static_cast<int>(titlecount);
+								titlecount = 0;
+							} // if there is a new titlecount
+						} // if we could extract the titlecount               
+						if (gst_element_query_position(pipeline_playbin, fmt, &currenttitle) ) {
+							if (map_md_dvd.value("currenttitle") != static_cast<int>(currenttitle))  {
+								map_md_dvd["currenttitle"] = static_cast<int>(currenttitle);
+								currenttitle = 0;
+							} // if there is a new currenttitle
+						} // if we could extract the currenttitle                         
+					break; }  // dvd case
+					
+				default:   
+					if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+						if (str) emit busMessage(MBMP_GI::NewTrack, QString(str) );
+					 g_free (str);
+					}
+					break;   // default media type case
+				} // mediatype switch
+				
+			gst_tag_list_free (tags); 
+			break; }  // GST_TAG case
+		
+		// Posted when elements complete an async state change.  Use to avoid rebuffering
+		// if the download flag is set.   
+		case GST_MESSAGE_ASYNC_DONE: {
+			// if DOWNLOAD flag is set and we are currently buffering start the
+			// download.  dl_timer is connected to downloadBuffer() which will
+			// start the playback at the appropriate time.
+			guint flags = 0;
+			g_object_get (pipeline_playbin, "flags", &flags, NULL);
+			if ( (flags & GST_PLAY_FLAG_DOWNLOAD) && is_buffering )  {
+				dl_timer->start(500);
+			} // if download flag is set       
+			break; }  // ASYNC_DONE case   
+		
+		default:
+		QString type = QString(gst_message_type_get_name(GST_MESSAGE_TYPE (msg)) );
+			emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message: %1")).arg(type) );
+			break;
+	} // switch
+      
+  return;
+}
+
 //////////////////////////// Public Slots ////////////////////////////
 //
 // Slot to process a mouse navigation event.  Our VideoWidget emits a signal
@@ -717,374 +1067,6 @@ void GST_Interface::setTextStream(const int& stream)
   return;
 } 
 
-  
-// Poll the bus and emit signals for messages we choose to deal with.
-// Called by a QTimer in the constructor.  Do minimal processing here
-// and emit the busMessage signal for PlayerControl::processBusMessage
-// to pickup and complete the processing.  Basically anything that needs
-// to operate immediately on the stream do here, anything that the user
-// needs to know about do in PlayerControl.
-void GST_Interface::pollGstBus()
-{
-  // query the stream position if we are currently playing. This will
-  // set the PlayerControl position widgets
-  if (getState() == GST_STATE_PLAYING) queryStreamPosition();
-
-  // return if there are no new messages
-  if (! gst_bus_have_pending(bus)) return;
-   
-  // variables and constants
-  GstMessage* msg = 0;  
-  const int msgtypes = GST_MESSAGE_EOS              |
-                        GST_MESSAGE_ERROR             | 
-                        GST_MESSAGE_WARNING           |
-                        GST_MESSAGE_INFO              |
-                        GST_MESSAGE_STATE_CHANGED     |
-                        GST_MESSAGE_STREAM_START      |
-                        GST_MESSAGE_APPLICATION       |
-                        GST_MESSAGE_BUFFERING         | 
-                        GST_MESSAGE_DURATION_CHANGED  |
-                        GST_MESSAGE_TOC               |
-                        GST_MESSAGE_TAG               |
-                        GST_MESSAGE_ASYNC_DONE        |
-                        GST_MESSAGE_CLOCK_LOST;
-  
-  msg = (GstMessage*)(gst_bus_pop_filtered(bus, (GstMessageType)(msgtypes)) );
- 
-  while (msg != NULL) {   
-    switch (GST_MESSAGE_TYPE (msg)) {
-      
-      // An ERROR message generated somewhere in the pipeline_playbin.  Gstreamer docs say the pipeline_playbin should be taken out down if an ERROR
-      // message is sent, however I've found this does not seem to be the behavior when using the commandline gst-launch-1.0 utility.
-      // I've remove the command to take down the pipeline_playbin from here to match that behavior. 
-      case GST_MESSAGE_ERROR: {
-        GError* err = NULL;
-        gchar* dbg_info = NULL;
-        
-        gst_message_parse_error (msg, &err, &dbg_info);
-        emit busMessage(MBMP_GI::Error, QString(tr("ERROR from element %1: %2\n  Debugging information: %3\n  The pipeline_playbin has been shut down"))
-            .arg(GST_OBJECT_NAME (msg->src))
-            .arg(err->message)
-            .arg( (dbg_info) ? dbg_info : "none") );
-        
-        g_error_free (err);
-        g_free (dbg_info);    
-        break; }
-    
-    // A WARNING message generated somewhere in the pipeline_playbin
-      case GST_MESSAGE_WARNING: {
-        GError* err = NULL;
-        gchar* dbg_info = NULL;
-        
-        gst_message_parse_warning (msg, &err, &dbg_info);
-        emit busMessage(MBMP_GI::Warning, QString(tr("WARNING MESSAGE from element %1: %2\n  Debugging information: %3"))
-            .arg(GST_OBJECT_NAME (msg->src))
-            .arg(err->message)
-            .arg( (dbg_info) ? dbg_info : "none") );
-        
-        g_error_free (err);
-        g_free (dbg_info);    
-        break; }
-      
-      // An INFO message generated somewhere in the pipeline_playbin
-      case GST_MESSAGE_INFO: {
-        GError* err = NULL;
-        gchar* dbg_info = NULL;
-        
-        gst_message_parse_info (msg, &err, &dbg_info);
-        emit busMessage(MBMP_GI::Info, QString(tr("INFOMATION MESSAGE from element %1: %2\n  Debugging information: %3"))
-            .arg(GST_OBJECT_NAME (msg->src))
-            .arg(err->message)
-            .arg( (dbg_info) ? dbg_info : "none") );
-        
-        g_error_free (err);
-        g_free (dbg_info);    
-        break; }
-      
-      // A clock_lost message, try to reset the clock by pausing then restarting the player
-      case GST_MESSAGE_CLOCK_LOST : {
-        emit busMessage(MBMP_GI::ClockLost, QString(tr("Pipeline clock has become unusable, trying to reset...")) );
-        gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED);
-        gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
-        break;  }
-  
-      // The end of stream message. Put the player into the NULL state.
-      case GST_MESSAGE_EOS: {
-        emit busMessage(MBMP_GI::EOS, QString(tr("End of stream has been reached.")) );
-        break; }
-      
-      // The start of stream message
-      case GST_MESSAGE_STREAM_START: {
-        emit busMessage(MBMP_GI::SOS, QString(tr("Start of a stream has been detected.")) );
-        break; }
-      
-      // Player state changed.  Do a bunch of processing here to analyze the stream and
-      // set the streaminfo dialog accordingly.
-      case GST_MESSAGE_STATE_CHANGED: {
-        GstState old_state;
-        GstState new_state;
-        
-        gst_message_parse_state_changed (msg, &old_state, &new_state, NULL);
-        emit busMessage(MBMP_GI::State, QString(tr("%1 has changed state from %2 to %3."))
-                                            .arg(GST_OBJECT_NAME (msg->src))
-                                            .arg(gst_element_state_get_name (old_state))
-                                            .arg(gst_element_state_get_name (new_state)) ); 
-        // set the streammap based on what state changed                                                                              
-        if (QString(GST_OBJECT_NAME (msg->src)).contains(PLAYER_NAME, Qt::CaseSensitive)) {                                   
-          switch (new_state) {
-            case GST_STATE_PLAYING:
-              analyzeStream();
-              streaminfo->updateAudioBox(getAudioStreamInfo());
-              streaminfo->updateVideoBox(getVideoStreamInfo());
-              streaminfo->updateSubtitleBox(getTextStreamInfo());
-              streaminfo->setComboBoxes(streammap); 
-              streaminfo->setSubtitleBoxEnabled(checkPlayFlag(GST_PLAY_FLAG_TEXT));
-              streaminfo->enableAll(true);
-              qobject_cast<PlayerControl*>(mainwidget)->setDurationWidgets(queryDuration() / (1000 * 1000 * 1000), queryStreamSeek() );
-              break;
-            case GST_STATE_PAUSED:
-              streaminfo->enableAll(false);
-              break;
-            default:
-              streaminfo->updateAudioBox(tr("Audio Information"));
-              streaminfo->updateVideoBox(tr("Video Information"));
-              streaminfo->updateSubtitleBox(tr("Subtitle Information"));
-              streammap.clear();
-              streaminfo->setComboBoxes(streammap); 
-              streaminfo->enableAll(false);
-              qobject_cast<PlayerControl*>(mainwidget)->setDurationWidgets(-1);
-              b_positionenabled = true;
-          } // state switch
-        } // if           
-        break; }    
-      
-      // A message we generate
-      case GST_MESSAGE_APPLICATION: {
-        gchar* payload = NULL;
-        gst_structure_get(gst_message_get_structure(msg), "MBMP_GI", G_TYPE_STRING, &payload, NULL); 
-        emit busMessage(MBMP_GI::Application, QString(payload));
-        g_free(payload);
-        break; }
-      
-      // Buffering messages, pause the playback while buffering, restart when finished
-      case GST_MESSAGE_BUFFERING: {
-        // if a live stream don't buffer
-        if (is_live) break;           
-                
-        // if download flag is set report buffering and let ASYNC_DONE deal with buffering
-        guint flags = 0;
-        g_object_get (pipeline_playbin, "flags", &flags, NULL);
-        if (  (flags & GST_PLAY_FLAG_DOWNLOAD) ) {
-          is_buffering = true;
-          break;
-        } 
-        
-        // non-download buffering
-        gint percent = 0;
-        gst_message_parse_buffering(msg, &percent);
-        
-        if (percent < 100) {
-          if (! is_buffering) {
-            gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED);
-            is_buffering = true;
-          }
-        }
-        else {
-          gst_element_set_state (pipeline_playbin, GST_STATE_PLAYING);
-          is_buffering = false;
-        }
-        
-        emit busMessage(MBMP_GI::Buffering, QString::number(percent));
-        break; }
-          
-      // Duration changed message.  These are typically only created for streams that have a variable bit rate
-      // where the pipeline_playbin calculates a duration based on some average bitrate.  Only report the duration changed
-      // using the emit, we activate or disactivate the position widgets from the STATE_CHANGED case above.     
-      case GST_MESSAGE_DURATION_CHANGED: {
-        QTime t(0,0,0);
-        t = t.addSecs(queryDuration() / (1000 * 1000 * 1000));
-        emit busMessage(MBMP_GI::Duration, QString(tr("New stream duration: %1")).arg(t.toString("HH:mm:ss")) );
-        break; }
-        
-      // TOC message, for instance from an audio CD or DVD      
-      case GST_MESSAGE_TOC: {
-        GstToc* toc;
-        gboolean updated = false;
-        
-        // parse the TOC
-        gst_message_parse_toc (msg, &toc, &updated);
-          
-        // if updated just send on the message, don't do any processing here
-        if (updated) {
-          emit busMessage(MBMP_GI::TOC, QString(tr("Received an updated table of contents for the media.")) );
-         }
-         
-        // TOC is new, process as appropriate 
-        else {
-          // create a new track list if the TOC contains tracklists
-          GList* entry = gst_toc_get_entries(toc);
-          if (gst_toc_entry_get_entry_type((GstTocEntry*) g_list_nth_data(entry, 0)) == GST_TOC_ENTRY_TYPE_TRACK ) {
-            tracklist.clear();  
-            for (uint i = 0; i < g_list_length(entry); ++i) {
-              this->extractTocTrack((GstTocEntry*) g_list_nth_data(entry, i));
-            } // for
-            emit busMessage(MBMP_GI::TOCTL, QString(tr("Received a new table of contents and tracklist.")) ); 
-          } // if
-          else {
-            emit busMessage(MBMP_GI::TOC, QString(tr("Received a new table of contents for the media.")) );
-          } // else
-        } // else
-              
-        gst_toc_unref(toc); 
-        break; }
-      
-      // TAG message.  Can be used to signal we need to query CDDB or MUSICBRAINZ
-      // we have not implemented these as of yet, so for now just send a notification
-      // to PlayerCtl that we got a tag
-      case GST_MESSAGE_TAG: {
-        gchar* str = NULL;
-        guint num = 0;
-        GstTagList* tags = NULL;
-        gst_message_parse_tag (msg, &tags);
-        
-        // Get tags and emit a message listing the tags we've got with their values
-        str = gst_tag_list_to_string(tags);
-        emit busMessage(MBMP_GI::Tag, QString(tr("Stream contains this taglist: %1")).arg(QString(str)) );
-        g_free(str);
-        
-        // Process tags appropriate to each media type
-        switch (mediatype) {
-          case MBMP_GI::CD: {
-            // Get Audio CD tags. map_md_cd has already been cleared in function check_CD 
-            // May need a new emit when we actually want to use some of this data, which right now we don't.
-            if (!map_md_cd.contains(GST_TAG_CDDA_CDDB_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID, &str)) {
-              map_md_cd[GST_TAG_CDDA_CDDB_DISCID] = QString(str);
-              g_free (str);
-            }
-            if (!map_md_cd.contains(GST_TAG_CDDA_CDDB_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_CDDB_DISCID_FULL, &str)) {
-              map_md_cd[GST_TAG_CDDA_CDDB_DISCID_FULL] = QString(str);
-              g_free (str);
-            }
-            if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID, &str)) {
-              map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID] = QString(str);
-              g_free (str);
-            }
-            if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL, &str)) {
-              map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL] = QString(str);
-              g_free (str);
-            }
-            if (!map_md_cd.contains(GST_TAG_TRACK_COUNT) && gst_tag_list_get_uint (tags, GST_TAG_TRACK_COUNT, &num)) {
-              map_md_cd[GST_TAG_TRACK_COUNT] = num;
-              num = 0;
-            }
-            if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &num)) {
-              if (num != map_md_cd.value(GST_TAG_TRACK_NUMBER)) {
-                map_md_cd[GST_TAG_TRACK_NUMBER] = num; 
-                emit busMessage(MBMP_GI::NewTrack);   
-              } // if we have a new track number
-              num = 0;
-            }
-            break; }  // cd case
-        
-          case MBMP_GI::DVD: {
-            // Get DVD tags. map_md_dvd has already been cleared in function check_DVD. 
-            // As with Audio CD we don't really do much with any of this (yet)
-              if (!map_md_dvd.contains(GST_TAG_VIDEO_CODEC) && gst_tag_list_get_string (tags, GST_TAG_VIDEO_CODEC, &str)) {
-                map_md_dvd[GST_TAG_VIDEO_CODEC] = QString(str);
-                g_free (str);
-              }
-              if (!map_md_dvd.contains(GST_TAG_MINIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MINIMUM_BITRATE, &num)) {
-                map_md_dvd[GST_TAG_MINIMUM_BITRATE] = num;
-                num = 0;
-              }
-              if (!map_md_dvd.contains(GST_TAG_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_BITRATE, &num)) {
-                map_md_dvd[GST_TAG_BITRATE] = num;
-                num = 0;
-              }
-              if (!map_md_dvd.contains(GST_TAG_MAXIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MAXIMUM_BITRATE, &num)) {
-                map_md_dvd[GST_TAG_MAXIMUM_BITRATE] = num;
-                num = 0;
-              }
-              if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
-                if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
-                  map_md_dvd[GST_TAG_TITLE] = QString(str);
-                  emit busMessage(MBMP_GI::NewTrack, QString(str));
-                  g_free (str);
-                } // if we have a new title
-              } // if we have a new DVD title
-              
-              // not actually tag information, but see if we can extract some metadata from the dvd stream
-              gint64 chaptercount = 0;
-              gint64 currentchapter = 0;
-              GstFormat fmt = gst_format_get_by_nick("chapter");
-              if (gst_element_query_duration(pipeline_playbin, fmt, &chaptercount) ) {
-                if (map_md_dvd.value("chaptercount") != static_cast<int>(chaptercount))  {
-                  map_md_dvd["chaptercount"] = static_cast<int>(chaptercount);
-                  emit busMessage(MBMP_GI::TagCL, QString(tr("DVD chapter count changed to %1")).arg(map_md_dvd.value("chaptercount").toInt()) );
-                  chaptercount = 0;
-                } // if there is a new chaptercount
-              } // if we could extract the chaptercount             
-              if (gst_element_query_position(pipeline_playbin, fmt, &currentchapter) ) {
-                if (map_md_dvd.value("currentchapter") != static_cast<int>(currentchapter))  {
-                  map_md_dvd["currentchapter"] = static_cast<int>(currentchapter);
-                  emit busMessage(MBMP_GI::TagCC, QString(tr("DVD current chapter changed to %1")).arg(map_md_dvd.value("currentchapter").toInt()) );                 
-                  currentchapter = 0;
-                } // if there is a new chapter
-              } // if we could extract the chapter                
-                      
-              gint64 titlecount = 0;                      
-              gint64 currenttitle = 0;
-              fmt = gst_format_get_by_nick("title");
-              if (gst_element_query_duration(pipeline_playbin, fmt, &titlecount) ) {
-                if (map_md_dvd.value("titlecount") != static_cast<int>(titlecount))  {
-                  map_md_dvd["titlecount"] = static_cast<int>(titlecount);
-                  titlecount = 0;
-                } // if there is a new titlecount
-              } // if we could extract the titlecount               
-              if (gst_element_query_position(pipeline_playbin, fmt, &currenttitle) ) {
-                if (map_md_dvd.value("currenttitle") != static_cast<int>(currenttitle))  {
-                  map_md_dvd["currenttitle"] = static_cast<int>(currenttitle);
-                  currenttitle = 0;
-                } // if there is a new currenttitle
-              } // if we could extract the currenttitle                         
-            break; }  // dvd case
-            
-          default:   
-						if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
-							if (str) emit busMessage(MBMP_GI::NewTrack, QString(str) );
-             g_free (str);
-						}
-            break;   // default media type case
-          } // mediatype switch
-          
-        gst_tag_list_free (tags); 
-        break; }  // GST_TAG case
-      
-      // Posted when elements complete an async state change.  Use to avoid rebuffering
-      // if the download flag is set.   
-      case GST_MESSAGE_ASYNC_DONE: {
-        // if DOWNLOAD flag is set and we are currently buffering start the
-        // download.  dl_timer is connected to downloadBuffer() which will
-        // start the playback at the appropriate time.
-        guint flags = 0;
-        g_object_get (pipeline_playbin, "flags", &flags, NULL);
-        if ( (flags & GST_PLAY_FLAG_DOWNLOAD) && is_buffering )  {
-          dl_timer->start(500);
-        } // if download flag is set       
-        break; }  // ASYNC_DONE case   
-      
-			default:
-				emit busMessage(MBMP_GI::Unhandled, QString(tr("Unhandled GSTBUS message")) );
-				break;
-    } // switch
-    
-  gst_message_unref(msg);   
-  msg = (GstMessage*)(gst_bus_pop_filtered(bus, (GstMessageType)(msgtypes)) );    
-  } // while loop 
-    
-  return;
-}
-
 // Slot to toggle mute
 void GST_Interface::toggleMute()
 {
@@ -1129,7 +1111,7 @@ void GST_Interface::playerStop()
   map_md_cd.clear();
   map_md_dvd.clear();
   mediatype = MBMP_GI::NotPlaying;
-  bus_timer->stop();  
+  pos_timer->stop();  
   is_live = false;
   is_buffering = false;
   dl_timer->stop();
@@ -1146,6 +1128,7 @@ void GST_Interface::toggleStreamInfo()
   
   return;
 }
+
 
 //////////////////////////// Private Functions//////////////////////////
 //
@@ -1181,7 +1164,7 @@ void GST_Interface::extractTocTrack(const GstTocEntry* e)
 
 //
 // Function to query the media stream and fillout the streammap.  Called
-// from pollGstBus whenever the state of the player changes to PLAYING.
+// from busHandler whenever the state of the player changes to PLAYING.
 // Ignore all the other pipeline_playbin subobjects going into the PLAYING state.
 void GST_Interface::analyzeStream()
 {
@@ -1204,33 +1187,10 @@ void GST_Interface::analyzeStream()
   return;
 }
 
-//
-// Function to query the steam position.  Called from pollGstBus and only
-// when it has been determined that stream is playing
-void GST_Interface::queryStreamPosition()
-{
-  // return now if we ever failed getting a stream position
-  if (! b_positionenabled) return;
-  
-  gint64 position = 0;  // the position in nanoseconds 
-  
-  if (!gst_element_query_position (pipeline_playbin, GST_FORMAT_TIME, &position)) {
-    b_positionenabled = false;
-    gst_element_post_message (pipeline_playbin,
-      gst_message_new_application (GST_OBJECT (pipeline_playbin),
-        gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Could not query the stream position", NULL))); 
-       }  // if query failed
-  else {
-    qobject_cast<PlayerControl*>(mainwidget)->setPositionWidgets(position / (1000 * 1000 * 1000) );
-    
-  } // else query succeeded       
-  
-  return;
-} 
 
 //
 // function to query the stream to see if we can seek in it.  Called in 
-// pollGstBus when the player state changes into a PLAYING state. First
+// busHandler when the player state changes into a PLAYING state. First
 // check to make sure there is a stream playing.  This should actually
 // be checked before the function is called, but just in case.
 bool GST_Interface::queryStreamSeek()
@@ -1261,7 +1221,7 @@ bool GST_Interface::queryStreamSeek()
   
  //
  // Function to query the stream duration.  Return the duration in 
- // gstreamer standard nanoseconds.  Called from two locations in pollGstBus
+ // gstreamer standard nanoseconds.  Called from two locations in busHandler
  // one is in the DURATION case which is mainly for VBR streams, and we
  // only treate consider it for informational purposes.  The second is when
  // the STATE changes to PLAYING.  This is used to set the duration widgets.
@@ -1280,8 +1240,35 @@ bool GST_Interface::queryStreamSeek()
  
  //////////////////////////// Private Slots //////////////////////////
 //
+// Slot to query the steam position.  Called from QTimer and only
+// when it has been determined that stream is playing
+void GST_Interface::queryStreamPosition()
+{
+	// return now if now playing
+	if (getState() != GST_STATE_PLAYING) return;	
+	
+  // return now if we ever failed getting a stream position
+  if (! b_positionenabled) return;
+  
+  gint64 position = 0;  // the position in nanoseconds 
+  
+  if (!gst_element_query_position (pipeline_playbin, GST_FORMAT_TIME, &position)) {
+    b_positionenabled = false;
+    gst_element_post_message (pipeline_playbin,
+      gst_message_new_application (GST_OBJECT (pipeline_playbin),
+        gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Could not query the stream position", NULL))); 
+       }  // if query failed
+  else {
+    qobject_cast<PlayerControl*>(mainwidget)->setPositionWidgets(position / (1000 * 1000 * 1000) );
+    
+  } // else query succeeded       
+  
+  return;
+} 
+
+//
 // Slot to download a file, or most of a file to a buffer.  Called from 
-// ASYNC_DONE case of pollGstBus. I cannot get the example in chapter
+// ASYNC_DONE case of busHandler. I cannot get the example in chapter
 // 15 of the Gstreamer docs to work.  Anyway, download the entire
 // file before we start playback
 void GST_Interface::downloadBuffer()

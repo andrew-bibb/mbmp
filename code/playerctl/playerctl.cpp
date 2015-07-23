@@ -1131,7 +1131,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 		case MBMP_GI::Unhandled: // a GstBus message we didn't handle (should never get here)
 			switch (loglevel) {
 				case 0:		// case 0 supress output
-					break;	
+					break;
 				default: // otherwise print output
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
@@ -1260,7 +1260,7 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
-			break;		
+		break;		
 			
 		}	// mtype switch
 			

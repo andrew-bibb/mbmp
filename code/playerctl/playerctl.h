@@ -41,12 +41,12 @@ DEALINGS IN THE SOFTWARE.
 
 # include "ui_playerctl.h"
 
+# include "./code/settings/settings.h"
 # include "./code/gstiface/gstiface.h"
 # include "./code/keymap/keymap.h"
 # include "./code/playlist/playlist.h"
 # include "./code/videowidget/videowidget.h"
 # include "./code/scrollbox/scrollbox.h"
-# include "./code/settings/settings.h"
 # include "./code/notify/notify.h"
 
 class PlayerControl : public QDialog
@@ -94,11 +94,17 @@ class PlayerControl : public QDialog
 		bool eventFilter(QObject*, QEvent*);
 	
   private:
-  // members 
+  // mbmp members 
     Ui::PlayerControl ui;
+    Settings* diag_settings;
     GST_Interface* gstiface;
     KeyMap* keymap;
     Playlist* playlist;
+    VideoWidget* videowidget;
+    ScrollBox* chtsht;
+    NotifyClient* notifyclient;
+ 
+  // plain members 
 		QActionGroup* playlist_group;    
 		QActionGroup* volume_group;
 		QActionGroup* seek_group;
@@ -111,15 +117,12 @@ class PlayerControl : public QDialog
 		QCursor ncurs;
 		QFile logfile;
 		int loglevel;
-		ScrollBox* chtsht;
-		VideoWidget* videowidget;
 		QAction* action_vis;
 		QAction* action_sub;
 		QAction* action_sbuf;
 		QAction* action_dbuf;
-		Settings* diag_settings;
 		int hiatus_resume;
-		NotifyClient* notifyclient;
+		
   
   // functions
 		QString readTextFile(const char*);

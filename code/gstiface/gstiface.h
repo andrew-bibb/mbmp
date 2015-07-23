@@ -121,6 +121,7 @@ class GST_Interface : public QObject
     QString getAudioStreamInfo();
     QString getVideoStreamInfo();
     QString getTextStreamInfo();
+    void busHandler(GstMessage*);
     // inline function to get private data members
     inline QList<QString> getVisualizerList() {return vismap.keys();}
     inline QList<TocEntry> getTrackList() {return tracklist;}
@@ -137,7 +138,6 @@ class GST_Interface : public QObject
     void setAudioStream(const int&);
     void setVideoStream(const int&);
     void setTextStream(const int&);
-    void pollGstBus();
     void toggleMute();
     void changeVolume(const double&);
     void changeConnectionSpeed(const guint64&);   
@@ -147,7 +147,7 @@ class GST_Interface : public QObject
     inline void cycleAudioStream() {streaminfo->cycleAudioStream();}
     inline void cycleVideoStream() {streaminfo->cycleVideoStream();}
     inline void cycleTextStream()  {streaminfo->cycleTextStream();}
-  
+
   signals:
     void busMessage(int, QString = QString());
     
@@ -155,7 +155,8 @@ class GST_Interface : public QObject
     // members
     GstElement* pipeline_playbin;
     GstBus* bus;
-    QTimer* bus_timer;
+    QTimer* pos_timer;
+    QTimer* dl_timer;
     QMap<QString, GstElementFactory*> vismap; 
     QMap<QString, int> streammap;
     StreamInfo* streaminfo;   
@@ -168,16 +169,15 @@ class GST_Interface : public QObject
     int mediatype;
     bool is_live;
     bool is_buffering;
-    QTimer* dl_timer;
     
     // functions
     void extractTocTrack(const GstTocEntry*);
     void analyzeStream();
-    void queryStreamPosition();
     bool queryStreamSeek();
     gint64 queryDuration();
     
     private slots:
+    void queryStreamPosition();    
     void downloadBuffer();
 };
     
