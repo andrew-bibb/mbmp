@@ -183,7 +183,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (! parser.isSet("loglevel") && diag_settings->useStartOptions() )
 		loglevel = diag_settings->getSetting("StartOptions", "log_level").toInt();
 	if (loglevel < 0 ) loglevel = 0;
-	if (loglevel > 2 ) loglevel = 2; 	
+	if (loglevel > 4 ) loglevel = 4; 	
 					
 	// setup the connection speed
 	quint64 cnxnspeed = 0;
@@ -1021,40 +1021,32 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 				gstiface->seekToPosition(hiatus_resume);
 				hiatus_resume = -1;
 			}
-			switch (loglevel) {
-				case 0:		// case 0 - surpress state change output
-					break;	
-				case 	1:	// case 1 - only output player state changes 
-					if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)) {
-						stream1 << msg << endl;
-						if (logtofile) stream2 << msg << endl;
-					}	// if PLAYER_NAME	
-					break;
-				default: // default (case 2 and above) - output everything	
+			if (loglevel >= 1 && loglevel <= 2) {
+				if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)) {
 					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;				
-			}	// loglevel switch
+					if (logtofile) stream2 << msg << endl;
+				}	// player name if
+			}	// loglevel if	
+			else if (loglevel >= 3) {	//output state change all elements	
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;				
+			}	// loglevel else
 			break;
 						
 		case MBMP_GI::EOS:	// end of stream
-			switch (loglevel) {
-				case 0:		// case 0 supress EOS output
-					break;	
-				default: // otherwise print EOS output
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-				}	// loglevel switch
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
+			
 			ui.actionPlaylistNext->trigger();
 			break;
 			
 		case MBMP_GI::SOS:	// start of stream
-			switch (loglevel) {
-				case 0:		// case 0 supress SOS output
-					break;	
-				default: // otherwise print SOS output
+			if (loglevel >= 3) {
 					stream1 << msg << endl;
 					if (logtofile) stream2 << msg << endl;
-				}	// loglevel switch
+				}	// loglevel sif
 			break;
 			
 		case MBMP_GI::Error:	// all errors printed regardless of loglevel
@@ -1062,19 +1054,18 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			if (logtofile) stream2 << msg << endl;
 			break;
 
-		case MBMP_GI::Warning: //all warnings printed regardless of loglevel
-			stream1 << msg << endl;
-			if (logtofile) stream2 << msg << endl;
+		case MBMP_GI::Warning: 
+			if (loglevel >= 1) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			} // loglevel if
 			break;
 		
 		case MBMP_GI::Info:
-			switch (loglevel) {
-				case 0:		// case 0 supress Info output
-					break;	
-				default: // otherwise print Info output
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
+			if (loglevel >= 2) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
 			break;
 		
 		case MBMP_GI::ClockLost: // message printed regardless of loglevel
@@ -1083,31 +1074,25 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			break;
 			
 		case MBMP_GI::Application:	// a message we posted to the bus
-			switch (loglevel) {
-				case 0:		// case 0 supress output
-					break;	
-				default: // otherwise print output
-					stream1 << "MBMP[Application]: " << msg << endl;
-					if (logtofile) stream2 << "MBMP[Application]: " << msg << endl;
-			}	// loglevel switch
+			if (loglevel >= 2) {
+				stream1 << "MBMP[Application]: " << msg << endl;
+				if (logtofile) stream2 << "MBMP[Application]: " << msg << endl;
+			}	// loglevel if
 			break;
 		
 		case MBMP_GI::Buffering: // buffering messages
 			static bool b_finished = true;
 			
-			switch (loglevel) {
-				case 0:		// no text output
-					break;
-				case 1:		// normally show one buffering message
-					if (b_finished) {
-						stream1 << "Buffering....." << endl;
-						if (logtofile) stream2 << "Buffering" << endl;
-					}
-					break;
-				default:	// case 2 and above, show every message
-					stream1 << "Buffering " << msg << "%" << endl;
-					if (logtofile) stream2 << "Buffering " << msg << "%" << endl;
-			}	// loglevel switch
+			if (loglevel >= 1 && loglevel <= 2) {	// only show message at end	
+				if (b_finished) {	
+					stream1 << "Buffering....." << endl;
+					if (logtofile) stream2 << "Buffering" << endl;
+				}	// if b_finisthed
+			}	// loglevel if
+			else if (loglevel >= 3) {		//show every message
+				stream1 << "Buffering " << msg << "%" << endl;
+				if (logtofile) stream2 << "Buffering " << msg << "%" << endl;
+			}	// loglevel else
 				
 			// conversion should always work since the QString was created by QString::number
 			// check the conversion just in case	
@@ -1128,100 +1113,70 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 			else b_finished = true;
 			break;
 			
-		case MBMP_GI::Unhandled: // a GstBus message we didn't handle (should never get here)
-			switch (loglevel) {
-				case 0:		// case 0 supress output
-					break;
-				default: // otherwise print output
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
+		case MBMP_GI::Unhandled: // a GstBus message we didn't handle
+			if (loglevel >= 2) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
 			break;	// Unhandled GstBus message		
 		
 		case MBMP_GI::Duration:	// a new stream duration message 
-			switch (loglevel) {
-				case 0:		// case 0 supress output
-					break;	
-				default: // otherwise print output
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
 			break;			
 		
 		case MBMP_GI::TOC: // A generic TOC
-			switch (loglevel) {
-				case 0:	// case 0 supress output
-					break;
-				default:	// otherwise show the message
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
 			break;
 		
 		case MBMP_GI::TOCTL: // A TOC with new tracklist
-			switch (loglevel) {
-				case 0:	// case 0 supress output
-					break;
-				default:	// otherwise show the message
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
+			
 			// send the tracklist to the playlist to create playlist entries
 			playlist->addTracks(gstiface->getTrackList());
 			if (playlist->isHidden()) playlist->show();
 			break;
 			
 		case MBMP_GI::Tag:	// a TAG message 
-			switch (loglevel) {
-				case 0: // case 0 supress output
-					break;
-				case 1:	// case 1 supress output
-					break;
-				default: // case 2 and above record the message
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
-		break;
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
+			break;
 		
 		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count
-			switch (loglevel) {
-				case 0: // case 0 supress output
-					break;
-				case 1:	// case 1 supress output
-					break;
-				default: // case 2 and above record the message
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
+			
 			playlist->addChapters(gstiface->getChapterCount() );
 			playlist->lockControls(true);
 			if (playlist->isHidden()) playlist->show();	
-		break;
+			break;
 		
 		case MBMP_GI::TagCC:	// a TAG message indicating a new dvd chapter
-			switch (loglevel) {
-				case 0: // case 0 supress output
-					break;
-				case 1:	// case 1 supress output
-					break;
-				default: // case 2 and above record the message
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
 			playlist->setCurrentChapter(gstiface->getCurrentChapter() );
-		break;
+			break;
 		
 		case MBMP_GI::NewTrack:	// a New Track signal was emitted
-			switch (loglevel) {
-				case 0: // case 0 supress output
-					break;
-				case 1:	// case 1 supress output
-					break;
-				default: // case 2 and above record the message
-					msg = "New track signal emitted";
-					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
-			}	// loglevel switch		
+			if (loglevel >= 3) {
+				msg = "New track signal emitted";
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if		
 		
 			// Set the window title and notifications
 			if (gstiface->getMediaType() == MBMP_GI::DVD)
@@ -1231,23 +1186,23 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					
 				if (playlist->currentItemType() == MBMP_PL::File || playlist->currentItemType() == MBMP_PL::Url) {
 					if(diag_settings->useNotifications() ) {
-							// collect some data
-							qint16 duration = playlist->getCurrentDuration();
-							QTime n(0,0,0);
-							QTime t;
-							t = n.addSecs(duration);
+						// collect some data
+						qint16 duration = playlist->getCurrentDuration();
+						QTime n(0,0,0);
+						QTime t;
+						t = n.addSecs(duration);
 							
-							// build the notification
-							notifyclient->init();
-							if (playlist->getCurrentTitle().isEmpty() ) 
-								notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
-							else {
-								notifyclient->setSummary(playlist->getCurrentTitle() );
-								QString s;
-								if (! playlist->getCurrentArtist().isEmpty() )
-									s.append(tr("\nArtist: %1").arg(playlist->getCurrentArtist()) );
-								if (duration > 0)
-									s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
+						// build the notification
+						notifyclient->init();
+						if (playlist->getCurrentTitle().isEmpty() ) 
+							notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
+						else {
+							notifyclient->setSummary(playlist->getCurrentTitle() );
+							QString s;
+							if (! playlist->getCurrentArtist().isEmpty() )
+								s.append(tr("\nArtist: %1").arg(playlist->getCurrentArtist()) );
+							if (duration > 0)
+								s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
 							notifyclient->setBody(s);
 						}	// else have title
 						notifyclient->setIcon("audio-x-generic");
@@ -1255,12 +1210,19 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 					}	// if useNotifications
 				}	// if media type we want notifications for
 			}	// else not DVD
-		break;		
+			break;		
+		
+		case MBMP_GI::StreamStatus:	// stream status message
+			if (loglevel >= 3) {
+				stream1 << msg << endl;
+				if (logtofile) stream2 << msg << endl;
+			}	// loglevel if
+			break;
 								
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;
 			if (logtofile) stream2 << msg << endl;
-		break;		
+			break;		
 			
 		}	// mtype switch
 			

@@ -354,7 +354,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
     // Set the video overlay and allow it to handle navigation events
     gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(pipeline_playbin), winId);
     gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), TRUE);                
-    
+
     // Bring the pipeline to paused and see if we have a live stream (for buffering)
     ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
 
@@ -946,6 +946,21 @@ void GST_Interface::busHandler(GstMessage* msg)
 				dl_timer->start(500);
 			} // if download flag is set       
 			break; }  // ASYNC_DONE case   
+		
+		// Posted when the stream status changes
+		case GST_MESSAGE_STREAM_STATUS: {
+			GstStreamStatusType type;
+			gst_message_parse_stream_status (msg, &type, NULL);
+			QString s;
+			if (type == GST_STREAM_STATUS_TYPE_CREATE) s = tr("Create");
+			else if (type == GST_STREAM_STATUS_TYPE_ENTER) s = tr("Thread entered its loop function");
+				else if (type == GST_STREAM_STATUS_TYPE_LEAVE) s = tr("Thread left its loop function");
+					else if (type == GST_STREAM_STATUS_TYPE_DESTROY) s = tr("Thread destroyed");
+						else if (type == GST_STREAM_STATUS_TYPE_START) s = tr("Thread started");
+							else if (type == GST_STREAM_STATUS_TYPE_PAUSE) s = tr("Thread paused");
+								else if (type == GST_STREAM_STATUS_TYPE_STOP) s = tr("Thread stopped");
+			emit busMessage(MBMP_GI::StreamStatus, QString(tr("Stream Status: %1").arg(s)) );
+			break; } // GST_STREAM_STATUS case
 		
 		default:
 		QString type = QString(gst_message_type_get_name(GST_MESSAGE_TYPE (msg)) );

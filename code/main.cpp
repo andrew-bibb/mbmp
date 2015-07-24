@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 		QString() );
   parser.addOption(useIconTheme);   
 	
-	QCommandLineOption logLevel(QStringList() << "l" << "loglevel", QCoreApplication::translate("main.cpp", "Set the log level from 0 to 2 (default is 1)."), QCoreApplication::translate("main.cpp", "loglevel"), "1" );
+	QCommandLineOption logLevel(QStringList() << "l" << "loglevel", QCoreApplication::translate("main.cpp", "Set the log level from 0 to 4 (default is 1)."), QCoreApplication::translate("main.cpp", "loglevel"), "1" );
 	parser.addOption(logLevel);  
   
   QCommandLineOption enableSubtitles(QStringList() << "s" << "subtitles", QCoreApplication::translate("main.cpp", "Enable display of subtitles if a subtitle stream is found (default is no subtitles).") );

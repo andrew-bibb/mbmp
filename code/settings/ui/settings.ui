@@ -240,7 +240,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the log level (0-2) with higher numbers displaying more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="maximum">
-          <number>2</number>
+          <number>4</number>
          </property>
          <property name="value">
           <number>1</number>
