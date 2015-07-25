@@ -142,7 +142,7 @@ class GST_Interface : public QObject
     void toggleMute();
     void changeVolume(const double&);
     void changeConnectionSpeed(const guint64&);   
-    void playerStop();
+    inline void playerStop() {gst_element_set_state (pipeline_playbin, GST_STATE_NULL);}
     void toggleStreamInfo();
     // passthrough slots
     inline void cycleAudioStream() {streaminfo->cycleAudioStream();}

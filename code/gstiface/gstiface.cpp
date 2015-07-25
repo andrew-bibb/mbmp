@@ -1,3 +1,4 @@
+
 /**************************** gstiface.cpp *****************************
 
 Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
@@ -62,14 +63,11 @@ static void sourceSetup(GstElement* bin, GstElement* src, QString* opticaldrive)
   // return now if opticaldrive is empty (means we are not playing a CD or DVD)
   if (opticaldrive->isEmpty() ) return;
 
+	// if there is a device property set it 
   g_object_get(G_OBJECT (src), "device", &device, NULL);
-  // if no device (probably a file or url) return. 
-  if (device == NULL)
-    return;
-  // otherwise set the device on the source element
-  else 
-    g_object_set(G_OBJECT (src), "device", opticaldrive->toLocal8Bit().data(), NULL);   
-    
+  if (device != NULL)
+    g_object_set(G_OBJECT (src), "device", qPrintable(opticaldrive->data()), NULL); 
+   
 	return;
 }
 
@@ -357,7 +355,6 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 
     // Bring the pipeline to paused and see if we have a live stream (for buffering)
     ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
-
     switch (ret) {
       case GST_STATE_CHANGE_SUCCESS: 
         is_live = false;
@@ -719,6 +716,16 @@ void GST_Interface::busHandler(GstMessage* msg)
 					case GST_STATE_PAUSED:
 						streaminfo->enableAll(false);
 						break;
+					case GST_STATE_NULL:
+					  opticaldrive.clear();
+					  map_md_cd.clear();
+					  map_md_dvd.clear();
+					  mediatype = MBMP_GI::NotPlaying;
+					  pos_timer->stop();  
+					  is_live = false;
+					  is_buffering = false;
+					  dl_timer->stop();
+						break;	
 					default:
 						streaminfo->updateAudioBox(tr("Audio Information"));
 						streaminfo->updateVideoBox(tr("Video Information"));
@@ -1116,24 +1123,6 @@ void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
   return;
 }
 
-// Slot to stop the player
-void GST_Interface::playerStop()
-{
-  gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
-  
-  // reset data elements
-  opticaldrive.clear();
-  map_md_cd.clear();
-  map_md_dvd.clear();
-  mediatype = MBMP_GI::NotPlaying;
-  pos_timer->stop();  
-  is_live = false;
-  is_buffering = false;
-  dl_timer->stop();
-  
-  return;
-}
-
 //
 // Slot to toggle the streaminfo dialog up and down.  Called from
 // a QAction in various functions
@@ -1238,7 +1227,7 @@ bool GST_Interface::queryStreamSeek()
  // Function to query the stream duration.  Return the duration in 
  // gstreamer standard nanoseconds.  Called from two locations in busHandler
  // one is in the DURATION case which is mainly for VBR streams, and we
- // only treate consider it for informational purposes.  The second is when
+ // only consider it for informational purposes.  The second is when
  // the STATE changes to PLAYING.  This is used to set the duration widgets.
  gint64 GST_Interface::queryDuration()
  {
