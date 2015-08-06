@@ -5,6 +5,9 @@
     <file>text/changelog.txt</file>
     <file>text/license.txt</file>
   </qresource>
+  <qresource prefix="media">
+    <file>media/silence.ogg</file>
+  </qresource>
   <qresource prefix="images">
     <file>images/16x16/help.png</file>
     <file>images/16x16/kscd.png</file>

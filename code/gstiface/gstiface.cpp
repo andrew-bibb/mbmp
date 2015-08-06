@@ -1,4 +1,5 @@
 
+
 /**************************** gstiface.cpp *****************************
 
 Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
@@ -65,9 +66,9 @@ static void sourceSetup(GstElement* bin, GstElement* src, QString* opticaldrive)
 
 	// if there is a device property set it 
   g_object_get(G_OBJECT (src), "device", &device, NULL);
-  if (device != NULL)
+  if (device != NULL) 
     g_object_set(G_OBJECT (src), "device", qPrintable(opticaldrive->data()), NULL); 
-   
+      
 	return;
 }
 
@@ -147,8 +148,58 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   
   // clean up
   g_list_free(list);
-  g_list_free(walk);
+  g_list_free(walk); 
   
+  // This is a hack. When playing Audio CD's I cannot get pipeline_playbin into PAUSED
+  // or PLAYING unless the pipeline has already been in one of those states.  I don't
+  // know why and after weeks of working on it I'm almost convinced it is not something
+  // I've done.  The code below will bring the pipeline into a PAUSED state with an 
+  // audio file that plays silence.     
+  gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
+  
+  QTemporaryFile temp_file;
+  if (! temp_file.open() ) {
+		#if QT_VERSION >= 0x050400 
+			qCritical("Error in GST_Interface Constructor: failed opening temporary file %s", qUtf8Printable(temp_file.fileName()) );
+		# else	
+			qCritical("Error in GST_Interface Constructor: failed opening temporary file %s", qPrintable(temp_file.fileName()) );
+		# endif
+		return;
+	}
+	
+	QFile src_file(":/media/media/silence.ogg");
+	if (! src_file.open(QIODevice::ReadOnly) ) {
+		#if QT_VERSION >= 0x050400 
+			qCritical("Error in GST_Interface Constructor: failed opening source file %s", qUtf8Printable(src_file.fileName()) );
+		# else	
+			qCritical("Error in GST_Interface Constructor: failed opening source file %s", qPrintable(src_file.fileName()) );
+		# endif
+		return;
+	}
+	
+	QByteArray ba = src_file.readAll();
+	qint64 bw = temp_file.write(ba);
+	temp_file.close();
+	src_file.close();
+	if (bw < 0) {
+		#if QT_VERSION >= 0x050400 
+			qCritical("Error in GST_Interface Constructor: failed copying %s to %s",
+			qUtf8Printable(temp_file.fileName()),
+			qUtf8Printable(src_file.fileName()) );
+		# else	
+			qCritical("Error in GST_Interface Constructor: failed copying %s to %s",
+			qPrintable(temp_file.fileName()),
+			qPrintable(src_file.fileName()) );
+		# endif
+		qCritical("Error in GST_Interface Constructor: failed copying silence.ogg to temporary file.");
+		return;
+	}
+	
+	QString s("file://");
+	s.append(temp_file.fileName());
+	g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(s), NULL);
+	gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED);
+
 }
 
 // Destructor
@@ -250,7 +301,7 @@ int GST_Interface::checkCD(QString dev)
   // Clean up
   gst_element_set_state (pipeline_audiocd, GST_STATE_NULL);
   gst_object_unref (GST_OBJECT (pipeline_audiocd));  
-    
+ 
   // So far so go, return no error
   return 0;
 }
@@ -305,7 +356,7 @@ int GST_Interface::checkDVD(QString dev)
     opticaldrive.clear();
     return MBMP_GI::BadDVDRead;
   } 
-  
+  qDebug() << "DVD duration " << duration;
   // Clean up
   gst_element_set_state (pipeline_dvd, GST_STATE_NULL);
   gst_object_unref (GST_OBJECT (pipeline_dvd)); 
@@ -339,7 +390,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
     // start with the pipeline_playbin set to NULL, is_live to false
     gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
     is_live = false;
-    
+  
     // Set the media source. 
     g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(uri), NULL);    
     
@@ -355,6 +406,7 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
 
     // Bring the pipeline to paused and see if we have a live stream (for buffering)
     ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
+    
     switch (ret) {
       case GST_STATE_CHANGE_SUCCESS: 
         is_live = false;

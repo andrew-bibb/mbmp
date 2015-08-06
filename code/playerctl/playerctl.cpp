@@ -68,7 +68,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	hiatus_resume = -1;
 	notifyclient = NULL;
 	
-	
 	// Create the notifyclient, make four tries; first immediately in constructor, then
   // at 1/2 second, 2 seconds and finally at 8 seconds
   notifyclient = new NotifyClient(this);
