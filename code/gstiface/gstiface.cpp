@@ -174,6 +174,7 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 		# else	
 			qCritical("Error in GST_Interface Constructor: failed opening source file %s", qPrintable(src_file.fileName()) );
 		# endif
+		temp_file.close();
 		return;
 	}
 	
