@@ -184,14 +184,13 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 	if (bw < 0) {
 		#if QT_VERSION >= 0x050400 
 			qCritical("Error in GST_Interface Constructor: failed copying %s to %s",
-			qUtf8Printable(temp_file.fileName()),
-			qUtf8Printable(src_file.fileName()) );
+			qUtf8Printable(src_file.fileName()),
+			qUtf8Printable(temp_file.fileName()) );
 		# else	
 			qCritical("Error in GST_Interface Constructor: failed copying %s to %s",
-			qPrintable(temp_file.fileName()),
-			qPrintable(src_file.fileName()) );
+			qPrintable(src_file.fileName()),
+			qPrintable(temp_file.fileName()) );
 		# endif
-		qCritical("Error in GST_Interface Constructor: failed copying silence.ogg to temporary file.");
 		return;
 	}
 	
