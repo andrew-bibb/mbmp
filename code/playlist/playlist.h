@@ -81,6 +81,7 @@ class Playlist : public QDialog
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
+		inline void removeAll() {ui.listWidget_playlist->clear(); updateSummary();}
 		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
 		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}
 		inline void triggerAddPlaylist() {if (ui.actionAddPlaylist->isEnabled()) ui.actionAddPlaylist->trigger();}

@@ -142,7 +142,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionAddURL, SIGNAL(triggered()), this, SLOT(addURL()));
   connect (media_group, SIGNAL(triggered(QAction*)), this, SLOT(addFile(QAction*)));
   connect (ui.actionRemoveItem, SIGNAL(triggered()), this, SLOT(removeItem()));
-  connect (ui.actionRemoveAll, SIGNAL(triggered()), ui.listWidget_playlist, SLOT(clear()));
+  connect (ui.actionRemoveAll, SIGNAL(triggered()), this, SLOT(removeAll()));
   connect (ui.actionHidePlaylist, SIGNAL(triggered()), this, SLOT(hide()));
   connect (ui.listWidget_playlist, SIGNAL(itemDoubleClicked(QListWidgetItem*)), qobject_cast<PlayerControl*>(parent), SLOT(playMedia()));
   connect (ui.actionSavePlaylist, SIGNAL(triggered()), this, SLOT(savePlaylist()));
@@ -453,7 +453,6 @@ void Playlist::removeItem()
 	if (ui.listWidget_playlist->currentRow() >= 0)
 		delete ui.listWidget_playlist->takeItem(ui.listWidget_playlist->currentRow() );
 		
-	
 	// update the summary count
 	this->updateSummary();
 	
@@ -652,9 +651,11 @@ void Playlist::updateSummary()
 	// Variables
 	int totaltime = 0;
 	
-	// Blank out the summary if there are no items in the playlist
+	// If there are no items in the playlist blank out the sumamry
+	// and enable all controls
 	if (ui.listWidget_playlist->count() <= 0) {
 		ui.label_summary->clear();
+		lockControls(false);
 		return;
 	}
 	

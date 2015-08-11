@@ -80,7 +80,7 @@ class PlayerControl : public QDialog
 		void showChangeLog();
 		
 	private slots:
-		void processBusMessages(int, QString);
+		void processGstifaceMessages(int, QString);
 		void changeVolumeDialStep(QAction*);
 		void popupVisualizerMenu();
 		void popupOptionsMenu();

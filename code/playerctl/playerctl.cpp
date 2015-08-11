@@ -478,7 +478,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionPlayPause, SIGNAL (triggered()), this, SLOT(playPause()));
 	connect (ui.toolButton_playpause, SIGNAL(toggled(bool)), options_menu, SLOT(setDisabled(bool)));
 	connect (playlist_group, SIGNAL(triggered(QAction*)), this, SLOT(playMedia(QAction*)));
-	connect (gstiface, SIGNAL(busMessage(int, QString)), this, SLOT(processBusMessages(int, QString)));
+	connect (gstiface, SIGNAL(signalMessage(int, QString)), this, SLOT(processGstifaceMessages(int, QString)));
 	connect (ui.actionAddMedia, SIGNAL (triggered()), playlist, SLOT(addMedia()));
 	connect (ui.actionToggleMute, SIGNAL (triggered()), gstiface, SLOT(toggleMute())); 
 	connect (volume_group, SIGNAL(triggered(QAction*)), this, SLOT(changeVolumeDialStep(QAction*)));
@@ -1007,7 +1007,7 @@ void PlayerControl::showChangeLog()
 //	Slot to process the output from the gstreamer bus
 // 	mtype should be an MBMP enum from the gstiface.h file
 //	msg is an optional qstring to display or send to a file
-void PlayerControl::processBusMessages(int mtype, QString msg)
+void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 {
 	const bool logtofile = logfile.open(QIODevice::Append | QIODevice::Text);
 	QTextStream stream1 (stdout);
@@ -1030,6 +1030,8 @@ void PlayerControl::processBusMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (logtofile) stream2 << msg << endl;				
 			}	// loglevel else
+			// set the duration widgets
+			setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
 			break;
 						
 		case MBMP_GI::EOS:	// end of stream

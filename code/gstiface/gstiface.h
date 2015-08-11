@@ -123,6 +123,8 @@ class GST_Interface : public QObject
     QString getVideoStreamInfo();
     QString getTextStreamInfo();
     void busHandler(GstMessage*);
+    gint64 queryDuration();
+    bool queryStreamSeek();
     // inline function to get private data members
     inline QList<QString> getVisualizerList() {return vismap.keys();}
     inline QList<TocEntry> getTrackList() {return tracklist;}
@@ -150,7 +152,7 @@ class GST_Interface : public QObject
     inline void cycleTextStream()  {streaminfo->cycleTextStream();}
 
   signals:
-    void busMessage(int, QString = QString());
+    void signalMessage(int, QString = QString());
     
   private:
     // members
@@ -174,8 +176,6 @@ class GST_Interface : public QObject
     // functions
     void extractTocTrack(const GstTocEntry*);
     void analyzeStream();
-    bool queryStreamSeek();
-    gint64 queryDuration();
     
     private slots:
     void queryStreamPosition();    
