@@ -119,10 +119,7 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   // Monitor the playbin source-setup signal
   g_signal_connect (GST_ELEMENT(pipeline_playbin), "source-setup", G_CALLBACK (&sourceSetup), &opticaldrive);
   
-  // Create the timers we need and connect them to slots
-  pos_timer = new QTimer(this);
-  connect(pos_timer, SIGNAL(timeout()), this, SLOT(queryStreamPosition()));
-  
+  // Create the timers we need and connect them to slots  
   dl_timer = new QTimer(this);
   connect(dl_timer, SIGNAL(timeout()), this, SLOT(downloadBuffer()));
     
@@ -665,18 +662,18 @@ QString GST_Interface::getTextStreamInfo()
   return s; 
 }
 
- //
- // Function to query the stream duration.  Return the duration in 
- // gstreamer standard nanoseconds.  Called from playerControl
- gint64 GST_Interface::queryDuration()
- {
-  gint64 duration = -1;  // the duration in nanoseconds (nanoseconds!! are you kidding me)
+//
+// Function to query the stream duration.  Return the duration in 
+// gstreamer standard nanoseconds.  Called from playerControl
+gint64 GST_Interface::queryDuration()
+{
+	gint64 duration = -1;  // the duration in nanoseconds (nanoseconds!! are you kidding me)
   
   if (!gst_element_query_duration (pipeline_playbin, GST_FORMAT_TIME, &duration)) {
 		emit signalMessage(MBMP_GI::Info, tr("Info: Could not query the stream duration with GST_FORMAT_TIME") );    
 	}
    
-   return duration;
+  return duration;
 }
 
 //
@@ -708,6 +705,23 @@ bool GST_Interface::queryStreamSeek()
   gst_query_unref (query);
   return static_cast<bool>(seek_enabled);
  }
+ 
+//
+// Function to query the steam position.  Called from PlayerCtl and only
+// when it has been determined that stream is playing.
+gint64 GST_Interface::queryStreamPosition()
+{  
+  gint64 position = 0;  // the position in nanoseconds 
+  
+  // query the position 
+  if (b_positionenabled) {
+		if (!gst_element_query_position (pipeline_playbin, GST_FORMAT_TIME, &position)) {
+			b_positionenabled = false;
+			emit signalMessage(MBMP_GI::Info, tr("Info: Could not query the stream position with GST_FORMAT_TIME") );
+		}  // if query failed     
+  }	// if positionenabled
+  return position;
+} 
 
 //////////////////////////// Public Slots ////////////////////////////
 //
@@ -1012,7 +1026,6 @@ void GST_Interface::busHandler(GstMessage* msg)
 			if (QString(GST_OBJECT_NAME (msg->src)).contains(PLAYER_NAME, Qt::CaseSensitive)) {                                   
 				switch (new_state) {
 					case GST_STATE_PLAYING:
-						pos_timer->start(500);
 						analyzeStream();
 						streaminfo->updateAudioBox(getAudioStreamInfo());
 						streaminfo->updateVideoBox(getVideoStreamInfo());
@@ -1028,8 +1041,7 @@ void GST_Interface::busHandler(GstMessage* msg)
 					  opticaldrive.clear();
 					  map_md_cd.clear();
 					  map_md_dvd.clear();
-					  mediatype = MBMP_GI::NotPlaying;
-					  pos_timer->stop();  
+					  mediatype = MBMP_GI::NotPlaying;  
 					  is_live = false;
 					  is_buffering = false;
 					  dl_timer->stop();
@@ -1287,33 +1299,6 @@ void GST_Interface::busHandler(GstMessage* msg)
 
    
  //////////////////////////// Private Slots //////////////////////////
-//
-// Slot to query the steam position.  Called from QTimer and only
-// when it has been determined that stream is playing
-void GST_Interface::queryStreamPosition()
-{
-	// return now if now playing
-	if (getState() != GST_STATE_PLAYING) return;	
-	
-  // return now if we ever failed getting a stream position
-  if (! b_positionenabled) return;
-  
-  gint64 position = 0;  // the position in nanoseconds 
-  
-  if (!gst_element_query_position (pipeline_playbin, GST_FORMAT_TIME, &position)) {
-    b_positionenabled = false;
-    gst_element_post_message (pipeline_playbin,
-      gst_message_new_application (GST_OBJECT (pipeline_playbin),
-        gst_structure_new ("Application", "MBMP_GI", G_TYPE_STRING, "Error: Could not query the stream position", NULL))); 
-       }  // if query failed
-  else {
-    qobject_cast<PlayerControl*>(mainwidget)->setPositionWidgets(position / (1000 * 1000 * 1000) );
-    
-  } // else query succeeded       
-  
-  return;
-} 
-
 //
 // Slot to download a file, or most of a file to a buffer.  Called from 
 // ASYNC_DONE case of busHandler. I cannot get the example in chapter

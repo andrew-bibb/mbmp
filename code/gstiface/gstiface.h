@@ -125,6 +125,7 @@ class GST_Interface : public QObject
     void busHandler(GstMessage*);
     gint64 queryDuration();
     bool queryStreamSeek();
+    gint64 queryStreamPosition(); 
     // inline function to get private data members
     inline QList<QString> getVisualizerList() {return vismap.keys();}
     inline QList<TocEntry> getTrackList() {return tracklist;}
@@ -158,7 +159,6 @@ class GST_Interface : public QObject
     // members
     GstElement* pipeline_playbin;
     GstBus* bus;
-    QTimer* pos_timer;
     QTimer* dl_timer;
     QMap<QString, GstElementFactory*> vismap; 
     QMap<QString, int> streammap;
@@ -177,8 +177,7 @@ class GST_Interface : public QObject
     void extractTocTrack(const GstTocEntry*);
     void analyzeStream();
     
-    private slots:
-    void queryStreamPosition();    
+    private slots:   
     void downloadBuffer();
 };
     

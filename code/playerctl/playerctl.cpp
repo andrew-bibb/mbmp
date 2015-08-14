@@ -27,7 +27,6 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QtCore/QDebug>
 # include <QLocale>
-# include <QTimer>
 # include <QFile>
 # include <QTextStream>
 # include <QFile>
@@ -67,6 +66,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	videowidget = new VideoWidget(this);
 	hiatus_resume = -1;
 	notifyclient = NULL;
+	pos_timer = new QTimer(this);
 	
 	// Create the notifyclient, make four tries; first immediately in constructor, then
   // at 1/2 second, 2 seconds and finally at 8 seconds
@@ -183,6 +183,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		loglevel = diag_settings->getSetting("StartOptions", "log_level").toInt();
 	if (loglevel < 0 ) loglevel = 0;
 	if (loglevel > 4 ) loglevel = 4; 	
+	b_logtofile = logfile.open(QIODevice::Append | QIODevice::Text);
 					
 	// setup the connection speed
 	quint64 cnxnspeed = 0;
@@ -494,6 +495,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
 	connect (options_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeOptions(QAction*)));
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
+	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
 	
 	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -600,47 +602,13 @@ QList<QKeySequence> PlayerControl::getShortcuts(const QString& cmd)
 }
 
 //
-// Function to set the stream duration stream label.  Called from gstiface
-// when a new stream duration is found.  Int value sent as the argument
-// is the stream duration in seconds.
-void PlayerControl:: setDurationWidgets(int duration, bool seek_enabled)
-{
-	// duration is zero or positive
-	if (duration >= 0 ) {
-		QTime t(0,0,0);
-		t = t.addSecs(duration);
-		ui.label_duration->setText(t.toString("HH:mm:ss") );
-		ui.horizontalSlider_position->setMaximum(duration);
-		ui.horizontalSlider_position->setEnabled(seek_enabled);
-		ui.horizontalSlider_position->setSingleStep(duration / 100 );
-		ui.horizontalSlider_position->setPageStep(duration / 10);
-		// we are playing a DVD enable seeking only after we've got a chapter
-		if (gstiface->getMediaType() == MBMP_GI::DVD) {
-			if (gstiface->getCurrentChapter() > 0 ) seek_group->setEnabled(seek_enabled);
-		}
-		else 
-			seek_group->setEnabled(seek_enabled);
-	}
-	// duration is negative, for instance we just stopped the stream,
-	else {
-		ui.label_duration->setText("00:00:00");
-		ui.label_position->setText("00:00:00");
-		ui.horizontalSlider_position->setMaximum(0);
-		ui.horizontalSlider_position->setSliderPosition(0); 
-		ui.horizontalSlider_position->setEnabled(false);
-		seek_group->setEnabled(false);
-	}
-		
-	return;	
-}
-
-//
 // Function to set the stream position.  This will set both the text
-// label and the slider. Called from gstiface at the beginning of
-// pollGstBus before any other bus message is processed. Position
+// label and the slider. Called from this->pos_timer. Position
 // is the stream position in seconds.
-void PlayerControl::setPositionWidgets(int position)
+void PlayerControl::setPositionWidgets()
 {
+	int position = gstiface->queryStreamPosition() / (1000 * 1000 * 1000);
+	
 	// position is zero or positive
 	if (position >= 0 ) {
 		QTime t(0,0,0);
@@ -808,7 +776,7 @@ void PlayerControl::stopPlaying()
 		
 	// Set window title and duration labels to zero, will also disable seek ui elements
 	this->setDurationWidgets(-1);
-	this->setPositionWidgets(0);
+	this->setPositionWidgets();
 	this->setWindowTitle(LONG_NAME);
 	
 	return;
@@ -1009,35 +977,39 @@ void PlayerControl::showChangeLog()
 //	msg is an optional qstring to display or send to a file
 void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 {
-	const bool logtofile = logfile.open(QIODevice::Append | QIODevice::Text);
 	QTextStream stream1 (stdout);
 	QTextStream stream2 (&logfile);
 	
 	switch (mtype) {
 		case MBMP_GI::State: 
 			// restore stream after hiatus
-			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)  && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) && hiatus_resume >= 0 ) {
+			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) && hiatus_resume >= 0 ) {
 				gstiface->seekToPosition(hiatus_resume);
 				hiatus_resume = -1;
 			}
 			if (loglevel >= 1 && loglevel <= 2) {
 				if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)) {
 					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
+					if (b_logtofile) stream2 << msg << endl;
 				}	// player name if
 			}	// loglevel if	
 			else if (loglevel >= 3) {	//output state change all elements	
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;				
+				if (b_logtofile) stream2 << msg << endl;				
 			}	// loglevel else
+			
 			// set the duration widgets
-			setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
+			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) )
+				setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
+	
+			// start or stop timer based on player state
+			gstiface->getState() == GST_STATE_PLAYING ? pos_timer->start(500) : pos_timer->stop();
 			break;
 						
 		case MBMP_GI::EOS:	// end of stream
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			
 			ui.actionPlaylistNext->trigger();
@@ -1046,38 +1018,38 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 		case MBMP_GI::SOS:	// start of stream
 			if (loglevel >= 3) {
 					stream1 << msg << endl;
-					if (logtofile) stream2 << msg << endl;
+					if (b_logtofile) stream2 << msg << endl;
 				}	// loglevel sif
 			break;
 			
 		case MBMP_GI::Error:	// all errors printed regardless of loglevel
 			stream1 << msg << endl;
-			if (logtofile) stream2 << msg << endl;
+			if (b_logtofile) stream2 << msg << endl;
 			break;
 
 		case MBMP_GI::Warning: 
 			if (loglevel >= 1) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			} // loglevel if
 			break;
 		
 		case MBMP_GI::Info:
 			if (loglevel >= 2) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			break;
 		
 		case MBMP_GI::ClockLost: // message printed regardless of loglevel
 			stream1 << msg << endl;
-			if (logtofile) stream2 << msg << endl;
+			if (b_logtofile) stream2 << msg << endl;
 			break;
 			
 		case MBMP_GI::Application:	// a message we posted to the bus
 			if (loglevel >= 2) {
 				stream1 << "MBMP[Application]: " << msg << endl;
-				if (logtofile) stream2 << "MBMP[Application]: " << msg << endl;
+				if (b_logtofile) stream2 << "MBMP[Application]: " << msg << endl;
 			}	// loglevel if
 			break;
 		
@@ -1087,12 +1059,12 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			if (loglevel >= 1 && loglevel <= 2) {	// only show message at end	
 				if (b_finished) {	
 					stream1 << "Buffering....." << endl;
-					if (logtofile) stream2 << "Buffering" << endl;
+					if (b_logtofile) stream2 << "Buffering" << endl;
 				}	// if b_finisthed
 			}	// loglevel if
 			else if (loglevel >= 3) {		//show every message
 				stream1 << "Buffering " << msg << "%" << endl;
-				if (logtofile) stream2 << "Buffering " << msg << "%" << endl;
+				if (b_logtofile) stream2 << "Buffering " << msg << "%" << endl;
 			}	// loglevel else
 				
 			// conversion should always work since the QString was created by QString::number
@@ -1117,28 +1089,28 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 		case MBMP_GI::Unhandled: // a GstBus message we didn't handle
 			if (loglevel >= 2) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			break;	// Unhandled GstBus message		
 		
 		case MBMP_GI::Duration:	// a new stream duration message 
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			break;			
 		
 		case MBMP_GI::TOC: // A generic TOC
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			break;
 		
 		case MBMP_GI::TOCTL: // A TOC with new tracklist
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			
 			// send the tracklist to the playlist to create playlist entries
@@ -1149,14 +1121,14 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 		case MBMP_GI::Tag:	// a TAG message 
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			break;
 		
 		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			
 			playlist->addChapters(gstiface->getChapterCount() );
@@ -1167,7 +1139,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 		case MBMP_GI::TagCC:	// a TAG message indicating a new dvd chapter
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			playlist->setCurrentChapter(gstiface->getCurrentChapter() );
 			break;
@@ -1176,7 +1148,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			if (loglevel >= 3) {
 				msg = "New track signal emitted";
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if		
 		
 			// Set the window title and notifications
@@ -1216,19 +1188,17 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 		case MBMP_GI::StreamStatus:	// stream status message
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
-				if (logtofile) stream2 << msg << endl;
+				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			break;
 								
 		default:	// should never be here so if we are we had best see the message
 			stream1 << msg << endl;
-			if (logtofile) stream2 << msg << endl;
+			if (b_logtofile) stream2 << msg << endl;
 			break;		
 			
 		}	// mtype switch
-			
-	if (logtofile) logfile.close();
-	
+
 	return;
 }
 
@@ -1305,12 +1275,13 @@ void PlayerControl::cleanUp()
 {
   // write settings
   diag_settings->saveElementGeometry("playerctl", true, this->size(), this->pos() );
-	diag_settings->saveElementGeometry("playlist", playlist->isVisible(),  playlist->size(), playlist->pos() );
-		
+	diag_settings->saveElementGeometry("playlist", playlist->isVisible(),  playlist->size(), playlist->pos() );	
   diag_settings->writeSettings();
-  
   diag_settings->savePlaylist(playlist->getCurrentList(), playlist->getCurrentRow(), ui.horizontalSlider_position->sliderPosition() );
-  
+  			
+  // close b_logtofile			
+	logfile.close();
+	
   return;
 }
 
@@ -1357,6 +1328,41 @@ void PlayerControl::connectNotifyClient()
   } // else we don't have a valid client.
 
   return;
+}
+
+//
+// Function to set the stream duration stream label.  Called from gstiface
+// when a new stream duration is found.  Int value sent as the argument
+// is the stream duration in seconds.
+void PlayerControl::setDurationWidgets(int duration, bool seek_enabled)
+{
+	// duration is zero or positive
+	if (duration >= 0 ) {
+		QTime t(0,0,0);
+		t = t.addSecs(duration);
+		ui.label_duration->setText(t.toString("HH:mm:ss") );
+		ui.horizontalSlider_position->setMaximum(duration);
+		ui.horizontalSlider_position->setEnabled(seek_enabled);
+		ui.horizontalSlider_position->setSingleStep(duration / 100 );
+		ui.horizontalSlider_position->setPageStep(duration / 10);
+		// we are playing a DVD enable seeking only after we've got a chapter
+		if (gstiface->getMediaType() == MBMP_GI::DVD) {
+			if (gstiface->getCurrentChapter() > 0 ) seek_group->setEnabled(seek_enabled);
+		}
+		else 
+			seek_group->setEnabled(seek_enabled);
+	}
+	// duration is negative, for instance we just stopped the stream,
+	else {
+		ui.label_duration->setText("00:00:00");
+		ui.label_position->setText("00:00:00");
+		ui.horizontalSlider_position->setMaximum(0);
+		ui.horizontalSlider_position->setSliderPosition(0); 
+		ui.horizontalSlider_position->setEnabled(false);
+		seek_group->setEnabled(false);
+	}
+		
+	return;	
 }
 
 ////////////////////////////// Protected Functions ////////////////////////////

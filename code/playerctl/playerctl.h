@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QFile>
 # include <QMenu>
 # include <QMessageBox>
+# include <QTimer>
 
 # include "ui_playerctl.h"
 
@@ -56,8 +57,6 @@ class PlayerControl : public QDialog
 	public:
     PlayerControl(const QCommandLineParser&, QWidget* parent = 0);
     QList<QKeySequence> getShortcuts(const QString&);
-    void setDurationWidgets(int, bool seek_enabled = false);
-    void setPositionWidgets(int);
     
   public slots:
 		void changeVolume(int);
@@ -88,6 +87,8 @@ class PlayerControl : public QDialog
 		void changeOptions(QAction*);
     void cleanUp();
     void connectNotifyClient();
+    void setDurationWidgets(int, bool seek_enabled = false);
+    void setPositionWidgets();
 
 	protected:
 		void contextMenuEvent(QContextMenuEvent*);		
@@ -103,6 +104,8 @@ class PlayerControl : public QDialog
     VideoWidget* videowidget;
     ScrollBox* chtsht;
     NotifyClient* notifyclient;
+    QTimer* pos_timer;
+    bool b_logtofile;
  
   // plain members 
 		QActionGroup* playlist_group;    
