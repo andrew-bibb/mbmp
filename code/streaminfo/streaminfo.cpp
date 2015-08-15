@@ -27,11 +27,12 @@ DEALINGS IN THE SOFTWARE.
 
 # include "./code/streaminfo/streaminfo.h"	
 # include "./code/playerctl/playerctl.h"	
+# include "./code/scman/scman.h"
 
 # include <QtCore/QDebug>
 
 
-StreamInfo::StreamInfo(QObject* parent, QWidget* mainwidget) : QDialog()
+StreamInfo::StreamInfo(QObject* parent) : QDialog()
 //StreamInfo::StreamInfo() : QDialog()
 {
   // setup the user interface
@@ -44,9 +45,10 @@ StreamInfo::StreamInfo(QObject* parent, QWidget* mainwidget) : QDialog()
 	this->addAction(ui.actionCycleSubtitle);
 	
 	// now assign the shortcuts to each action
-	ui.actionCycleAudio->setShortcuts(qobject_cast<PlayerControl*>(mainwidget)->getShortcuts("cmd_cycleaudio") );
-	ui.actionCycleVideo->setShortcuts(qobject_cast<PlayerControl*>(mainwidget)->getShortcuts("cmd_cyclevideo") );
-	ui.actionCycleSubtitle->setShortcuts(qobject_cast<PlayerControl*>(mainwidget)->getShortcuts("cmd_cyclesubtitle") );
+	ShortCutManager scman(this);
+	ui.actionCycleAudio->setShortcuts(scman.getKeySequence("cmd_cycleaudio") );
+	ui.actionCycleVideo->setShortcuts(scman.getKeySequence("cmd_cyclevideo") );
+	ui.actionCycleSubtitle->setShortcuts(scman.getKeySequence("cmd_cyclesubtitle") );
 	
 	// create the stream menu
 	stream_menu = new QMenu(this);
@@ -68,7 +70,7 @@ StreamInfo::StreamInfo(QObject* parent, QWidget* mainwidget) : QDialog()
 //	Slot to cycle to the next available audio stream
 //	Called from a QAction
 void StreamInfo::cycleAudioStream()
-{
+{qDebug() << "CYCLE AUDIO";
 	// can't cycle if there is only one or less items
 	if (ui.comboBox_audio->count() <= 1 ) return;
 	

@@ -42,7 +42,7 @@ class StreamInfo : public QDialog
   Q_OBJECT
 
   public:
-		StreamInfo (QObject*, QWidget*);
+		StreamInfo (QObject*);
 		inline void updateAudioBox(const QString& sa) {ui.label_audio->setText(sa);}
 		inline void updateVideoBox(const QString& sv) {ui.label_video->setText(sv);}
 		inline void updateSubtitleBox(const QString& st) {ui.label_subtitles->setText(st);}

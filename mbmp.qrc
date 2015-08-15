@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="text">
+    <file>text/sc_def.txt</file>
     <file>text/icon_def.txt</file>
     <file>text/mbmp.keys</file>
     <file>text/changelog.txt</file>

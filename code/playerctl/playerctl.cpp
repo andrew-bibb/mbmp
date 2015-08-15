@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QTime>
 # include <QFileInfo>
 
+# include "./code/scman/scman.h"
 # include "./code/iconman/iconman.h"
 # include "./code/playerctl/playerctl.h"	
 # include "./code/resource.h"
@@ -59,7 +60,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		else QIcon::setThemeName(INTERNAL_THEME);
 	
 	// data members
-	keymap = new KeyMap(this);
 	playlist = new Playlist(this); 
 	gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
@@ -75,12 +75,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   QTimer::singleShot(500, this, SLOT(connectNotifyClient()));
   QTimer::singleShot(2 * 1000, this, SLOT(connectNotifyClient()));
   QTimer::singleShot(8 * 1000, this, SLOT(connectNotifyClient()));
-
-  // setup the cheatsheet message box
-	chtsht = new ScrollBox(this);
-	chtsht->setWindowTitle(tr("Key Bindings"));
-	chtsht->setDisplayText(keymap->getCheatSheet());
-	chtsht->setWindowModality(Qt::NonModal);	
   
   // setup the user interface
   ui.setupUi(this);	
@@ -414,53 +408,60 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	control_menu->addAction(ui.actionQuit);	
 	
 	// now assign the shortcuts to each action
-	ui.actionTogglePlaylist->setShortcuts(getShortcuts("cmd_playlist"));
-	ui.actionToggleStreamInfo->setShortcuts(getShortcuts("cmd_streaminfo"));
-	ui.actionQuit->setShortcuts(getShortcuts("cmd_quit"));
-	ui.actionToggleGUI->setShortcuts(getShortcuts("cmd_gui"));
-	ui.actionToggleFullscreen->setShortcuts(getShortcuts("cmd_fullscreen"));
-	ui.actionShowCheatsheet->setShortcuts(getShortcuts("cmd_cheatsheet"));
-	ui.actionAbout->setShortcuts(getShortcuts("cmd_about"));
-	ui.actionAboutMBMP->setShortcuts(getShortcuts("cmd_aboutmbmp"));
-	ui.actionAboutNuvola->setShortcuts(getShortcuts("cmd_aboutnuvola"));
-	ui.actionAboutQT->setShortcuts(getShortcuts("cmd_aboutqt"));
-	ui.actionShowLicense->setShortcuts(getShortcuts("cmd_showlicense"));
-	ui.actionShowChangeLog->setShortcuts(getShortcuts("cmd_showchangelog"));
-	ui.actionPlayPause->setShortcuts(getShortcuts("cmd_playpause"));
-	ui.actionPlaylistFirst->setShortcuts(getShortcuts("cmd_playlistfirst"));
-	ui.actionPlaylistBack->setShortcuts(getShortcuts("cmd_playlistprev"));	
-	ui.actionPlaylistNext->setShortcuts(getShortcuts("cmd_playlistnext"));
-	ui.actionPlaylistLast->setShortcuts(getShortcuts("cmd_playlistlast"));
-	ui.actionAddMedia->setShortcuts(getShortcuts("cmd_addmedia"));
-	ui.actionToggleMute->setShortcuts(getShortcuts("cmd_togglemute"));
-	ui.actionVolumeDecreaseStep->setShortcuts(getShortcuts("cmd_voldec"));
-	ui.actionVolumeIncreaseStep->setShortcuts(getShortcuts("cmd_volinc"));
-	ui.actionVisualizer->setShortcuts(getShortcuts("cmd_visualizer"));
-	ui.actionPlayerStop->setShortcuts(getShortcuts("cmd_playerstop"));
-	ui.actionSeekBack10->setShortcuts(getShortcuts("cmd_seek_back_10"));
-	ui.actionSeekFrwd10->setShortcuts(getShortcuts("cmd_seek_frwd_10"));
-	ui.actionSeekBack60->setShortcuts(getShortcuts("cmd_seek_back_60"));
-	ui.actionSeekFrwd60->setShortcuts(getShortcuts("cmd_seek_frwd_60"));
-	ui.actionSeekBack600->setShortcuts(getShortcuts("cmd_seek_back_600"));
-	ui.actionSeekFrwd600->setShortcuts(getShortcuts("cmd_seek_frwd_600"));
-	ui.actionAdvancedMenu->setShortcuts(getShortcuts("cmd_advanced_menu"));
-	ui.actionAVSync->setShortcuts(getShortcuts("cmd_av_sync"));
-	ui.actionColorBalance->setShortcuts(getShortcuts("cmd_color_bal"));
-	ui.actionAudioCD->setShortcuts(getShortcuts("cmd_playaudiocd"));
-	ui.actionDVD->setShortcuts(getShortcuts("cmd_playdvd"));
-	ui.actionDVDBackOneMenu->setShortcuts(getShortcuts("cmd_dvd_back_one_menu"));
-	ui.actionDVDTitleMenu->setShortcuts(getShortcuts("cmd_dvd_title_menu"));
-	ui.actionDVDRootMenu->setShortcuts(getShortcuts("cmd_dvd_root_menu"));
-	ui.actionDVDSubpictureMenu->setShortcuts(getShortcuts("cmd_dvd_subpicture_menu"));
-	ui.actionDVDAudioMenu->setShortcuts(getShortcuts("cmd_dvd_audio_menu"));
-	ui.actionDVDAngleMenu->setShortcuts(getShortcuts("cmd_dvd_angle_menu"));
-	ui.actionDVDChapterMenu->setShortcuts(getShortcuts("cmd_dvd_chapter_menu"));
-	ui.actionDVDLeft->setShortcuts(getShortcuts("cmd_dvd_left"));
-	ui.actionDVDRight->setShortcuts(getShortcuts("cmd_dvd_right"));
-	ui.actionDVDUp->setShortcuts(getShortcuts("cmd_dvd_up"));
-	ui.actionDVDDown->setShortcuts(getShortcuts("cmd_dvd_down"));
-	ui.actionDVDActivate->setShortcuts(getShortcuts("cmd_dvd_activate"));
-	ui.actionOptions->setShortcuts(getShortcuts("cmd_options"));
+	ShortCutManager scman(this);
+	ui.actionTogglePlaylist->setShortcuts(scman.getKeySequence("cmd_playlist"));
+	ui.actionToggleStreamInfo->setShortcuts(scman.getKeySequence("cmd_streaminfo"));
+	ui.actionQuit->setShortcuts(scman.getKeySequence("cmd_quit"));
+	ui.actionToggleGUI->setShortcuts(scman.getKeySequence("cmd_gui"));
+	ui.actionToggleFullscreen->setShortcuts(scman.getKeySequence("cmd_fullscreen"));
+	ui.actionShowCheatsheet->setShortcuts(scman.getKeySequence("cmd_cheatsheet"));
+	ui.actionAbout->setShortcuts(scman.getKeySequence("cmd_about"));
+	ui.actionAboutMBMP->setShortcuts(scman.getKeySequence("cmd_aboutmbmp"));
+	ui.actionAboutNuvola->setShortcuts(scman.getKeySequence("cmd_aboutnuvola"));
+	ui.actionAboutQT->setShortcuts(scman.getKeySequence("cmd_aboutqt"));
+	ui.actionShowLicense->setShortcuts(scman.getKeySequence("cmd_showlicense"));
+	ui.actionShowChangeLog->setShortcuts(scman.getKeySequence("cmd_showchangelog"));
+	ui.actionPlayPause->setShortcuts(scman.getKeySequence("cmd_playpause"));
+	ui.actionPlaylistFirst->setShortcuts(scman.getKeySequence("cmd_playlistfirst"));
+	ui.actionPlaylistBack->setShortcuts(scman.getKeySequence("cmd_playlistprev"));	
+	ui.actionPlaylistNext->setShortcuts(scman.getKeySequence("cmd_playlistnext"));
+	ui.actionPlaylistLast->setShortcuts(scman.getKeySequence("cmd_playlistlast"));
+	ui.actionAddMedia->setShortcuts(scman.getKeySequence("cmd_addmedia"));
+	ui.actionToggleMute->setShortcuts(scman.getKeySequence("cmd_togglemute"));
+	ui.actionVolumeDecreaseStep->setShortcuts(scman.getKeySequence("cmd_voldec"));
+	ui.actionVolumeIncreaseStep->setShortcuts(scman.getKeySequence("cmd_volinc"));
+	ui.actionVisualizer->setShortcuts(scman.getKeySequence("cmd_visualizer"));
+	ui.actionPlayerStop->setShortcuts(scman.getKeySequence("cmd_playerstop"));
+	ui.actionSeekBack10->setShortcuts(scman.getKeySequence("cmd_seek_back_10"));
+	ui.actionSeekFrwd10->setShortcuts(scman.getKeySequence("cmd_seek_frwd_10"));
+	ui.actionSeekBack60->setShortcuts(scman.getKeySequence("cmd_seek_back_60"));
+	ui.actionSeekFrwd60->setShortcuts(scman.getKeySequence("cmd_seek_frwd_60"));
+	ui.actionSeekBack600->setShortcuts(scman.getKeySequence("cmd_seek_back_600"));
+	ui.actionSeekFrwd600->setShortcuts(scman.getKeySequence("cmd_seek_frwd_600"));
+	ui.actionAdvancedMenu->setShortcuts(scman.getKeySequence("cmd_advanced_menu"));
+	ui.actionAVSync->setShortcuts(scman.getKeySequence("cmd_av_sync"));
+	ui.actionColorBalance->setShortcuts(scman.getKeySequence("cmd_color_bal"));
+	ui.actionAudioCD->setShortcuts(scman.getKeySequence("cmd_playaudiocd"));
+	ui.actionDVD->setShortcuts(scman.getKeySequence("cmd_playdvd"));
+	ui.actionDVDBackOneMenu->setShortcuts(scman.getKeySequence("cmd_dvd_back_one_menu"));
+	ui.actionDVDTitleMenu->setShortcuts(scman.getKeySequence("cmd_dvd_title_menu"));
+	ui.actionDVDRootMenu->setShortcuts(scman.getKeySequence("cmd_dvd_root_menu"));
+	ui.actionDVDSubpictureMenu->setShortcuts(scman.getKeySequence("cmd_dvd_subpicture_menu"));
+	ui.actionDVDAudioMenu->setShortcuts(scman.getKeySequence("cmd_dvd_audio_menu"));
+	ui.actionDVDAngleMenu->setShortcuts(scman.getKeySequence("cmd_dvd_angle_menu"));
+	ui.actionDVDChapterMenu->setShortcuts(scman.getKeySequence("cmd_dvd_chapter_menu"));
+	ui.actionDVDLeft->setShortcuts(scman.getKeySequence("cmd_dvd_left"));
+	ui.actionDVDRight->setShortcuts(scman.getKeySequence("cmd_dvd_right"));
+	ui.actionDVDUp->setShortcuts(scman.getKeySequence("cmd_dvd_up"));
+	ui.actionDVDDown->setShortcuts(scman.getKeySequence("cmd_dvd_down"));
+	ui.actionDVDActivate->setShortcuts(scman.getKeySequence("cmd_dvd_activate"));
+	ui.actionOptions->setShortcuts(scman.getKeySequence("cmd_options"));
+
+  // setup the cheatsheet message box
+	chtsht = new ScrollBox(this);
+	chtsht->setWindowTitle(tr("Key Bindings"));
+	chtsht->setDisplayText(scman.getCheatSheet());
+	chtsht->setWindowModality(Qt::NonModal);	
 	
   // connect signals to slots 
   connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
@@ -500,42 +501,42 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
 	this->addAction(pl_Act01);
-	pl_Act01->setShortcuts(getShortcuts("cmd_addaudio") );
+	pl_Act01->setShortcuts(scman.getKeySequence("cmd_addaudio") );
 	connect (pl_Act01, SIGNAL(triggered()), playlist, SLOT(triggerAddAudio()));
 	
 	QAction* pl_Act02 = new QAction(this);
 	this->addAction(pl_Act02);
-	pl_Act02->setShortcuts(getShortcuts("cmd_addvideo") );
+	pl_Act02->setShortcuts(scman.getKeySequence("cmd_addvideo") );
 	connect (pl_Act02, SIGNAL(triggered()), playlist, SLOT(triggerAddVideo()));
 	
 	QAction* pl_Act03 = new QAction(this);
 	this->addAction(pl_Act03);
-	pl_Act03->setShortcuts(getShortcuts("cmd_addplaylist") );
+	pl_Act03->setShortcuts(scman.getKeySequence("cmd_addplaylist") );
 	connect (pl_Act03, SIGNAL(triggered()), playlist, SLOT(triggerAddPlaylist()));
 	
 	QAction* pl_Act04 = new QAction(this);
 	this->addAction(pl_Act04);
-	pl_Act04->setShortcuts(getShortcuts("cmd_addfile") );
+	pl_Act04->setShortcuts(scman.getKeySequence("cmd_addfile") );
 	connect (pl_Act04, SIGNAL(triggered()), playlist, SLOT(triggerAddFiles()));	
 	
 	QAction* pl_Act05 = new QAction(this);
 	this->addAction(pl_Act05);
-	pl_Act05->setShortcuts(getShortcuts("cmd_addurl") );
+	pl_Act05->setShortcuts(scman.getKeySequence("cmd_addurl") );
 	connect (pl_Act05, SIGNAL(triggered()), playlist, SLOT(addURL()));	
 	
 	QAction* pl_Act06 = new QAction(this);
 	this->addAction(pl_Act06);
-	pl_Act06->setShortcuts(getShortcuts("cmd_cycleaudio") );
+	pl_Act06->setShortcuts(scman.getKeySequence("cmd_cycleaudio") );
 	connect (pl_Act06, SIGNAL(triggered()), gstiface, SLOT(cycleAudioStream()));		
 		
 	QAction* pl_Act07 = new QAction(this);
 	this->addAction(pl_Act07);
-	pl_Act07->setShortcuts(getShortcuts("cmd_cyclevideo") );
+	pl_Act07->setShortcuts(scman.getKeySequence("cmd_cyclevideo") );
 	connect (pl_Act07, SIGNAL(triggered()), gstiface, SLOT(cycleVideoStream()));
 		
 	QAction* pl_Act08 = new QAction(this);
 	this->addAction(pl_Act08);
-	pl_Act08->setShortcuts(getShortcuts("cmd_cyclesubtitle") );
+	pl_Act08->setShortcuts(scman.getKeySequence("cmd_cyclesubtitle") );
 	connect (pl_Act08, SIGNAL(triggered()), gstiface, SLOT(cycleTextStream()));		
 
 	//restore GUI elements
@@ -591,16 +592,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 
 
 ////////////////////////////// Public Functions ////////////////////////////
-// 
-// Function to get a list of shortcuts from the keymap.  Needed only
-// for access from other classes that have this as a parent (for
-// instance class "playlist".  Otherwise we could just call keymap->getKeySequence
-// from here. 
-QList<QKeySequence> PlayerControl::getShortcuts(const QString& cmd)
-{
-	return keymap->getKeySequence(cmd);
-}
-
 //
 // Function to set the stream position.  This will set both the text
 // label and the slider. Called from this->pos_timer. Position

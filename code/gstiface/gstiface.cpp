@@ -92,7 +92,6 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   is_buffering = false;       // true if we are currently buffering
   vismap.clear();
   streammap.clear();
-  mainwidget = qobject_cast<QWidget*>(parent);
   opticaldrive.clear();
   tracklist.clear();
   map_md_cd.clear();        // map containing CD metadata
@@ -102,7 +101,7 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
                             // or the display with failed position messages                 
   
   // setup the dialog to display stream info
-  streaminfo = new StreamInfo(this, mainwidget);
+  streaminfo = new StreamInfo(this);
   streaminfo->enableAll(false);
     
   // initialize gstreamer

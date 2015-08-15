@@ -56,7 +56,6 @@ class PlayerControl : public QDialog
 	
 	public:
     PlayerControl(const QCommandLineParser&, QWidget* parent = 0);
-    QList<QKeySequence> getShortcuts(const QString&);
     
   public slots:
 		void changeVolume(int);
@@ -99,7 +98,6 @@ class PlayerControl : public QDialog
     Ui::PlayerControl ui;
     Settings* diag_settings;
     GST_Interface* gstiface;
-    KeyMap* keymap;
     Playlist* playlist;
     VideoWidget* videowidget;
     ScrollBox* chtsht;

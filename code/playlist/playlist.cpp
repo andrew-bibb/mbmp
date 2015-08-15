@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/playerctl/playerctl.h"
 # include "./code/resource.h"
 # include "./code/iconman/iconman.h"
+# include "./code/scman/scman.h"
 
 # include <QtCore/QDebug>
 # include <QFileDialog>
@@ -123,17 +124,18 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	playlist_menu->addAction(ui.actionHidePlaylist);	
 		  
   // add the shortcuts defined by the user to the actions
-  ui.actionMoveUp->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_moveup") );
-  ui.actionMoveDown->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_movedown") );
-  ui.actionAddAudio->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addaudio") );
-  ui.actionAddVideo->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addvideo") );
-  ui.actionAddPlaylist->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addplaylist") );
-  ui.actionAddFiles->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addfile") );
-  ui.actionAddURL->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_addurl") );  
-  ui.actionRemoveItem->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_removeitem") );
-  ui.actionRemoveAll->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_removeall") );
-  ui.actionHidePlaylist->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_playlist") );
-  ui.actionSavePlaylist->setShortcuts(qobject_cast<PlayerControl*>(parent)->getShortcuts("cmd_saveplaylist") );
+  ShortCutManager scman(this);
+  ui.actionMoveUp->setShortcuts(scman.getKeySequence("cmd_moveup") );
+  ui.actionMoveDown->setShortcuts(scman.getKeySequence("cmd_movedown") );
+  ui.actionAddAudio->setShortcuts(scman.getKeySequence("cmd_addaudio") );
+  ui.actionAddVideo->setShortcuts(scman.getKeySequence("cmd_addvideo") );
+  ui.actionAddPlaylist->setShortcuts(scman.getKeySequence("cmd_addplaylist") );
+  ui.actionAddFiles->setShortcuts(scman.getKeySequence("cmd_addfile") );
+  ui.actionAddURL->setShortcuts(scman.getKeySequence("cmd_addurl") );  
+  ui.actionRemoveItem->setShortcuts(scman.getKeySequence("cmd_removeitem") );
+  ui.actionRemoveAll->setShortcuts(scman.getKeySequence("cmd_removeall") );
+  ui.actionHidePlaylist->setShortcuts(scman.getKeySequence("cmd_playlist") );
+  ui.actionSavePlaylist->setShortcuts(scman.getKeySequence("cmd_saveplaylist") );
   
   // connect signals to slots
   connect (ui.actionMoveUp, SIGNAL(triggered()), this, SLOT(moveItemUp()));

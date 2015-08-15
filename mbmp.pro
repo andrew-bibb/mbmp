@@ -16,7 +16,6 @@ INSTALLS += target
 #	header files
 HEADERS		+= ./code/resource.h
 HEADERS 	+= ./code/playerctl/playerctl.h
-HEADERS 	+= ./code/keymap/keymap.h
 HEADERS 	+= ./code/playlist/playlist.h
 HEADERS 	+= ./code/playlist/playlistitem.h
 HEADERS 	+= ./code/gstiface/gstiface.h
@@ -26,6 +25,7 @@ HEADERS		+= ./code/scrollbox/scrollbox.h
 HEADERS		+= ./code/settings/settings.h
 HEADERS		+= ./code/iconman/iconman.h
 HEADERS		+= ./code/notify/notify.h
+HEADERS		+= ./code/scman/scman.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
@@ -37,7 +37,6 @@ FORMS		+= ./code/settings/ui/settings.ui
 #	sources
 SOURCES	+= ./code/main.cpp
 SOURCES	+= ./code/playerctl/playerctl.cpp
-SOURCES	+= ./code/keymap/keymap.cpp
 SOURCES	+= ./code/playlist/playlist.cpp
 SOURCES	+= ./code/playlist/playlistitem.cpp
 SOURCES	+= ./code/gstiface/gstiface.cpp
@@ -47,6 +46,7 @@ SOURCES += ./code/scrollbox/scrollbox.cpp
 SOURCES += ./code/settings/settings.cpp
 SOURCES += ./code/iconman/iconman.cpp
 SOURCES += ./code/notify/notify.cpp
+SOURCES += ./code/scman/scman.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc

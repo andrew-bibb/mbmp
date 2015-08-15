@@ -40,10 +40,10 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 {
 	// Set the cfg member (path to ${home}/.config/mbmp
 	// APP defined in resource.h
-	cfg = QString(qPrintable(QDir::homePath().append(QString("/.config/%1/%1.icon").arg(QString(APP).toLower()))) );	
+	cfg = QDir::homePath().append(QString("/.config/%1/%1.keys").arg(QString(APP).toLower()) );	
 	
 	// Set the qrc data member
-	qrc = QString(qPrintable(QString(":/text/text/icon_def.txt")) );
+	qrc = QString(":/text/text/icon_def.txt");
 	
 	// Initialize icon_map
 	icon_map.clear();
@@ -51,7 +51,7 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 	// Make the local conf file if necessary
 	this->makeLocalFile();	
 	
-	// Create the icon_ map.   
+	// Create the icon_map.   
 	QFile f1(cfg);
 	if (!f1.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		#if QT_VERSION >= 0x050400 
@@ -59,7 +59,8 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 		# else	
 			qCritical("Error opening icon_def file: %s", qPrintable(cfg) );
 		# endif
-	}
+		return;
+	}	// if
 			
 	QTextStream in(&f1);
 	QString line;
@@ -81,7 +82,7 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 		}	// if [icon]
 	}	// while not atEnd()
 	f1.close();
-	
+
 	return;
 }
 
