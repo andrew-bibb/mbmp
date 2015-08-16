@@ -52,7 +52,7 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 	this->makeLocalFile();	
 	
 	// Create the icon_map.   
-	QFile f1(cfg);
+	QFile f1(qPrintable(cfg) );
 	if (!f1.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		#if QT_VERSION >= 0x050400 
 			qCritical("Error opening icon_def file: %s", qUtf8Printable(cfg) );

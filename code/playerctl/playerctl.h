@@ -44,7 +44,6 @@ DEALINGS IN THE SOFTWARE.
 
 # include "./code/settings/settings.h"
 # include "./code/gstiface/gstiface.h"
-# include "./code/keymap/keymap.h"
 # include "./code/playlist/playlist.h"
 # include "./code/videowidget/videowidget.h"
 # include "./code/scrollbox/scrollbox.h"
