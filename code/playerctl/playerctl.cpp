@@ -66,6 +66,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	videowidget = new VideoWidget(this);
 	hiatus_resume = -1;
 	notifyclient = NULL;
+	ipcagent = new IPC_Agent(this);
 	pos_timer = new QTimer(this);
 	
 	// Create the notifyclient, make four tries; first immediately in constructor, then
@@ -1141,7 +1142,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if		
-		
+
 			// Set the window title and notifications
 			if (gstiface->getMediaType() == MBMP_GI::DVD)
 				this->setWindowTitle(msg);
@@ -1272,6 +1273,9 @@ void PlayerControl::cleanUp()
   			
   // close b_logtofile			
 	logfile.close();
+	
+	// stop the ipc agent
+	ipcagent->stopAgent();
 	
   return;
 }

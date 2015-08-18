@@ -48,6 +48,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/videowidget/videowidget.h"
 # include "./code/scrollbox/scrollbox.h"
 # include "./code/notify/notify.h"
+# include "./code/ipc/ipcagent.h"
 
 class PlayerControl : public QDialog
 {
@@ -101,6 +102,7 @@ class PlayerControl : public QDialog
     VideoWidget* videowidget;
     ScrollBox* chtsht;
     NotifyClient* notifyclient;
+    IPC_Agent* ipcagent;
     QTimer* pos_timer;
     bool b_logtofile;
  

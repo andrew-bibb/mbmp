@@ -13,6 +13,10 @@ TEMPLATE = app
 target.path = /usr/bin/
 INSTALLS += target
 
+# dbus
+DBUS_ADAPTORS		+= ./code/ipc/org.monkey_business_enterprises.ipcagent.xml
+DBUS_INTERFACES	+= ./code/ipc/org.monkey_business_enterprises.ipcagent.xml
+
 #	header files
 HEADERS		+= ./code/resource.h
 HEADERS 	+= ./code/playerctl/playerctl.h
@@ -26,6 +30,7 @@ HEADERS		+= ./code/settings/settings.h
 HEADERS		+= ./code/iconman/iconman.h
 HEADERS		+= ./code/notify/notify.h
 HEADERS		+= ./code/scman/scman.h
+HEADERS		+= ./code/ipc/ipcagent.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
@@ -47,6 +52,7 @@ SOURCES += ./code/settings/settings.cpp
 SOURCES += ./code/iconman/iconman.cpp
 SOURCES += ./code/notify/notify.cpp
 SOURCES += ./code/scman/scman.cpp
+SOURCES += ./code/ipc/ipcagent.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc
