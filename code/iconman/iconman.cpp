@@ -40,7 +40,7 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 {
 	// Set the cfg member (path to ${home}/.config/mbmp
 	// APP defined in resource.h
-	cfg = QDir::homePath().append(QString("/.config/%1/%1.keys").arg(QString(APP).toLower()) );	
+	cfg = QDir::homePath().append(QString("/.config/%1/%1.icon").arg(QString(APP).toLower()) );	
 	
 	// Set the qrc data member
 	qrc = QString(":/text/text/icon_def.txt");
@@ -61,6 +61,7 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 		# endif
 		return;
 	}	// if
+
 			
 	QTextStream in(&f1);
 	QString line;
@@ -69,20 +70,20 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 		line = line.simplified();
 		if (line.startsWith("[icon]", Qt::CaseInsensitive) ) {
 			IconElement ie;
-			QString iconame;
+			QString iconname;
 			do {
 				line = in.readLine();
-				if (line.startsWith("icon_name", Qt::CaseInsensitive) ) iconame = extractValue(line);
+				if (line.startsWith("icon_name", Qt::CaseInsensitive) ) iconname = extractValue(line);
 					else if (line.startsWith("resource", Qt::CaseInsensitive) ) ie.resource_path = extractValue(line);
 						else if (line.startsWith("fdo_name", Qt::CaseInsensitive) ) ie.fdo_name = extractValue(line);
 							else if (line.startsWith("theme_names", Qt::CaseInsensitive) ) ie.name_list = extractValue(line).split(',', QString::SkipEmptyParts) ;
 			} while ( ! line.isEmpty() );
 		
-			icon_map[iconame] = ie;
+			icon_map[iconname] = ie;
 		}	// if [icon]
 	}	// while not atEnd()
 	f1.close();
-
+	
 	return;
 }
 

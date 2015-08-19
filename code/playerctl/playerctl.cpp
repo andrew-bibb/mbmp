@@ -499,6 +499,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
 	
+	connect(ipcagent, SIGNAL(controlStop()), ui.actionPlayerStop, SLOT(trigger()));
+	connect(ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
+	connect(ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
+	connect(ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
+	
 	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
 	this->addAction(pl_Act01);
@@ -1175,6 +1180,14 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 					}	// if useNotifications
 				}	// if media type we want notifications for
 			}	// else not DVD
+			
+			// Pass information to ipcagent
+			ipcagent->init();
+			ipcagent->addEntry("Title", playlist->getCurrentTitle() );
+			ipcagent->addEntry("Artist", playlist->getCurrentArtist() );
+			ipcagent->addEntry("Duration", playlist->getCurrentDuration() );
+			ipcagent->newTrack();
+			
 			break;		
 		
 		case MBMP_GI::StreamStatus:	// stream status message

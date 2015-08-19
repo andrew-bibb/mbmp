@@ -45,8 +45,8 @@ DEALINGS IN THE SOFTWARE.
 //  constructor
 IPC_Agent::IPC_Agent(QObject* parent) : QObject(parent)
 {
-  //  Create ipcagentadaptor  
-  new IpcagentAdaptor(this);  
+  //  Create ipcagentadaptor    
+  new IPCAdaptor(this);
 
 	// Try to register a service on the system bus
 	if (! QDBusConnection::sessionBus().registerService(IPC_SERVICE)) {
@@ -96,11 +96,4 @@ void IPC_Agent::stopAgent()
     
 /////////////////////// Public Slots (Methods) //////////////////////////
 //
-// Function to stop the player
-void IPC_Agent::stopPlayer()
-{
-	
-	qDebug() << "!!!!!!!!!!!!!! INSIDE STOP PLAYER !!!!!!!!!!!!!!!!!!!!!!!";
-	
-	return;
-}
+

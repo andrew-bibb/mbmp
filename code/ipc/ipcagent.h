@@ -34,23 +34,35 @@ DEALINGS IN THE SOFTWARE.
 # include <QObject>
 # include <QtDBus/QDBusContext>
 # include <QVariant>
+# include <QMap>
+
 
 class IPC_Agent : public QObject, protected QDBusContext
 {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", "org.mbmp.ipcagent")
+  Q_CLASSINFO("D-Bus Interface", "org.mbmp.IPC")
 
   public:
     IPC_Agent(QObject* parent = 0);
  
 		// functions
 		void stopAgent();
+		inline void init() {vmap.clear();}
+		inline void addEntry(QString key,QVariant val) {vmap[key] = val;}
   
-  public slots:
-		void stopPlayer();   
+	public Q_SLOTS:
+		inline void stopPlayer() {emit controlStop();} 
+		inline void playPause() {emit controlPlaypause();}
+		inline void playlistNext() {emit controlPlaylistNext();}
+		inline void playlistBack() {emit controlPlaylistBack();}
+		inline void newTrack() {emit trackChanged(vmap);}
 	
-	signals:
-//i	void trackChanged(QVariantMap);
+	Q_SIGNALS:
+		Q_SCRIPTABLE void trackChanged(QVariantMap);
+		void controlStop();
+		void controlPlaypause();
+		void controlPlaylistNext();
+		void controlPlaylistBack();
 		
 	private:
 		// data members

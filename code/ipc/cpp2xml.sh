@@ -5,4 +5,5 @@
 #	-M	all public slots
 #	-P	all properties
 # -S  all signals
-qdbuscpp2xml -M -S ipcagent.h -o org.monkey_business_enterprises.ipcagent.xml
+# -s	all scriptable signals
+qdbuscpp2xml -M -s ipcagent.h -o org.monkey_business_enterprises.ipcagent.xml
