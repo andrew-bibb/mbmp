@@ -71,6 +71,8 @@ IPC_Agent::IPC_Agent(QObject* parent) : QObject(parent)
 		
 		// data members
 		vmap.clear();
+		keywords.clear();
+		keywords << "sequence" << "uri" << "artist" << "title" << "duration";
 		
   return;
 }  
@@ -95,5 +97,4 @@ void IPC_Agent::stopAgent()
 }
     
 /////////////////////// Public Slots (Methods) //////////////////////////
-//
 

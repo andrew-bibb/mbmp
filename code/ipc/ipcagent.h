@@ -35,7 +35,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QtDBus/QDBusContext>
 # include <QVariant>
 # include <QMap>
-
+# include <QStringList>
 
 class IPC_Agent : public QObject, protected QDBusContext
 {
@@ -48,17 +48,24 @@ class IPC_Agent : public QObject, protected QDBusContext
 		// functions
 		void stopAgent();
 		inline void init() {vmap.clear();}
-		inline void addEntry(QString key,QVariant val) {vmap[key] = val;}
+		inline void setProperty(const QString& key, QVariant val) {if (keywords.contains(key, Qt::CaseInsensitive)) vmap[key.simplified().toLower()] = val;} 
   
 	public Q_SLOTS:
-		inline void stopPlayer() {emit controlStop();} 
-		inline void playPause() {emit controlPlaypause();}
-		inline void playlistNext() {emit controlPlaylistNext();}
-		inline void playlistBack() {emit controlPlaylistBack();}
-		inline void newTrack() {emit trackChanged(vmap);}
+		Q_SCRIPTABLE inline void stopPlayer() {emit controlStop();} 
+		Q_SCRIPTABLE inline void playPause() {emit controlPlaypause();}
+		Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
+		Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
+		Q_SCRIPTABLE inline int getSequence() { return vmap.value("sequence").toInt();}
+		Q_SCRIPTABLE inline QString getUri() { return vmap.value("uri").toString();}
+		Q_SCRIPTABLE inline QString getArtist() { return vmap.value("artist").toString();}
+		Q_SCRIPTABLE inline QString getTitle() { return vmap.value("title").toString();}
+		Q_SCRIPTABLE inline qlonglong getDuration() { return vmap.value("duration").toLongLong();}
+		
+		inline void updatedTrackInfo() {emit trackChanged(vmap);}
 	
 	Q_SIGNALS:
 		Q_SCRIPTABLE void trackChanged(QVariantMap);
+		
 		void controlStop();
 		void controlPlaypause();
 		void controlPlaylistNext();
@@ -67,6 +74,7 @@ class IPC_Agent : public QObject, protected QDBusContext
 	private:
 		// data members
 		QVariantMap vmap;	
+		QStringList keywords;
 };  
 
 #endif

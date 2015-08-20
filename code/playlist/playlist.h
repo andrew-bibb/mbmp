@@ -93,7 +93,7 @@ class Playlist : public QDialog
 		inline int getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
 		inline QString getCurrentTitle() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTitle();}
 		inline QString getCurrentArtist() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getArtist();}
-		inline qint16 getCurrentDuration() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration();}
+		inline qint64 getCurrentDuration() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration();}
 		inline bool isCurrentPlayable() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable();}
 		inline int getCurrentRow() {return ui.listWidget_playlist->currentRow();}
 		inline void setCurrentRow(const int& row) {ui.listWidget_playlist->setCurrentRow(row);}

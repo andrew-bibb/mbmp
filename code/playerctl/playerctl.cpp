@@ -1182,11 +1182,14 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			}	// else not DVD
 			
 			// Pass information to ipcagent
+			qDebug() << "!!!!!!!!!	 NEW TAG !!!!!!!!!!! MGS = " << msg;
 			ipcagent->init();
-			ipcagent->addEntry("Title", playlist->getCurrentTitle() );
-			ipcagent->addEntry("Artist", playlist->getCurrentArtist() );
-			ipcagent->addEntry("Duration", playlist->getCurrentDuration() );
-			ipcagent->newTrack();
+			ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
+			ipcagent->setProperty("uri", playlist->getCurrentUri() );
+			ipcagent->setProperty("artist", playlist->getCurrentArtist() );
+			ipcagent->setProperty("title", playlist->getCurrentTitle() );
+			ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
+			ipcagent->updatedTrackInfo();
 			
 			break;		
 		

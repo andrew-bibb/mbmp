@@ -13,7 +13,20 @@
     </method>
     <method name="playlistBack">
     </method>
-    <method name="newTrack">
+    <method name="getSequence">
+      <arg type="i" direction="out"/>
+    </method>
+    <method name="getUri">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="getArtist">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="getTitle">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="getDuration">
+      <arg type="x" direction="out"/>
     </method>
   </interface>
 </node>
