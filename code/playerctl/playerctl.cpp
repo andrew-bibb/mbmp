@@ -1001,6 +1001,52 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 	
 			// start or stop timer based on player state
 			gstiface->getState() == GST_STATE_PLAYING ? pos_timer->start(500) : pos_timer->stop();
+			
+			//// Set the window title and notifications
+			//if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && gstiface->getState() == GST_STATE_PLAYING) {
+				//if (gstiface->getMediaType() == MBMP_GI::DVD)
+					//this->setWindowTitle(msg);
+				//else {
+					//this->setWindowTitle(playlist->getWindowTitle() );
+						
+					//if (playlist->currentItemType() == MBMP_PL::File || playlist->currentItemType() == MBMP_PL::Url) {
+						//if(diag_settings->useNotifications() ) {
+							//// collect some data
+							//qint16 duration = playlist->getCurrentDuration();
+							//QTime n(0,0,0);
+							//QTime t;
+							//t = n.addSecs(duration);
+								
+							//// build the notification
+							//notifyclient->init();
+							//if (playlist->getCurrentTitle().isEmpty() ) 
+								//notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
+							//else {
+								//notifyclient->setSummary(playlist->getCurrentTitle() );
+								//QString s;
+								//if (! playlist->getCurrentArtist().isEmpty() )
+									//s.append(tr("\nArtist: %1").arg(playlist->getCurrentArtist()) );
+								//if (duration > 0)
+									//s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
+								//notifyclient->setBody(s);
+							//}	// else have title
+							//notifyclient->setIcon("audio-x-generic");
+							//notifyclient->sendNotification();
+						//}	// if useNotifications
+					//}	// if media type we want notifications for
+				//}	// else not DVD
+				
+				//// Pass information to ipcagent
+				//ipcagent->init();
+				//ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
+				//ipcagent->setProperty("uri", playlist->getCurrentUri() );
+				//ipcagent->setProperty("artist", playlist->getCurrentArtist() );
+				//ipcagent->setProperty("title", playlist->getCurrentTitle() );
+				//ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
+				//ipcagent->updatedTrackInfo();
+			//}
+			
+			
 			break;
 						
 		case MBMP_GI::EOS:	// end of stream
@@ -1146,51 +1192,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				msg = "New track signal emitted";
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
-			}	// loglevel if		
-
-			// Set the window title and notifications
-			if (gstiface->getMediaType() == MBMP_GI::DVD)
-				this->setWindowTitle(msg);
-			else {
-				this->setWindowTitle(playlist->getWindowTitle() );
-					
-				if (playlist->currentItemType() == MBMP_PL::File || playlist->currentItemType() == MBMP_PL::Url) {
-					if(diag_settings->useNotifications() ) {
-						// collect some data
-						qint16 duration = playlist->getCurrentDuration();
-						QTime n(0,0,0);
-						QTime t;
-						t = n.addSecs(duration);
-							
-						// build the notification
-						notifyclient->init();
-						if (playlist->getCurrentTitle().isEmpty() ) 
-							notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
-						else {
-							notifyclient->setSummary(playlist->getCurrentTitle() );
-							QString s;
-							if (! playlist->getCurrentArtist().isEmpty() )
-								s.append(tr("\nArtist: %1").arg(playlist->getCurrentArtist()) );
-							if (duration > 0)
-								s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
-							notifyclient->setBody(s);
-						}	// else have title
-						notifyclient->setIcon("audio-x-generic");
-						notifyclient->sendNotification();
-					}	// if useNotifications
-				}	// if media type we want notifications for
-			}	// else not DVD
-			
-			// Pass information to ipcagent
-			qDebug() << "!!!!!!!!!	 NEW TAG !!!!!!!!!!! MGS = " << msg;
-			ipcagent->init();
-			ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
-			ipcagent->setProperty("uri", playlist->getCurrentUri() );
-			ipcagent->setProperty("artist", playlist->getCurrentArtist() );
-			ipcagent->setProperty("title", playlist->getCurrentTitle() );
-			ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
-			ipcagent->updatedTrackInfo();
-			
+			}	// loglevel if					
 			break;		
 		
 		case MBMP_GI::StreamStatus:	// stream status message

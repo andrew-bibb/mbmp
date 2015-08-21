@@ -37,10 +37,20 @@ DEALINGS IN THE SOFTWARE.
 # include <QMap>
 # include <QStringList>
 
+# define IPC_INTERFACE "org.mbmp.IPC"
+# define IPC_SERVICE "org.mbmp"
+# define IPC_OBJECT "/agent"
+
 class IPC_Agent : public QObject, protected QDBusContext
 {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", "org.mbmp.IPC")
+  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE)
+  Q_PROPERTY(int sequence READ sequence)
+  Q_PROPERTY(QString uri READ uri)
+  Q_PROPERTY(QString artist READ artist)
+  Q_PROPERTY(QString title READ title)
+  Q_PROPERTY(qlonglong duration READ duration)
+    
 
   public:
     IPC_Agent(QObject* parent = 0);
@@ -49,17 +59,26 @@ class IPC_Agent : public QObject, protected QDBusContext
 		void stopAgent();
 		inline void init() {vmap.clear();}
 		inline void setProperty(const QString& key, QVariant val) {if (keywords.contains(key, Qt::CaseInsensitive)) vmap[key.simplified().toLower()] = val;} 
+		
+		//QString artitst() const;
   
 	public Q_SLOTS:
 		Q_SCRIPTABLE inline void stopPlayer() {emit controlStop();} 
 		Q_SCRIPTABLE inline void playPause() {emit controlPlaypause();}
 		Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
 		Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
-		Q_SCRIPTABLE inline int getSequence() { return vmap.value("sequence").toInt();}
-		Q_SCRIPTABLE inline QString getUri() { return vmap.value("uri").toString();}
-		Q_SCRIPTABLE inline QString getArtist() { return vmap.value("artist").toString();}
-		Q_SCRIPTABLE inline QString getTitle() { return vmap.value("title").toString();}
-		Q_SCRIPTABLE inline qlonglong getDuration() { return vmap.value("duration").toLongLong();}
+		
+		//Q_SCRIPTABLE inline int getSequence() { return vmap.value("sequence").toInt();}
+		//Q_SCRIPTABLE inline QString getUri() { return vmap.value("uri").toString();}
+		//Q_SCRIPTABLE inline QString getArtist() { return vmap.value("artist").toString();}
+		//Q_SCRIPTABLE inline QString getTitle() { return vmap.value("title").toString();}
+		//Q_SCRIPTABLE inline qlonglong getDuration() { return vmap.value("duration").toLongLong();}
+		
+		Q_SCRIPTABLE int sequence() const;
+		Q_SCRIPTABLE QString uri() const;
+		Q_SCRIPTABLE QString artist() const;
+		Q_SCRIPTABLE QString title() const;
+		Q_SCRIPTABLE qlonglong duration() const;
 		
 		inline void updatedTrackInfo() {emit trackChanged(vmap);}
 	
@@ -75,6 +94,7 @@ class IPC_Agent : public QObject, protected QDBusContext
 		// data members
 		QVariantMap vmap;	
 		QStringList keywords;
+		//QString artist;
 };  
 
 #endif

@@ -39,9 +39,6 @@ DEALINGS IN THE SOFTWARE.
 # include "ipcagent_adaptor.h"
 # include "ipcagent_interface.h"
 
-# define IPC_SERVICE "org.mbmp.IPC"
-# define IPC_OBJECT "/agent"
-
 //  constructor
 IPC_Agent::IPC_Agent(QObject* parent) : QObject(parent)
 {
@@ -98,3 +95,36 @@ void IPC_Agent::stopAgent()
     
 /////////////////////// Public Slots (Methods) //////////////////////////
 
+// Return the sequence (typically track number in an album)
+int IPC_Agent::sequence() const
+{
+	return vmap.value("sequence").toInt();
+}
+
+//
+// Return the uri
+QString IPC_Agent::uri() const
+{
+	return vmap.value("uri").toString();
+}
+
+//
+// Return the artist
+QString IPC_Agent::artist() const
+{
+	return vmap.value("artist").toString();
+}
+
+//
+// Return the title
+QString IPC_Agent::title() const
+{
+	return vmap.value("title").toString();
+}
+
+//
+// Return the duration (in seconds)
+qlonglong IPC_Agent::duration() const
+{
+	return vmap.value("duration").toLongLong();
+}

@@ -1,6 +1,11 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="org.mbmp.IPC">
+    <property name="sequence" type="i" access="read"/>
+    <property name="uri" type="s" access="read"/>
+    <property name="artist" type="s" access="read"/>
+    <property name="title" type="s" access="read"/>
+    <property name="duration" type="x" access="read"/>
     <signal name="trackChanged">
       <arg type="a{sv}" direction="out"/>
       <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
@@ -13,19 +18,19 @@
     </method>
     <method name="playlistBack">
     </method>
-    <method name="getSequence">
+    <method name="sequence">
       <arg type="i" direction="out"/>
     </method>
-    <method name="getUri">
+    <method name="uri">
       <arg type="s" direction="out"/>
     </method>
-    <method name="getArtist">
+    <method name="artist">
       <arg type="s" direction="out"/>
     </method>
-    <method name="getTitle">
+    <method name="title">
       <arg type="s" direction="out"/>
     </method>
-    <method name="getDuration">
+    <method name="duration">
       <arg type="x" direction="out"/>
     </method>
   </interface>

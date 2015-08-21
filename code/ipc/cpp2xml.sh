@@ -8,7 +8,7 @@
 # -p  all scriptable properties
 # -S  all signals
 # -s	all scriptable signals
-qdbuscpp2xml -m -s ipcagent.h -o org.monkey_business_enterprises.ipcagent.xml
+qdbuscpp2xml -m -s -P ipcagent.h -o org.monkey_business_enterprises.ipcagent.xml
 #
 #	utility seems to create the annotation entry for signals with QVariantMap
 # wrong, this corrects it
