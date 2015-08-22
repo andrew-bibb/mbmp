@@ -37,21 +37,15 @@ DEALINGS IN THE SOFTWARE.
 # include <QMap>
 # include <QStringList>
 
-# define IPC_INTERFACE "org.mbmp.IPC"
 # define IPC_SERVICE "org.mbmp"
+# define IPC_INTERFACE "org.mbmp.IPC"
 # define IPC_OBJECT "/agent"
 
 class IPC_Agent : public QObject, protected QDBusContext
 {
   Q_OBJECT
   Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE)
-  Q_PROPERTY(int sequence READ sequence)
-  Q_PROPERTY(QString uri READ uri)
-  Q_PROPERTY(QString artist READ artist)
-  Q_PROPERTY(QString title READ title)
-  Q_PROPERTY(qlonglong duration READ duration)
     
-
   public:
     IPC_Agent(QObject* parent = 0);
  
@@ -68,17 +62,11 @@ class IPC_Agent : public QObject, protected QDBusContext
 		Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
 		Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
 		
-		//Q_SCRIPTABLE inline int getSequence() { return vmap.value("sequence").toInt();}
-		//Q_SCRIPTABLE inline QString getUri() { return vmap.value("uri").toString();}
-		//Q_SCRIPTABLE inline QString getArtist() { return vmap.value("artist").toString();}
-		//Q_SCRIPTABLE inline QString getTitle() { return vmap.value("title").toString();}
-		//Q_SCRIPTABLE inline qlonglong getDuration() { return vmap.value("duration").toLongLong();}
-		
-		Q_SCRIPTABLE int sequence() const;
-		Q_SCRIPTABLE QString uri() const;
-		Q_SCRIPTABLE QString artist() const;
-		Q_SCRIPTABLE QString title() const;
-		Q_SCRIPTABLE qlonglong duration() const;
+		Q_SCRIPTABLE inline int getSequence() { return vmap.value("sequence").toInt();}
+		Q_SCRIPTABLE inline QString getUri() { return vmap.value("uri").toString();}
+		Q_SCRIPTABLE inline QString getArtist() { return vmap.value("artist").toString();}
+		Q_SCRIPTABLE inline QString getTitle() { return vmap.value("title").toString();}
+		Q_SCRIPTABLE inline qlonglong getDuration() { return vmap.value("duration").toLongLong();}
 		
 		inline void updatedTrackInfo() {emit trackChanged(vmap);}
 	
@@ -94,7 +82,12 @@ class IPC_Agent : public QObject, protected QDBusContext
 		// data members
 		QVariantMap vmap;	
 		QStringList keywords;
-		//QString artist;
 };  
+
+// dbus-send that works
+//dbus-send --print-reply --session --dest=org.mbmp /agent org.mbmp.IPC.getUri
+// and save to a bash variable
+//a=$(dbus-send --print-reply=literal --session --dest=org.mbmp /agent org.mbmp.IPC.getUri)
+
 
 #endif
