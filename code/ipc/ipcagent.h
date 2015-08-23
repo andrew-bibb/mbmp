@@ -88,6 +88,8 @@ class IPC_Agent : public QObject, protected QDBusContext
 //dbus-send --print-reply --session --dest=org.mbmp /agent org.mbmp.IPC.getUri
 // and save to a bash variable
 //a=$(dbus-send --print-reply=literal --session --dest=org.mbmp /agent org.mbmp.IPC.getUri)
-
+// and to send a command
+// dbus-send --print-reply --session --dest=org.mbmp /agent org.mbmp.IPC.playlistNext
+// dbus-send --print-reply --session --dest=org.mbmp /agent org.mbmp.IPC.playlistNext
 
 #endif

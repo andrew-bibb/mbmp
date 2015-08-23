@@ -352,7 +352,7 @@ int GST_Interface::checkDVD(QString dev)
     opticaldrive.clear();
     return MBMP_GI::BadDVDRead;
   } 
-  qDebug() << "DVD duration " << duration;
+  
   // Clean up
   gst_element_set_state (pipeline_dvd, GST_STATE_NULL);
   gst_object_unref (GST_OBJECT (pipeline_dvd)); 

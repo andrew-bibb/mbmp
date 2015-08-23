@@ -1002,6 +1002,17 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			// start or stop timer based on player state
 			gstiface->getState() == GST_STATE_PLAYING ? pos_timer->start(500) : pos_timer->stop();
 			
+			// Pass information to ipcagent
+			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) {
+				ipcagent->init();
+				ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
+				ipcagent->setProperty("uri", playlist->getCurrentUri() );
+				ipcagent->setProperty("artist", playlist->getCurrentArtist() );
+				ipcagent->setProperty("title", playlist->getCurrentTitle() );
+				ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
+				ipcagent->updatedTrackInfo();	
+			}	// if
+			
 			break;
 						
 		case MBMP_GI::EOS:	// end of stream
@@ -1181,16 +1192,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 					}	// if useNotifications
 				}	// if media type we want notifications for
 			}	// else not DVD
-			
-			// Pass information to ipcagent
-			ipcagent->init();
-			ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
-			ipcagent->setProperty("uri", playlist->getCurrentUri() );
-			ipcagent->setProperty("artist", playlist->getCurrentArtist() );
-			ipcagent->setProperty("title", playlist->getCurrentTitle() );
-			ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
-			ipcagent->updatedTrackInfo();				
-				
+						
 			break;		
 		
 		case MBMP_GI::StreamStatus:	// stream status message
