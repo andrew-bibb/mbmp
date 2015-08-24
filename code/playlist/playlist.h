@@ -90,10 +90,10 @@ class Playlist : public QDialog
 		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
 		inline void clearPlaylist() {ui.listWidget_playlist->clear();}
 		inline QString getCurrentUri() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri();}
-		inline int getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
+		inline qint16 getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
 		inline QString getCurrentTitle() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTitle();}
 		inline QString getCurrentArtist() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getArtist();}
-		inline qint64 getCurrentDuration() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration();}
+		inline qint32 getCurrentDuration() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration();}
 		inline bool isCurrentPlayable() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable();}
 		inline int getCurrentRow() {return ui.listWidget_playlist->currentRow();}
 		inline void setCurrentRow(const int& row) {ui.listWidget_playlist->setCurrentRow(row);}

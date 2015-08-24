@@ -26,7 +26,11 @@
       <arg type="s" direction="out"/>
     </method>
     <method name="getDuration">
-      <arg type="x" direction="out"/>
+      <arg type="i" direction="out"/>
+    </method>
+    <method name="getProperties">
+      <arg type="a{sv}" direction="out"/>
+      <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
     </method>
   </interface>
 </node>

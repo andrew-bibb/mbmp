@@ -66,7 +66,9 @@ class IPC_Agent : public QObject, protected QDBusContext
 		Q_SCRIPTABLE inline QString getUri() { return vmap.value("uri").toString();}
 		Q_SCRIPTABLE inline QString getArtist() { return vmap.value("artist").toString();}
 		Q_SCRIPTABLE inline QString getTitle() { return vmap.value("title").toString();}
-		Q_SCRIPTABLE inline qlonglong getDuration() { return vmap.value("duration").toLongLong();}
+		Q_SCRIPTABLE inline int getDuration() { return vmap.value("duration").toInt();}
+		
+		Q_SCRIPTABLE inline QVariantMap getProperties() { return vmap;}
 		
 		inline void updatedTrackInfo() {emit trackChanged(vmap);}
 	
@@ -83,13 +85,5 @@ class IPC_Agent : public QObject, protected QDBusContext
 		QVariantMap vmap;	
 		QStringList keywords;
 };  
-
-// dbus-send that works
-//dbus-send --print-reply --session --dest=org.mbmp /agent org.mbmp.IPC.getUri
-// and save to a bash variable
-//a=$(dbus-send --print-reply=literal --session --dest=org.mbmp /agent org.mbmp.IPC.getUri)
-// and to send a command
-// dbus-send --print-reply --session --dest=org.mbmp /agent org.mbmp.IPC.playlistNext
-// dbus-send --print-reply --session --dest=org.mbmp /agent org.mbmp.IPC.playlistNext
 
 #endif

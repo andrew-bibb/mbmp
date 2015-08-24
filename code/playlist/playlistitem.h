@@ -40,11 +40,11 @@ class PlaylistItem : public QListWidgetItem
 		PlaylistItem (const QString&, QListWidget*, int);
 		
 		// get functions
-		inline int getSequence() {return sequence;}
+		inline qint16 getSequence() {return sequence;}
 		inline QString getUri() {return uri;}
 		inline QString getArtist() {return artist;}
 		inline QString getTitle() {return title;}
-		inline qint16 getDuration() {return duration;}
+		inline qint32 getDuration() {return duration;}
 		inline bool isPlayable() {return errors.isEmpty() ? true : false;}
 		
 		// set functions
@@ -58,8 +58,8 @@ class PlaylistItem : public QListWidgetItem
 		
 	private:
 	// members - which ones are used depends upon the item type
-		int sequence;					// track or chapter number
-		qint64 duration;			// length in seconds, or a negative number for duation not known		
+		qint16 sequence;					// track or chapter number
+		qint32 duration;			// length in seconds, or a negative number for duation not known		
 		QString uri;					// the uri of the media 
 		bool seekable;				// true if we can seek in the stream, false otherwise	
 		QString title;				// the title of the media file	
