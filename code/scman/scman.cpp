@@ -45,8 +45,9 @@ ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent)
 	// Set the qrc data member
 	qrc = QString(":/text/text/sc_def.txt");
 	
-	//// Initialize key_map
+	//// Initialize key_map and shifted key string
 	key_map.clear();
+	shiftedkeys.clear();
 	
 	//// Make the local conf file if necessary
 	this->makeLocalFile();	
@@ -78,17 +79,13 @@ ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent)
 		line = line.section("#", 0, 0);
 		if (line.size() > 0 ) {	
 			QString cmd = line.section(' ', 0, 0);
-			QStringList sl_shortcuts = line.section(' ', 1, 1).split(',');	
-			QList<QKeySequence> keyseq;
-			keyseq.clear();
-			for (int j = 0; j < sl_shortcuts.size(); ++j) {
-				keyseq.append(QKeySequence::fromString(sl_shortcuts.at(j)) );		
-			}	// j loop
-			key_map[cmd] = keyseq;
+			if (cmd.startsWith("shifted_keys", Qt::CaseInsensitive) )
+				shiftedkeys = line.section(' ', 1, 1);
+			else 
+				key_map[cmd] = line.section(' ', 1, 1).split(',');
 		} // if size > 0		
 	}	// while not atEnd()
 	f1.close();	
-		
 	return;
 }
 
@@ -99,40 +96,50 @@ ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent)
 // 	defined in the configuration file.  
 QList<QKeySequence> ShortCutManager::getKeySequence(const QString& cmd)
 {	
-	if (key_map.contains(cmd) ) return key_map.value(cmd);
-	
-	// cmd not found, return an empty QKeySequence list
-	QList<QKeySequence> list;
-	list.clear();	
-	return list;
+	// initialize variables
+	QList<QKeySequence> keyseq;
+	keyseq.clear();
+		
+	// modify for shifted keys if necessary
+	if (key_map.contains(cmd) ) {
+		QStringList sl = key_map.value(cmd);
+		for (int i = 0; i < sl.count(); ++i) {			
+			if (sl.at(i).size() == 1 && shiftedkeys.contains(sl.at(i)) )
+				keyseq.append(QKeySequence::fromString(QString("Shift+" + sl.at(i))) );
+			else
+				keyseq.append(QKeySequence::fromString(sl.at(i)) );		
+		}	// for
+	}	// if
+		
+	// return (empty list if cmd not in key_map)	
+	return keyseq;
 }
 
 //
-//	Slot to return a cheatsheet of key bindings
+//	Slot to return am html formated cheatsheet of key bindings
 QString ShortCutManager::getCheatSheet()
 {
 	QString s = QString();
 	s.append(QString("<table><tr><td width=110><b>%1</b></td><td><b>%2</b></td></tr>").arg(tr("KEY(S)")).arg(tr("COMMAND")) );
 			
-	QMap<QString, QList<QKeySequence> >::const_iterator itr = key_map.constBegin();
+	QMap<QString, QStringList >::const_iterator itr = key_map.constBegin();
 	while (itr != key_map.constEnd()) {
-		QStringList sl;
-		for (int i = 0; i < itr.value().size(); ++i) {
-			sl.append(itr.value().at(i).toString().toHtmlEscaped() );
-		}	// for
+		QStringList sl = itr.value();
+		
 		if (! sl.at(0).isEmpty() ) {
 			QString t = itr.key();
-			s.append(QString("<tr><td>%1</td><td>%2</td></tr>").arg(sl.join(',')).arg(t.remove(0,4)) );
+			s.append(QString("<tr><td>%1</td><td>%2</td></tr>").arg(sl.join(',').toHtmlEscaped()).arg(t.remove(0,4)) );
 		}	// if
+		
     ++itr;
 	}
 	s.append("</table>");
+	
 	return s;
 }
 
 
 //////////////////////////////// Private Functions ////////////////////////////
-//
 //
 // Function to make a local version of the configuration fiqle
 void ShortCutManager::makeLocalFile()

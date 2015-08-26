@@ -32,16 +32,8 @@ DEALINGS IN THE SOFTWARE.
 # include <QString>
 # include <QMap>
 # include <QKeySequence>
-# include <QList>
 
 # include "../resource.h"
-
-//struct IconElement
-//{
-	//QString resource_path;
-	//QString fdo_name;
-	//QStringList name_list;
-//};
 
 class ShortCutManager : public QObject
 {
@@ -57,7 +49,8 @@ class ShortCutManager : public QObject
   
   private:
   // members
-		QMap<QString, QList<QKeySequence> > key_map;
+		QMap<QString, QStringList > key_map;
+		QString shiftedkeys;
 		QString cfg;
 		QString qrc;
 		

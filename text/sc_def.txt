@@ -28,8 +28,13 @@
 #
 # A hash (#) indicates a comment. All text on a line after the # is
 # treated as a comment and is not parsed. The # may not be used as part
-# of a command, there is no combinaion of quotes or escapes that will 
-# allow # to be used.  In the case of multiple shortcuts keys only
+# of a command, there is no combination of quotes or escapes that will 
+# allow # to be used.
+#
+#	Additional reserved keys which may not be used for keys are the comma
+# key and the " key
+#
+# In the case of multiple shortcuts keys only
 # the first one will be displayed in the menus, although each shortcut
 # will be active.
 #                                                                             pc = playercontrol
@@ -107,3 +112,9 @@ cmd_saveplaylist    ctrl+S            # Save the playlist to disk               
 cmd_cycleaudio        ~               # Cycle through available audio streams                 y     e       e
 cmd_cyclevideo        !               # Cycle through available video streams                 y     e       e
 cmd_cyclesubtitle     @               # Cycle through availabe subtitle streams               y     e       e
+#
+#
+#	We need a list of all keys only accessible by using the SHIFT key.  This does not include any letter
+# character as QKeySequence does not care (or deal with) letter case.  List below is for a US standard
+# keyhboard.  Modify as necessary for your keyboard (don't forgot you can't list # or " in the string)
+shifted_keys			~!@$%^&*()_+{}|:<>?
