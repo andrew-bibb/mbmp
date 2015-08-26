@@ -75,14 +75,14 @@ ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent)
 	QString line;
 	while (!in.atEnd()) {
 		line = in.readLine();
-		line = line.simplified();
-		line = line.section("#", 0, 0);
+		line = line.simplified();				// remove extra white space
+		line = line.section("#", 0, 0);	// remove comments
 		if (line.size() > 0 ) {	
-			QString cmd = line.section(' ', 0, 0);
+			QString cmd = line.section('=', 0, 0).simplified();
 			if (cmd.startsWith("shifted_keys", Qt::CaseInsensitive) )
-				shiftedkeys = line.section(' ', 1, 1);
+				shiftedkeys = line.section('=', 1, 1).simplified();
 			else 
-				key_map[cmd] = line.section(' ', 1, 1).split(',');
+				key_map[cmd] = line.section('=', 1, -1).simplified().split(' ');
 		} // if size > 0		
 	}	// while not atEnd()
 	f1.close();	
@@ -99,7 +99,7 @@ QList<QKeySequence> ShortCutManager::getKeySequence(const QString& cmd)
 	// initialize variables
 	QList<QKeySequence> keyseq;
 	keyseq.clear();
-		
+	
 	// modify for shifted keys if necessary
 	if (key_map.contains(cmd) ) {
 		QStringList sl = key_map.value(cmd);
@@ -116,7 +116,7 @@ QList<QKeySequence> ShortCutManager::getKeySequence(const QString& cmd)
 }
 
 //
-//	Slot to return am html formated cheatsheet of key bindings
+//	Slot to return am html formatted cheatsheet of key bindings
 QString ShortCutManager::getCheatSheet()
 {
 	QString s = QString();
@@ -128,7 +128,7 @@ QString ShortCutManager::getCheatSheet()
 		
 		if (! sl.at(0).isEmpty() ) {
 			QString t = itr.key();
-			s.append(QString("<tr><td>%1</td><td>%2</td></tr>").arg(sl.join(',').toHtmlEscaped()).arg(t.remove(0,4)) );
+			s.append(QString("<tr><td>%1</td><td>%2</td></tr>").arg(sl.join(' ').toHtmlEscaped()).arg(t.remove(0,4)) );
 		}	// if
 		
     ++itr;
