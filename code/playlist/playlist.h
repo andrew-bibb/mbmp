@@ -53,11 +53,11 @@ namespace MBMP_PL
     Current	= 0x03,						// Current item 
     Next	= 0x04, 						// Next item
     Last = 0x05,							// Last item 
-    File = (QListWidgetItem::UserType + 1),		// Playlist file 
-    Url  = (QListWidgetItem::UserType + 2),		// Playlist url
-    Dev  = (QListWidgetItem::UserType + 100),	// Marker for the start of devices
-    ACD  = (QListWidgetItem::UserType + 101),	// Playlist Audio CD
-    DVD  = (QListWidgetItem::UserType + 102)	// Playlist DVD	
+    None = (QListWidgetItem::UserType) + 1,		// No type
+    File = (QListWidgetItem::UserType) + 11,	// Playlist file 
+    Url  = (QListWidgetItem::UserType) + 12,	// Playlist url
+    ACD  = (QListWidgetItem::UserType) + 101,	// Playlist Audio CD
+    DVD  = (QListWidgetItem::UserType) + 102	// Playlist DVD	
   };
 } // namespace MBMP_PL
 
@@ -86,17 +86,18 @@ class Playlist : public QDialog
 		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}
 		inline void triggerAddPlaylist() {if (ui.actionAddPlaylist->isEnabled()) ui.actionAddPlaylist->trigger();}
 		inline void triggerAddFiles() {if (ui.actionAddFiles->isEnabled()) ui.actionAddFiles->trigger();}
-		inline int currentItemType() {return ui.listWidget_playlist->currentItem()->type();}
+		inline void clearPlaylist() {ui.listWidget_playlist->clear();}		
 		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
-		inline void clearPlaylist() {ui.listWidget_playlist->clear();}
-		inline QString getCurrentUri() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri();}
-		inline qint16 getCurrentSeq() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence();}
-		inline QString getCurrentTitle() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTitle();}
-		inline QString getCurrentArtist() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getArtist();}
-		inline qint32 getCurrentDuration() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration();}
-		inline bool isCurrentPlayable() {return static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable();}
-		inline int getCurrentRow() {return ui.listWidget_playlist->currentRow();}
 		inline void setCurrentRow(const int& row) {ui.listWidget_playlist->setCurrentRow(row);}
+	
+		inline QString getCurrentUri() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri() : QString();}
+		inline qint16 getCurrentSeq() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence() : -1;}
+		inline QString getCurrentTitle() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTitle() : QString();}
+		inline QString getCurrentArtist() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getArtist() : QString();}
+		inline qint32 getCurrentDuration() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration() : -1;}
+		inline int getCurrentRow() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentRow() : -1;}		
+		
+		inline bool currentIsPlayable() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable() : false;}
 	
 	public:
 		void seedPlaylist(const QStringList&);
@@ -120,7 +121,6 @@ class Playlist : public QDialog
 	// functions
 		void processM3U(const QString&);
 		void updateSummary();
-
 };
 
 #endif

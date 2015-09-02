@@ -319,7 +319,7 @@ void Playlist::addFile(QAction* a)
   if (sl_files.size() > 0) {
 		if (ui.listWidget_playlist->count() > 0 ) {
 			this->setWindowTitle(tr("Playlist"));
-			if (ui.listWidget_playlist->item(0)->type() >= MBMP_PL::Dev) ui.listWidget_playlist->clear();
+			if (ui.listWidget_playlist->item(0)->type() && (MBMP_PL::ACD | MBMP_PL::DVD)) ui.listWidget_playlist->clear();
 		}
 		for (int i = 0; i < sl_files.size(); ++i) {
 			if (sl_files.at(i).endsWith(".m3u", Qt::CaseInsensitive) )
@@ -355,7 +355,7 @@ void Playlist::addURL()
 	if (! s.isEmpty() ) {
 		if (ui.listWidget_playlist->count() > 0 ) {
 			this->setWindowTitle(tr("Playlist"));
-			if (ui.listWidget_playlist->item(0)->type() >= MBMP_PL::Dev) ui.listWidget_playlist->clear();
+			if (ui.listWidget_playlist->item(0)->type() && (MBMP_PL::ACD | MBMP_PL::DVD)) ui.listWidget_playlist->clear();
 		}	// if
 		new PlaylistItem(s, ui.listWidget_playlist, MBMP_PL::Url);	
 	}	// if
@@ -561,7 +561,7 @@ QString Playlist::getWindowTitle()
 {
 	PlaylistItem* pli = static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem());
 	
-	if (this->currentItemType() == MBMP_PL::ACD) {
+	if (ui.listWidget_playlist->currentItem()->type() == MBMP_PL::ACD) {
 		int seq = -1;
 		seq = pli->getSequence();
 		if (seq >= 0) 
@@ -571,7 +571,7 @@ QString Playlist::getWindowTitle()
 	}	// if CD
 	
 	// for DVD's playerctl will get title from p_gstiface
-	if (this->currentItemType() == MBMP_PL::DVD) 
+	if (ui.listWidget_playlist->currentItem()->type() == MBMP_PL::DVD)  
 		return QString();
 
 	// default (not CD or DVD)	
@@ -680,4 +680,5 @@ void Playlist::updateSummary()
 	
 	return;
 }
+
 

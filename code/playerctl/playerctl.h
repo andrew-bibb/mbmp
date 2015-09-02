@@ -128,6 +128,7 @@ class PlayerControl : public QDialog
   
   // functions
 		QString readTextFile(const char*);
+		void processMediaInfo();
 
 };
 

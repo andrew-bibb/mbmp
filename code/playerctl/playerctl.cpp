@@ -604,6 +604,10 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 // is the stream position in seconds.
 void PlayerControl::setPositionWidgets()
 {
+	// return if we are not playing
+	if (gstiface->getState() != GST_STATE_PLAYING) return;
+	
+	// variables
 	int position = gstiface->queryStreamPosition() / (1000 * 1000 * 1000);
 	
 	// position is zero or positive
@@ -723,18 +727,18 @@ void PlayerControl::playMedia(QAction* act)
 	ui.actionPlayPause->setChecked(true);
 		
 	// if we are playing a CD send the track to gstiface
-	if (playlist->currentItemType() == MBMP_PL::ACD) {
+	if (gstiface->currentIsACD() ) {
 		gstiface->playMedia(videowidget->winId(), "cdda://", playlist->getCurrentSeq());
 	}	// if we are playing a disk
 	
 	// if we are playing a DVD send the chapter to gstiface
-	else if (playlist->currentItemType() == MBMP_PL::DVD) {
+	else if (gstiface->currentIsDVD() ) {
 		gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to gstiface to play the media
-		if (playlist->isCurrentPlayable() ) 
+		if (playlist->currentIsPlayable() ) 
 			gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());	
 	}	// else
 	
@@ -753,20 +757,14 @@ void PlayerControl::stopPlaying()
 	// sync the playpause action
 	ui.actionPlayPause->setChecked(false);
 	
-	// save the current media type before we reset it in the next line
-	int mt = gstiface->getMediaType();
+	// bool if we are playing a disk
+	bool b_disk = gstiface->currentIsDisk();
 	
 	// Let gstiface know about it, this will set the playerstate to NULL
 	gstiface->playerStop();	
 	
-	// If we're playing a DVD
-	if (mt == MBMP_GI::DVD) {
-		playlist->clearPlaylist();
-		playlist->lockControls(false);
-	}
-	
-	// If we're playing a CD
-	else if (mt == MBMP_GI::CD) {
+	// If we were playing a disk
+	if (b_disk) {
 		playlist->clearPlaylist();
 		playlist->lockControls(false);
 	}
@@ -775,6 +773,7 @@ void PlayerControl::stopPlaying()
 	this->setDurationWidgets(-1);
 	this->setPositionWidgets();
 	this->setWindowTitle(LONG_NAME);
+	this->pos_timer->stop();
 	
 	return;
 }	
@@ -969,21 +968,27 @@ void PlayerControl::showChangeLog()
 
 ////////////////////////////// Private Slots ////////////////////////////
 //
-//	Slot to process the output from the gstreamer bus
-// 	mtype should be an MBMP enum from the gstiface.h file
-//	msg is an optional qstring to display or send to a file
+// Slot to process the output from the gstreamer bus
+// mtype should be an MBMP enum from the gstiface.h file
+// msg is an optional qstring to display or send to a file
+//
+// Remember that when this is called the playlist may contain no items
+// because CD's and DVD's are started directly.  For these types only 
+// after the stream has started do we fill in the playlist items.
 void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 {
 	QTextStream stream1 (stdout);
 	QTextStream stream2 (&logfile);
-	
+
 	switch (mtype) {
-		case MBMP_GI::State: 
+		case MBMP_GI::State:
+		
 			// restore stream after hiatus
 			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) && hiatus_resume >= 0 ) {
 				gstiface->seekToPosition(hiatus_resume);
 				hiatus_resume = -1;
 			}
+			// log message
 			if (loglevel >= 1 && loglevel <= 2) {
 				if (msg.contains(PLAYER_NAME, Qt::CaseSensitive)) {
 					stream1 << msg << endl;
@@ -994,25 +999,18 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;				
 			}	// loglevel else
+		
+			// start or stop position timer based on player state
+			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) )
+				gstiface->getState() == GST_STATE_PLAYING ? pos_timer->start(500) : pos_timer->stop();
 			
 			// set the duration widgets
 			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) )
 				setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
-	
-			// start or stop timer based on player state
-			gstiface->getState() == GST_STATE_PLAYING ? pos_timer->start(500) : pos_timer->stop();
 			
-			// Pass information to ipcagent
-			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) {
-				ipcagent->init();
-				ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
-				ipcagent->setProperty("uri", playlist->getCurrentUri() );
-				ipcagent->setProperty("artist", playlist->getCurrentArtist() );
-				ipcagent->setProperty("title", playlist->getCurrentTitle() );
-				ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
-				ipcagent->updatedTrackInfo();	
-			}	// if
-			
+			// process media info for notifications and ipc	
+			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) 
+				this->processMediaInfo();								
 			break;
 						
 		case MBMP_GI::EOS:	// end of stream
@@ -1102,11 +1100,14 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			}	// loglevel if
 			break;	// Unhandled GstBus message		
 		
+		// only get Duration messages on CD track and DVD chapter changes
+		// come through here.  Set file and url durations in the ::State case above
 		case MBMP_GI::Duration:	// a new stream duration message 
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
+			setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
 			break;			
 		
 		case MBMP_GI::TOC: // A generic TOC
@@ -1121,10 +1122,10 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
-			
 			// send the tracklist to the playlist to create playlist entries
 			playlist->addTracks(gstiface->getTrackList());
 			if (playlist->isHidden()) playlist->show();
+
 			break;
 			
 		case MBMP_GI::Tag:	// a TAG message 
@@ -1139,7 +1140,6 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
-			
 			playlist->addChapters(gstiface->getChapterCount() );
 			playlist->lockControls(true);
 			if (playlist->isHidden()) playlist->show();	
@@ -1159,40 +1159,11 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if	
-
-			// Set the window title and notifications
-			if (gstiface->getMediaType() == MBMP_GI::DVD)
-				this->setWindowTitle(msg);
-			else {
-				this->setWindowTitle(playlist->getWindowTitle() );
-					
-				if (playlist->currentItemType() == MBMP_PL::File || playlist->currentItemType() == MBMP_PL::Url) {
-					if(diag_settings->useNotifications() ) {
-						// collect some data
-						qint16 duration = playlist->getCurrentDuration();
-						QTime n(0,0,0);
-						QTime t;
-						t = n.addSecs(duration);
-							
-						// build the notification
-						notifyclient->init();
-						if (playlist->getCurrentTitle().isEmpty() ) 
-							notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
-						else {
-							notifyclient->setSummary(playlist->getCurrentTitle() );
-							QString s;
-							if (! playlist->getCurrentArtist().isEmpty() )
-								s.append(tr("\nArtist: %1").arg(playlist->getCurrentArtist()) );
-							if (duration > 0)
-								s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
-							notifyclient->setBody(s);
-						}	// else have title
-						notifyclient->setIcon("audio-x-generic");
-						notifyclient->sendNotification();
-					}	// if useNotifications
-				}	// if media type we want notifications for
-			}	// else not DVD
-						
+			// Set the window title, notifications, and ipc data
+			if (msg.isEmpty() )
+				this->setWindowTitle(playlist->getWindowTitle());
+			else 
+				this->setWindowTitle(msg);						
 			break;		
 		
 		case MBMP_GI::StreamStatus:	// stream status message
@@ -1348,7 +1319,7 @@ void PlayerControl::connectNotifyClient()
 // when a new stream duration is found.  Int value sent as the argument
 // is the stream duration in seconds.
 void PlayerControl::setDurationWidgets(int duration, bool seek_enabled)
-{
+{	
 	// duration is zero or positive
 	if (duration >= 0 ) {
 		QTime t(0,0,0);
@@ -1359,7 +1330,7 @@ void PlayerControl::setDurationWidgets(int duration, bool seek_enabled)
 		ui.horizontalSlider_position->setSingleStep(duration / 100 );
 		ui.horizontalSlider_position->setPageStep(duration / 10);
 		// we are playing a DVD enable seeking only after we've got a chapter
-		if (gstiface->getMediaType() == MBMP_GI::DVD) {
+		if (gstiface->currentIsDVD() ) {
 			if (gstiface->getCurrentChapter() > 0 ) seek_group->setEnabled(seek_enabled);
 		}
 		else 
@@ -1430,3 +1401,46 @@ QString PlayerControl::readTextFile(const char* textfile)
 	
 	return rtnstring;
 } 
+
+//
+// Function to process the media info (tags) and select various pieces 
+// for display, etc.  Called from various case statements in processGstifaceMessages
+void PlayerControl::processMediaInfo()
+{
+	if (! gstiface->currentIsDisk() ) {
+		if(diag_settings->useNotifications() ) {
+			// collect some data
+			qint16 duration = playlist->getCurrentDuration();
+			QTime n(0,0,0);
+			QTime t;
+			t = n.addSecs(duration);
+				
+			// build the notification
+			notifyclient->init();
+			if (playlist->getCurrentTitle().isEmpty() ) 
+				notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
+			else {
+				notifyclient->setSummary(playlist->getCurrentTitle() );
+				QString s;
+				if (! playlist->getCurrentArtist().isEmpty() )
+					s.append(tr("\nArtist: %1").arg(playlist->getCurrentArtist()) );
+				if (duration > 0)
+					s.append(tr("\nDuration: %1").arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss")) );
+				notifyclient->setBody(s);
+			}	// else have title
+			notifyclient->setIcon("audio-x-generic");
+			notifyclient->sendNotification();
+		}	// if useNotifications
+	}	// if media type we want notifications for
+	
+	// Pass information from playlist to ipcagent
+	ipcagent->init();
+	ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
+	ipcagent->setProperty("uri", playlist->getCurrentUri() );
+	ipcagent->setProperty("artist", playlist->getCurrentArtist() );
+	ipcagent->setProperty("title", playlist->getCurrentTitle() );
+	ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
+	ipcagent->updatedTrackInfo();	
+	
+	return;
+}

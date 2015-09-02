@@ -69,11 +69,11 @@ namespace MBMP_GI
     NoDVDPipe   = 0x33,   // not able to create a DVD pipe
     BadDVDRead  = 0x34,   // can't read the DVD 
     // media types
-    NotPlaying  = 0x00,   // not playing anything
-    File        = 0x01,   // a local media file
-    URL         = 0x02,   // a remote file
-    CD          = 0x03,   // an audio cd
-    DVD         = 0x04,   // a dvd
+    None			  = (1 << 0),   // not playing anything
+    File        = (1 << 1),   // a local media file
+    Url         = (1 << 2),   // a remote file
+    ACD         = (1 << 3),   // an audio cd
+    DVD         = (1 << 4),   // a dvd
   };
 } // namespace MBMP_GI
 
@@ -122,18 +122,24 @@ class GST_Interface : public QObject
     QString getAudioStreamInfo();
     QString getVideoStreamInfo();
     QString getTextStreamInfo();
-    void busHandler(GstMessage*);
-    gint64 queryDuration();
+    gint64 queryDuration(GstFormat fmt = GST_FORMAT_TIME);
     bool queryStreamSeek();
     gint64 queryStreamPosition(); 
+    void busHandler(GstMessage*);
+     
     // inline function to get private data members
     inline QList<QString> getVisualizerList() {return vismap.keys();}
     inline QList<TocEntry> getTrackList() {return tracklist;}
     inline QMap<QString, int> getStreamMap() {return streammap;} 
     inline int getChapterCount() {return map_md_dvd.value("chaptercount").toInt();}
     inline int getCurrentChapter() {return map_md_dvd.value("currentchapter").toInt();}
-    inline QString getDVDTitle() {return map_md_dvd.value(GST_TAG_TITLE).toString();}
-    inline int getMediaType() {return mediatype;};
+    
+    inline bool currentIsNone() {return checkCurrent(MBMP_GI::None);}
+		inline bool currentIsFile() {return checkCurrent(MBMP_GI::File);}
+		inline bool currentIsUrl() {return checkCurrent(MBMP_GI::Url);}
+		inline bool currentIsACD() {return checkCurrent(MBMP_GI::ACD);}
+		inline bool currentIsDVD() {return checkCurrent(MBMP_GI::DVD);}
+		inline bool currentIsDisk() {return checkCurrent(MBMP_GI::ACD | MBMP_GI::DVD);}
         
     public slots:
     void mouseNavEvent(QString, int, int, int);
@@ -164,7 +170,6 @@ class GST_Interface : public QObject
     QMap<QString, int> streammap;
     StreamInfo* streaminfo;   
     QWidget* mainwidget;
-    bool b_positionenabled;
     QList<TocEntry> tracklist;
     QMap<QString, QVariant> map_md_cd;
     QMap<QString, QVariant> map_md_dvd;
@@ -176,6 +181,7 @@ class GST_Interface : public QObject
     // functions
     void extractTocTrack(const GstTocEntry*);
     void analyzeStream();
+    bool checkCurrent(int);
     
     private slots:   
     void downloadBuffer();
