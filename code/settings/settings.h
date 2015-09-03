@@ -46,10 +46,10 @@ class Settings : public QDialog
 
   public:
     Settings(QWidget*);
-    inline bool useStartOptions() {return usestartoptions;}
-    inline bool useState() {return usestate;}
-    inline bool usePlaylist() {return useplaylist;}
-    inline bool useNotifications() {return usenotifications;}
+    inline bool useStartOptions() {return ui.checkBox_usestartoptions->isChecked();}
+    inline bool useState() {return ui.checkBox_retainstate->isChecked();}
+    inline bool usePlaylist() {return ui.checkBox_retainplaylist->isChecked();}
+    inline bool useNotifications() {return ui.checkBox_notifydaemon->isChecked();}
   	void writeSettings();
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
   	void restoreElementGeometry(const QString&, QWidget*);
@@ -64,10 +64,6 @@ class Settings : public QDialog
   // members 
     Ui::Settings ui;    
     QSettings* settings;
-    bool usestartoptions;
-    bool usestate;
-    bool useplaylist;
-    bool usenotifications;
 
 };
 

@@ -726,13 +726,17 @@ void PlayerControl::playMedia(QAction* act)
 	// come here directly so handle that case
 	ui.actionPlayPause->setChecked(true);
 		
-	// if we are playing a CD send the track to gstiface
-	if (gstiface->currentIsACD() ) {
+	// If we are playing a CD send the track to gstiface.  This is only if
+	// we change tracks in the playlist.  Initially playing is started directly
+	// from initializeCD
+	if (playlist->currentItemType() == MBMP_PL::ACD ) {
 		gstiface->playMedia(videowidget->winId(), "cdda://", playlist->getCurrentSeq());
 	}	// if we are playing a disk
 	
-	// if we are playing a DVD send the chapter to gstiface
-	else if (gstiface->currentIsDVD() ) {
+	// If we are playing a DVD send the chapter to gstiface. This is only if
+	// we change chapters in the playlist.  Initially playing is started directly
+	// from initializeDVD
+	else if (playlist->currentItemType() == MBMP_PL::DVD) {
 		gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
 	else {

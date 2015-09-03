@@ -970,31 +970,7 @@ void GST_Interface::busHandler(GstMessage* msg)
 				case MBMP_GI::DVD: {
 					// Get DVD tags. map_md_dvd has already been cleared in function check_DVD. 
 					// As with Audio CD we don't really do much with any of this (yet)
-						if (!map_md_dvd.contains(GST_TAG_VIDEO_CODEC) && gst_tag_list_get_string (tags, GST_TAG_VIDEO_CODEC, &str)) {
-							map_md_dvd[GST_TAG_VIDEO_CODEC] = QString(str);
-							g_free (str);
-						}
-						if (!map_md_dvd.contains(GST_TAG_MINIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MINIMUM_BITRATE, &num)) {
-							map_md_dvd[GST_TAG_MINIMUM_BITRATE] = num;
-							num = 0;
-						}
-						if (!map_md_dvd.contains(GST_TAG_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_BITRATE, &num)) {
-							map_md_dvd[GST_TAG_BITRATE] = num;
-							num = 0;
-						}
-						if (!map_md_dvd.contains(GST_TAG_MAXIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MAXIMUM_BITRATE, &num)) {
-							map_md_dvd[GST_TAG_MAXIMUM_BITRATE] = num;
-							num = 0;
-						}
-						if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
-							if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
-								map_md_dvd[GST_TAG_TITLE] = QString(str);
-								emit signalMessage(MBMP_GI::NewTrack, QString(str));
-								g_free (str);
-							} // if we have a new title
-						} // if we have a new DVD title
-						
-						// not actually tag information, but see if we can extract some metadata from the dvd stream
+					// Start with things not actually tag information, but see if we can extract some metadata from the dvd stream
 						gint64 chaptercount = 0;
 						gint64 currentchapter = 0;
 						GstFormat fmt = gst_format_get_by_nick("chapter");
@@ -1027,7 +1003,30 @@ void GST_Interface::busHandler(GstMessage* msg)
 								map_md_dvd["currenttitle"] = static_cast<int>(currenttitle);
 								currenttitle = 0;
 							} // if there is a new currenttitle
-						} // if we could extract the currenttitle                         
+						} // if we could extract the currenttitle   
+						if (!map_md_dvd.contains(GST_TAG_VIDEO_CODEC) && gst_tag_list_get_string (tags, GST_TAG_VIDEO_CODEC, &str)) {
+							map_md_dvd[GST_TAG_VIDEO_CODEC] = QString(str);
+							g_free (str);
+						}
+						if (!map_md_dvd.contains(GST_TAG_MINIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MINIMUM_BITRATE, &num)) {
+							map_md_dvd[GST_TAG_MINIMUM_BITRATE] = num;
+							num = 0;
+						}
+						if (!map_md_dvd.contains(GST_TAG_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_BITRATE, &num)) {
+							map_md_dvd[GST_TAG_BITRATE] = num;
+							num = 0;
+						}
+						if (!map_md_dvd.contains(GST_TAG_MAXIMUM_BITRATE) && gst_tag_list_get_uint (tags, GST_TAG_MAXIMUM_BITRATE, &num)) {
+							map_md_dvd[GST_TAG_MAXIMUM_BITRATE] = num;
+							num = 0;
+						}
+						if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+							if (map_md_dvd.value(GST_TAG_TITLE).toString() != QString(str)) {
+								map_md_dvd[GST_TAG_TITLE] = QString(str);
+								emit signalMessage(MBMP_GI::NewTrack, QString(str));
+								g_free (str);
+							} // if we have a new title
+						} // if we have a new DVD title                      
 					break; }  // dvd case
 					
 				default:   
