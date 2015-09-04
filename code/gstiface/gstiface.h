@@ -151,7 +151,7 @@ class GST_Interface : public QObject
     void toggleMute();
     void changeVolume(const double&);
     void changeConnectionSpeed(const guint64&);   
-    inline void playerStop() {gst_element_set_state (pipeline_playbin, GST_STATE_NULL);}
+    void playerStop();
     void toggleStreamInfo();
     // passthrough slots
     inline void cycleAudioStream() {streaminfo->cycleAudioStream();}
@@ -164,7 +164,6 @@ class GST_Interface : public QObject
   private:
     // members
     GstElement* pipeline_playbin;
-    GstBus* bus;
     QTimer* dl_timer;
     QMap<QString, GstElementFactory*> vismap; 
     QMap<QString, int> streammap;

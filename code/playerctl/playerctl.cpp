@@ -1013,8 +1013,10 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
 				
 				// process media info for notifications and ipc	
-				if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) 
+				if (msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) 
 					this->processMediaInfo();
+				else if (gstiface->getState() != GST_STATE_PAUSED)
+					ipcagent->init();
 				
 				// let ipcagent know about state changes	
 				ipcagent->setProperty("state", gstiface->getState() );

@@ -108,6 +108,7 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   pipeline_playbin = gst_element_factory_make("playbin", PLAYER_NAME);
   
   // Create the playbin bus and add a watch
+  GstBus* bus;
   bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline_playbin));
   gst_bus_add_watch(bus, busCallback, this);
   gst_object_unref (bus);
@@ -201,7 +202,6 @@ GST_Interface::~GST_Interface()
   gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
   gst_object_unref (GST_OBJECT (pipeline_playbin));
   
-  gst_object_unref (bus);
 }
 
 ///////////////////////////// Public Functions /////////////////////////
@@ -1211,6 +1211,7 @@ void GST_Interface::changeVolume(const double& d_vol)
   return;
 }
 
+//
 // Slot to change the connection speed.  Speed is measured in kbps
 // and needs to be <= 18446744073709551.  Default is 0
 void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
@@ -1220,6 +1221,17 @@ void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
   emit signalMessage(MBMP_GI::Application, QString(tr("Changing connection speed to %1")).arg(ui64_speed) );
     
   return;
+}
+
+//
+// Slot to handle things then the player stops.  We don't get a bus 
+// signal since the watch stops (or pauses) when the player stops
+void GST_Interface::playerStop()
+{
+	gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
+	emit signalMessage(MBMP_GI::State, QString("%1 has changed state to %2").arg(PLAYER_NAME).arg(GST_STATE_NULL) );
+	
+	return;
 }
 
 //
@@ -1292,7 +1304,7 @@ void GST_Interface::analyzeStream()
 
 
 //
-// Function to check the type of the current item
+// Function to check the type of the currently playing media
 bool GST_Interface::checkCurrent(int testval)
 {
 	return ( (testval & mediatype) == 0 ? false : true);	
