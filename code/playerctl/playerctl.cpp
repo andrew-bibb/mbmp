@@ -1009,12 +1009,18 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				gstiface->getState() == GST_STATE_PLAYING ? pos_timer->start(500) : pos_timer->stop();
 			
 			// set the duration widgets
-			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) )
+			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) ) {
 				setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
+				
+				// process media info for notifications and ipc	
+				if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) 
+					this->processMediaInfo();
+				
+				// let ipcagent know about state changes	
+				ipcagent->setProperty("state", gstiface->getState() );
+				ipcagent->updatedState();	
+			}	// if PLAYER_NAME								
 			
-			// process media info for notifications and ipc	
-			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) && msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) 
-				this->processMediaInfo();								
 			break;
 						
 		case MBMP_GI::EOS:	// end of stream

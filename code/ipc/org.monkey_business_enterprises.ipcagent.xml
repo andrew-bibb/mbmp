@@ -5,6 +5,9 @@
       <arg type="a{sv}" direction="out"/>
       <annotation name="org.qtproject.QtDBus.QtTypeName.In0" value="QVariantMap"/>
     </signal>
+    <signal name="stateChanged">
+      <arg type="i" direction="out"/>
+    </signal>
     <method name="stopPlayer">
     </method>
     <method name="playPause">
@@ -27,6 +30,15 @@
     </method>
     <method name="getDuration">
       <arg type="i" direction="out"/>
+    </method>
+    <method name="getState">
+      <arg type="i" direction="out"/>
+    </method>
+    <method name="isPlaying">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="isPaused">
+      <arg type="b" direction="out"/>
     </method>
     <method name="getProperties">
       <arg type="a{sv}" direction="out"/>

@@ -31,6 +31,8 @@ DEALINGS IN THE SOFTWARE.
 # ifndef IPC_AGENT
 # define IPC_AGENT
 
+# include <gst/gst.h>
+
 # include <QObject>
 # include <QtDBus/QDBusContext>
 # include <QVariant>
@@ -62,18 +64,23 @@ class IPC_Agent : public QObject, protected QDBusContext
 		Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
 		Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
 		
-		Q_SCRIPTABLE inline int getSequence() { return vmap.value("sequence").toInt();}
-		Q_SCRIPTABLE inline QString getUri() { return vmap.value("uri").toString();}
-		Q_SCRIPTABLE inline QString getArtist() { return vmap.value("artist").toString();}
-		Q_SCRIPTABLE inline QString getTitle() { return vmap.value("title").toString();}
-		Q_SCRIPTABLE inline int getDuration() { return vmap.value("duration").toInt();}
+		Q_SCRIPTABLE inline int getSequence() {return vmap.value("sequence").toInt();}
+		Q_SCRIPTABLE inline QString getUri() {return vmap.value("uri").toString();}
+		Q_SCRIPTABLE inline QString getArtist() {return vmap.value("artist").toString();}
+		Q_SCRIPTABLE inline QString getTitle() {return vmap.value("title").toString();}
+		Q_SCRIPTABLE inline int getDuration() {return vmap.value("duration").toInt();}
+	  Q_SCRIPTABLE inline int getState() {return vmap.value("state").toInt();}
+	  Q_SCRIPTABLE inline bool isPlaying() {return (vmap.value("state").toInt() == GST_STATE_PLAYING) ? true : false;}
+	  Q_SCRIPTABLE inline bool isPaused() {return (vmap.value("state").toInt() == GST_STATE_PAUSED) ? true : false;}
 		
-		Q_SCRIPTABLE inline QVariantMap getProperties() { return vmap;}
+		Q_SCRIPTABLE inline QVariantMap getProperties() {return vmap;}
 		
 		inline void updatedTrackInfo() {emit trackChanged(vmap);}
+		inline void updatedState() {emit stateChanged(vmap.value("state").toInt() );}
 	
 	Q_SIGNALS:
 		Q_SCRIPTABLE void trackChanged(QVariantMap);
+		Q_SCRIPTABLE void stateChanged(int);
 		
 		void controlStop();
 		void controlPlaypause();
