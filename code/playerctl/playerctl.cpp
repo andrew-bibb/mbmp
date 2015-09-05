@@ -748,6 +748,9 @@ void PlayerControl::playMedia(QAction* act)
 	
 	// Set the stream volume to agree with the dial
 	changeVolume(ui.dial_volume->value());
+	
+	// start the position timer
+	pos_timer->start(500);
 						
 	return;
 }
@@ -775,7 +778,6 @@ void PlayerControl::stopPlaying()
 		
 	// Set window title and duration labels to zero, will also disable seek ui elements
 	this->setDurationWidgets(-1);
-	this->setPositionWidgets();
 	this->setWindowTitle(LONG_NAME);
 	this->pos_timer->stop();
 	
@@ -1003,18 +1005,14 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;				
 			}	// loglevel else
-		
-			// start or stop position timer based on player state
-			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) )
-				gstiface->getState() == GST_STATE_PLAYING ? pos_timer->start(500) : pos_timer->stop();
 			
-			// set the duration widgets
+			// process information and set widgets depending onstate
 			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) ) {
-				setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() );
-				
 				// process media info for notifications and ipc	
-				if (msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) 
+				if (msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) {
+					this->setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() ); 
 					this->processMediaInfo();
+				}
 				else if (gstiface->getState() != GST_STATE_PAUSED)
 					ipcagent->init();
 				

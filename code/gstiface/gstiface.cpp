@@ -1132,7 +1132,7 @@ void GST_Interface::seekToPosition(int position)
                           GST_SEEK_FLAG_KEY_UNIT ; // seek to the nearest keyframe, faster but maybe not as accurate
                          	 
   // now do the seek
-  gst_element_seek_simple(pipeline_playbin, GST_FORMAT_TIME, (GstSeekFlags)(seekflags) , position * GST_SECOND);;
+  gst_element_seek_simple(pipeline_playbin, GST_FORMAT_TIME, (GstSeekFlags)(seekflags) , position * GST_SECOND);
   return;
 } 
 
@@ -1231,7 +1231,7 @@ void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
 void GST_Interface::playerStop()
 {
 	gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
-	emit signalMessage(MBMP_GI::State, QString("%1 has changed state to %2").arg(PLAYER_NAME).arg(GST_STATE_NULL) );
+	emit signalMessage(MBMP_GI::State, QString("%1 has changed state to %2").arg(PLAYER_NAME).arg(gst_element_state_get_name(GST_STATE_NULL)) );
 	
 	return;
 }
