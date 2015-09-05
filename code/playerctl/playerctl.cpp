@@ -127,6 +127,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// set up an event filter on the position slider
 	ui.horizontalSlider_position->installEventFilter(this);
+	qApp->installEventFilter(this);
 	
 	// find the the optical drives, or at least the first five
 	for (int i = 0; i < 5; ++i) {
@@ -1368,8 +1369,9 @@ void PlayerControl::contextMenuEvent(QContextMenuEvent* e)
 }	
 
 
-//
-//	Event filter
+// Event filter used to filter out tooltip events if we don't want to see them
+// and to catch events to the position slider. In eventFilters returning true
+// eats the event, false passes on it.
 bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 {
 	if (watched == ui.horizontalSlider_position && event->type() == QEvent::MouseButtonPress )
@@ -1386,8 +1388,23 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 		}	// if left button
 		else 
 			return false;
-	}	// if 
+	}	// if
 	
+	// check tooltips.  Always allow playlistitem tooltips, sent from 
+	// qt_scrollarea_viewport.  I think this is the only qtt_scrollarea_viewport
+	// where tooltips might appear, but keep in mind I would not bet my life on it.
+	if (event->type() == QEvent::ToolTip) {
+    if (diag_settings->disableToolTips() ) {
+			if ( watched->objectName().contains("qt_scrollarea_viewport"))
+				return false;
+			else	
+				return true;
+		}	// if
+    else
+      return false;
+  } // event is a tooltip
+	
+	// not interested, pass it on
 	return false;
 }
 

@@ -48,6 +48,7 @@ Settings::Settings(QWidget *parent)
 	ui.groupBox_startoptions->setEnabled(settings->value("use_startoptions").toBool() );
 	ui.checkBox_retainstate->setChecked(settings->value("retain_state").toBool() );
 	ui.checkBox_retainplaylist->setChecked(settings->value("retain_playlist").toBool() );
+	ui.checkBox_disabletooltips->setChecked(settings->value("disable_tooltips").toBool() );
 	settings->endGroup();
 	
 	// save notification settings in data member
@@ -83,6 +84,7 @@ void Settings::writeSettings()
   settings->setValue("use_startoptions", ui.checkBox_usestartoptions->isChecked() );
   settings->setValue("retain_state", ui.checkBox_retainstate->isChecked() );
   settings->setValue("retain_playlist", ui.checkBox_retainplaylist->isChecked() );
+  settings->setValue("disable_tooltips", ui.checkBox_disabletooltips->isChecked() );
   settings->endGroup();
   
   settings->beginGroup("Notifications");
