@@ -1225,7 +1225,9 @@ void GST_Interface::changeConnectionSpeed(const guint64& ui64_speed)
 
 //
 // Slot to handle things then the player stops.  We don't get a bus 
-// signal since the watch stops (or pauses) when the player stops
+// signal going to NULL.  I think this is because the pipeline flushes
+// the bus going from READY to NULL.  No matter what the reason send a
+// signal to Playerctl that we had a state change.
 void GST_Interface::playerStop()
 {
 	gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
