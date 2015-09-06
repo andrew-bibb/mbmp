@@ -126,7 +126,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.progressBar_buffering->hide();	
 	
 	// set up an event filter on the position slider
-	ui.horizontalSlider_position->installEventFilter(this);
 	qApp->installEventFilter(this);
 	
 	// find the the optical drives, or at least the first five
@@ -1395,7 +1394,7 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 	// where tooltips might appear, but keep in mind I would not bet my life on it.
 	if (event->type() == QEvent::ToolTip) {
     if (diag_settings->disableToolTips() ) {
-			if ( watched->objectName().contains("qt_scrollarea_viewport"))
+			if (watched->objectName().contains("qt_scrollarea_viewport"))
 				return false;
 			else	
 				return true;

@@ -319,7 +319,9 @@ void Playlist::addFile(QAction* a)
   if (sl_files.size() > 0) {
 		if (ui.listWidget_playlist->count() > 0 ) {
 			this->setWindowTitle(tr("Playlist"));
-			if (ui.listWidget_playlist->item(0)->type() && (MBMP_PL::ACD | MBMP_PL::DVD)) ui.listWidget_playlist->clear();
+			if ( (ui.listWidget_playlist->item(0)->type() == MBMP_PL::ACD)	| 
+					 (ui.listWidget_playlist->item(0)->type() == MBMP_PL::DVD)	)
+				ui.listWidget_playlist->clear();
 		}
 		for (int i = 0; i < sl_files.size(); ++i) {
 			if (sl_files.at(i).endsWith(".m3u", Qt::CaseInsensitive) )
