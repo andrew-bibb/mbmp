@@ -1,9 +1,14 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>In Progress</b>
+<b>6 September 2015</b>
 <ul>
-</ul>Added Russian Translation (by Ilya Shestopalov).<li>
+<li>Added Russian Translation (by Ilya Shestopalov).<li>
+<li>Added option to send track changes to a notification daemon.</li>
+<li>Added DBus based IPC mechanism.</li>
+<li>Major rework of internal communication lines from GstBus to our code.<li>
+<li>Better handling for Audio CD's and DVD's.</li>
+</ul>
 <b>2 June 2015</b>
 <ul>
 <li>Fixed visualizer menu not activating when visualizer option is toggled</li>

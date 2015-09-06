@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 <b><center>Monkey Business Media Player (MBMP)</center></b>
-<center>Copyright (C) 2014</center>
-=======
-<b><center>Connman System Tray (CMST)</center></b>
-<center>Copyright (C) 2013-2014</center>
->>>>>>> a9924654cb846fa95c2a013174bb292f636f4ef7
+<center>Copyright (C) 2014-2015</center>
 <center>by</center>
 <center>Andrew J. Bibb</center>
 <br>License: <b>MIT</b> 
