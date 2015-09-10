@@ -1,10 +1,7 @@
 /**************************** resource.h *******************************
 
-Header file that contains program #defines.  It used to be that we kept
-all program update and version information in this single file.  Now
-we've moved a lot of that to txt files inside the /text directory which
-are compiled in as a resource.  This seems to result in a faster 
-compile, but we now have manage information in two locations.
+Header file that contains program #defines and information used across
+the program.
 
 Copyright (C) 2013-2014
 by: Andrew J. Bibb
@@ -35,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 ///////////////////////////////// Program Values ///////////////////////
 //
 // Program Info (may be visible, but don't mark for tranalation) 
-#define VERSION "15.09.06-1"
+#define VERSION "2015.09.10-1"
 #define RELEASE_DATE "6 September 2015"
 #define COPYRIGHT_DATE "2013-2015"
 

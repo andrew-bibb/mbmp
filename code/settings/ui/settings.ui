@@ -308,7 +308,7 @@
        <item row="6" column="0">
         <widget class="QLabel" name="label">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the log level (0-2) with higher numbers displaying more information.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the log level (0-4) with higher numbers displaying more information.&lt;/p&gt;&lt;p&gt;Default value is log level = 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Log Level</string>
