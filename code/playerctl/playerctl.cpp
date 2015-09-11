@@ -33,6 +33,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QRegExp>
 # include <QTime>
 # include <QFileInfo>
+# include <QProcess>
 
 # include "./code/scman/scman.h"
 # include "./code/iconman/iconman.h"
@@ -191,7 +192,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		ok = true;
 	}			
 	if (ok) gstiface->changeConnectionSpeed(cnxnspeed);		
-					
+	
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work provided
   // the toolbutton is visible.  Since we can hide GUI in this widget
@@ -602,6 +603,10 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 // Function to set the stream position.  This will set both the text
 // label and the slider. Called from this->pos_timer. Position
 // is the stream position in seconds.
+//
+// Added feature, send a xscreensaver deactive command if the screensaver
+// the option is selected in settings. 
+
 void PlayerControl::setPositionWidgets()
 {
 	// return if we are not playing
@@ -621,6 +626,9 @@ void PlayerControl::setPositionWidgets()
 	else {
 		ui.label_position->setText("00:00:00");
 	}
+	
+	// deactive xscreensaver, do this each time we process a new position (about twice a second)
+	if (diag_settings->disableXScreenSaver() ) QProcess::execute("xscreensaver-command -deactivate");
 	
 	return;
 }

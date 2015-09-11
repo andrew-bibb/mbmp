@@ -51,6 +51,8 @@ class Settings : public QDialog
     inline bool usePlaylist() {return ui.checkBox_retainplaylist->isChecked();}
     inline bool useNotifications() {return ui.checkBox_notifydaemon->isChecked();}
     inline bool disableToolTips() {return ui.checkBox_disabletooltips->isChecked();}
+    inline bool disableXScreenSaver() {return (ui.checkBox_disablexscreensaver->isEnabled() && ui.checkBox_disablexscreensaver->isChecked() );}
+    
   	void writeSettings();
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
   	void restoreElementGeometry(const QString&, QWidget*);

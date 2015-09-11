@@ -25,8 +25,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ***********************************************************************/ 
 
-
 # include <QtCore/QDebug>
+# include <QProcess>
 
 # include "./code/settings/settings.h"
 # include "./code/resource.h"
@@ -42,20 +42,22 @@ Settings::Settings(QWidget *parent)
   // read the settings
   settings = new QSettings(ORG, APP, this);
   
-  // save the preferences in a class data member
+  // preferences 
 	settings->beginGroup("Preferences");
 	ui.checkBox_usestartoptions->setChecked(settings->value("use_startoptions").toBool() );
 	ui.groupBox_startoptions->setEnabled(settings->value("use_startoptions").toBool() );
 	ui.checkBox_retainstate->setChecked(settings->value("retain_state").toBool() );
 	ui.checkBox_retainplaylist->setChecked(settings->value("retain_playlist").toBool() );
 	ui.checkBox_disabletooltips->setChecked(settings->value("disable_tooltips").toBool() );
+	ui.checkBox_disablexscreensaver->setChecked(settings->value("disable_xscreensaver").toBool() );
 	settings->endGroup();
 	
-	// save notification settings in data member
+	// notification settings
 	settings->beginGroup("Notifications");
 	ui.checkBox_notifydaemon->setChecked(settings->value("use_notifications").toBool() );
 	settings->endGroup();
 	
+	// start options
 	settings->beginGroup("StartOptions");
 	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
 	ui.checkBox_gui->setChecked(settings->value("start_gui").toBool() );
@@ -73,7 +75,10 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_promoted->setText(settings->value("promoted-elements").toString() );
 	ui.lineEdit_blacklisted->setText(settings->value("blacklisted-elements").toString() );
 	settings->endGroup();
-		
+	
+	// See if we can find XScreenSaver disable settings if we can't
+	QProcess::execute("xscreensaver-command -version") == 0 ? ui.checkBox_disablexscreensaver->setEnabled(true) : ui.checkBox_disablexscreensaver->setEnabled(false);		
+			
 	return;  
 }  
 
@@ -85,6 +90,7 @@ void Settings::writeSettings()
   settings->setValue("retain_state", ui.checkBox_retainstate->isChecked() );
   settings->setValue("retain_playlist", ui.checkBox_retainplaylist->isChecked() );
   settings->setValue("disable_tooltips", ui.checkBox_disabletooltips->isChecked() );
+  settings->setValue("disable_xscreensaver", ui.checkBox_disablexscreensaver->isChecked() );
   settings->endGroup();
   
   settings->beginGroup("Notifications");
@@ -136,7 +142,7 @@ void Settings::restoreElementGeometry(const QString& elem, QWidget* win)
 }
 
 //
-// Function to return a start option as a QVariant
+// Function to return a setting as a QVariant
 QVariant Settings::getSetting(const QString& group, const QString& elem)
 {
 	QVariant v;
@@ -154,8 +160,8 @@ QVariant Settings::getSetting(const QString& group, const QString& elem)
 void Settings::setNotificationsTrying(const QString& s)
 {
 	ui.label_serverstatus->setText(s);
-	ui.groupBox_notifications->setToolTip("");
-  ui.groupBox_notifications->setWhatsThis("");
+	ui.checkBox_notifydaemon->setToolTip("");
+  ui.checkBox_notifydaemon->setWhatsThis("");
 	
 	return;
 }
@@ -166,7 +172,7 @@ void Settings::setNotificationsConnected(const QString& tt, const QString& wt)
 {
 	ui.label_serverstatus->clear();
   ui.label_serverstatus->setDisabled(true);
-  ui.groupBox_notifications->setToolTip(tt);
+  ui.checkBox_notifydaemon->setToolTip(tt);
   ui.checkBox_notifydaemon->setWhatsThis(wt);
 	return;
 }
@@ -177,8 +183,6 @@ void Settings::setNotificationsFailed()
 {
 	ui.checkBox_notifydaemon->setChecked(false);
   ui.checkBox_notifydaemon->setEnabled(false);
-  ui.groupBox_notifications->setToolTip("");
-  ui.groupBox_notifications->setWhatsThis("");
 	
 	return;
 }
