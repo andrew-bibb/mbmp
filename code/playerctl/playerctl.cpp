@@ -628,7 +628,7 @@ void PlayerControl::setPositionWidgets()
 	}
 	
 	// deactive xscreensaver, do this each time we process a new position (about twice a second)
-	if (diag_settings->disableXScreenSaver() ) QProcess::execute("xscreensaver-command -deactivate");
+	if (diag_settings->useDisableXSS() ) QProcess::execute("xscreensaver-command -deactivate");
 	
 	return;
 }
@@ -1401,7 +1401,7 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 	// qt_scrollarea_viewport.  I think this is the only qtt_scrollarea_viewport
 	// where tooltips might appear, but keep in mind I would not bet my life on it.
 	if (event->type() == QEvent::ToolTip) {
-    if (diag_settings->disableToolTips() ) {
+    if (diag_settings->useDisableTT() ) {
 			if (watched->objectName().contains("qt_scrollarea_viewport"))
 				return false;
 			else	

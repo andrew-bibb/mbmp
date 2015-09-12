@@ -181,7 +181,6 @@ void Settings::setNotificationsConnected(const QString& tt, const QString& wt)
 // function to set ui elements if we failed to connect to a notification daemon
 void Settings::setNotificationsFailed()
 {
-	ui.checkBox_notifydaemon->setChecked(false);
   ui.checkBox_notifydaemon->setEnabled(false);
 	
 	return;
