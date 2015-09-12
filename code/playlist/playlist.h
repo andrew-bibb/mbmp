@@ -81,14 +81,16 @@ class Playlist : public QDialog
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
-		inline void removeAll() {ui.listWidget_playlist->clear(); updateSummary();}
+		inline void clearPlaylist() {ui.listWidget_playlist->clear(); updateSummary();}
 		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
 		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}
 		inline void triggerAddPlaylist() {if (ui.actionAddPlaylist->isEnabled()) ui.actionAddPlaylist->trigger();}
-		inline void triggerAddFiles() {if (ui.actionAddFiles->isEnabled()) ui.actionAddFiles->trigger();}
-		inline void clearPlaylist() {ui.listWidget_playlist->clear();}		
+		inline void triggerAddFiles() {if (ui.actionAddFiles->isEnabled()) ui.actionAddFiles->trigger();}	
 		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
 		inline void setCurrentRow(const int& row) {ui.listWidget_playlist->setCurrentRow(row);}
+		inline void toggleWrapMode() {ui.checkBox_consume->setChecked(false); ui.checkBox_wrap->toggle();}
+		inline void toggleConsumeMode() {ui.checkBox_wrap->setChecked(false); ui.checkBox_consume->toggle();}
+		inline void toggleRandomMode() {ui.checkBox_random->toggle();}
 	
 		inline QString getCurrentUri() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri() : QString();}
 		inline qint16 getCurrentSeq() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence() : -1;}

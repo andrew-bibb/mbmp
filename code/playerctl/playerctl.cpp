@@ -504,6 +504,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect(ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
 	connect(ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
 	connect(ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
+	connect(ipcagent, SIGNAL(controlToggleWrap()), playlist, SLOT(toggleWrapMode()));
+	connect(ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
+	connect(ipcagent, SIGNAL(controlToggleRandom()), playlist, SLOT(toggleRandomMode()));
 	
 	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -533,18 +536,33 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	QAction* pl_Act06 = new QAction(this);
 	this->addAction(pl_Act06);
-	pl_Act06->setShortcuts(scman.getKeySequence("cmd_cycleaudio") );
-	connect (pl_Act06, SIGNAL(triggered()), gstiface, SLOT(cycleAudioStream()));		
-		
+	pl_Act06->setShortcuts(scman.getKeySequence("cmd_togglewrap") );
+	connect (pl_Act06, SIGNAL(triggered()), playlist, SLOT(toggleWrapMode()));	
+	
 	QAction* pl_Act07 = new QAction(this);
 	this->addAction(pl_Act07);
-	pl_Act07->setShortcuts(scman.getKeySequence("cmd_cyclevideo") );
-	connect (pl_Act07, SIGNAL(triggered()), gstiface, SLOT(cycleVideoStream()));
-		
+	pl_Act07->setShortcuts(scman.getKeySequence("cmd_toggleconsume") );
+	connect (pl_Act07, SIGNAL(triggered()), playlist, SLOT(toggleConsumeMode()));	
+	
 	QAction* pl_Act08 = new QAction(this);
 	this->addAction(pl_Act08);
-	pl_Act08->setShortcuts(scman.getKeySequence("cmd_cyclesubtitle") );
-	connect (pl_Act08, SIGNAL(triggered()), gstiface, SLOT(cycleTextStream()));		
+	pl_Act08->setShortcuts(scman.getKeySequence("cmd_togglerandom") );
+	connect (pl_Act08, SIGNAL(triggered()), playlist, SLOT(toggleRandomMode()));	
+	
+	QAction* si_Act01 = new QAction(this);
+	this->addAction(si_Act01);
+	si_Act01->setShortcuts(scman.getKeySequence("cmd_cycleaudio") );
+	connect (si_Act01, SIGNAL(triggered()), gstiface, SLOT(cycleAudioStream()));		
+		
+	QAction* si_Act02 = new QAction(this);
+	this->addAction(si_Act02);
+	si_Act02->setShortcuts(scman.getKeySequence("cmd_cyclevideo") );
+	connect (si_Act02, SIGNAL(triggered()), gstiface, SLOT(cycleVideoStream()));
+		
+	QAction* si_Act03 = new QAction(this);
+	this->addAction(si_Act03);
+	si_Act03->setShortcuts(scman.getKeySequence("cmd_cyclesubtitle") );
+	connect (si_Act03, SIGNAL(triggered()), gstiface, SLOT(cycleTextStream()));		
 
 	//restore GUI elements
 	if (diag_settings->useState()) {

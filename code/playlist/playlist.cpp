@@ -73,6 +73,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	ui.actionRemoveAll->setIcon(iconman.getIcon("remove_all"));
 	ui.actionSavePlaylist->setIcon(iconman.getIcon("save_playlist"));
 	ui.actionAddPlaylist->setIcon(iconman.getIcon("add_playlist"));
+	ui.actionToggleWrap->setIcon(iconman.getIcon("playlist_wrap"));
+	ui.actionToggleConsume->setIcon(iconman.getIcon("playlist_consume"));
+	ui.actionToggleRandom->setIcon(iconman.getIcon("playlist_random"));
   
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work.  If there
@@ -83,6 +86,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	this->addAction(ui.actionAddAudio);
 	this->addAction(ui.actionAddVideo);
 	this->addAction(ui.actionAddPlaylist);
+	this->addAction(ui.actionAddPlaylist);
 	this->addAction(ui.actionAddFiles);
 	this->addAction(ui.actionAddURL);
 	this->ui.toolButton_remove->setDefaultAction(ui.actionRemoveItem);
@@ -91,6 +95,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	this->ui.toolButton_exit->setDefaultAction(ui.actionHidePlaylist);
 	this->addAction(ui.actionSavePlaylist);
 	this->ui.toolButton_save->setDefaultAction(ui.actionSavePlaylist);
+	this->addAction(ui.actionToggleWrap);
+	this->addAction(ui.actionToggleConsume);
+	this->addAction(ui.actionToggleRandom);
 	
 	// add actions to action groups
 	media_group = new QActionGroup(this);	
@@ -122,6 +129,10 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	playlist_menu->addAction(ui.actionSavePlaylist);
 	playlist_menu->addSeparator();	
 	playlist_menu->addAction(ui.actionHidePlaylist);	
+	playlist_menu->addSeparator();	
+	playlist_menu->addAction(ui.actionToggleWrap);
+	playlist_menu->addAction(ui.actionToggleConsume);
+	playlist_menu->addAction(ui.actionToggleRandom);
 		  
   // add the shortcuts defined by the user to the actions
   ShortCutManager scman(this);
@@ -136,6 +147,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   ui.actionRemoveAll->setShortcuts(scman.getKeySequence("cmd_removeall") );
   ui.actionHidePlaylist->setShortcuts(scman.getKeySequence("cmd_playlist") );
   ui.actionSavePlaylist->setShortcuts(scman.getKeySequence("cmd_saveplaylist") );
+  ui.actionToggleWrap->setShortcuts(scman.getKeySequence("cmd_togglewrap") );
+  ui.actionToggleConsume->setShortcuts(scman.getKeySequence("cmd_toggleconsume") );
+  ui.actionToggleRandom->setShortcuts(scman.getKeySequence("cmd_togglerandom") );
   
   // connect signals to slots
   connect (ui.actionMoveUp, SIGNAL(triggered()), this, SLOT(moveItemUp()));
@@ -144,10 +158,13 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionAddURL, SIGNAL(triggered()), this, SLOT(addURL()));
   connect (media_group, SIGNAL(triggered(QAction*)), this, SLOT(addFile(QAction*)));
   connect (ui.actionRemoveItem, SIGNAL(triggered()), this, SLOT(removeItem()));
-  connect (ui.actionRemoveAll, SIGNAL(triggered()), this, SLOT(removeAll()));
+  connect (ui.actionRemoveAll, SIGNAL(triggered()), this, SLOT(clearPlaylist()));
   connect (ui.actionHidePlaylist, SIGNAL(triggered()), this, SLOT(hide()));
   connect (ui.listWidget_playlist, SIGNAL(itemDoubleClicked(QListWidgetItem*)), qobject_cast<PlayerControl*>(parent), SLOT(playMedia()));
   connect (ui.actionSavePlaylist, SIGNAL(triggered()), this, SLOT(savePlaylist()));
+  connect (ui.actionToggleWrap, SIGNAL(triggered()), this, SLOT(toggleWrapMode()));
+  connect (ui.actionToggleConsume, SIGNAL(triggered()), this, SLOT(toggleConsumeMode()));
+  connect (ui.actionToggleRandom, SIGNAL(triggered()), this, SLOT(toggleRandomMode()));
 }
 
 ////////////////////////////// Public Slots ////////////////////////////
@@ -682,5 +699,4 @@ void Playlist::updateSummary()
 	
 	return;
 }
-
 

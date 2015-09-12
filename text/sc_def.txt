@@ -95,7 +95,7 @@ cmd_dvd_activate =      alt+return    # Activate the selected button            
 # These are playlist related actions
 cmd_moveup =        ctrl+up           # Move a playlist entry up one line                 y             e
 cmd_movedown =      ctrl+down         # Move a playlist entry down one line               y             e
-cmd_removeitem =    ctrl+C            # Remove a playlist entry                           y             e
+cmd_removeitem =    ctrl+-            # Remove a playlist entry                           y             e
 cmd_removeall =     ctrl+del          # Remove all playlist entries                       y             e
 cmd_addmedia =      ctrl+ins          # Add media to the playlist                     y   y         E   
 cmd_addfile =       ctrl+F            # Add a file (audio or video) to the playlist   w   y         e   e
@@ -103,12 +103,16 @@ cmd_addaudio =      ctrl+A            # Add an audio file to the playlist       
 cmd_addvideo =      ctrl+V            # Add a video file to the playlist              w   y         e   e
 cmd_addplaylist =   ctrl+P            # Add entries contained in a playlist (.m3u)    w   y         e   e
 cmd_addurl =        ctrl+U            # Add a URL to the playlist                     w   y         e   e
-cmd_saveplaylist =  ctrl+S            # Save the playlist to disk                         y             e
+cmd_saveplaylist =  ctrl+S            # Save the playlist to disk                     w   y             e
+cmd_togglewrap	=		ctrl+W						# Toggle the wrap action												w		y					e		e
+cmd_toggleconsume = ctrl+C						# Toggle the consume action											w		y					e		e
+cmd_togglerandom	= ctrl+R						#	Toggle the random action											w		y					e		e
+
 #
 # These are streaminfo related actions
-cmd_cycleaudio =      ~               # Cycle through available audio streams                 y     e       e
-cmd_cyclevideo =      !               # Cycle through available video streams                 y     e       e
-cmd_cyclesubtitle =   @               # Cycle through availabe subtitle streams               y     e       e
+cmd_cycleaudio =      ~               # Cycle through available audio streams         w       y     e       e
+cmd_cyclevideo =      !               # Cycle through available video streams         w       y     e       e
+cmd_cyclesubtitle =   @               # Cycle through availabe subtitle streams       w       y     e       e
 #
 #
 #	We need a list of all keys only accessible by using the Shift key.  This does not include any letter

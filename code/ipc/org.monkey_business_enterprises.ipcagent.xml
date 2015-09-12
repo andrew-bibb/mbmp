@@ -16,6 +16,12 @@
     </method>
     <method name="playlistBack">
     </method>
+    <method name="toggleWrapMode">
+    </method>
+    <method name="toggleConsumeMode">
+    </method>
+    <method name="toggleRandomMode">
+    </method>
     <method name="getSequence">
       <arg type="i" direction="out"/>
     </method>

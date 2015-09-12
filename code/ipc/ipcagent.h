@@ -63,6 +63,10 @@ class IPC_Agent : public QObject, protected QDBusContext
 		Q_SCRIPTABLE inline void playPause() {emit controlPlaypause();}
 		Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
 		Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
+		Q_SCRIPTABLE inline void	toggleWrapMode() {emit controlToggleWrap();}
+		Q_SCRIPTABLE inline void toggleConsumeMode() {emit controlToggleConsume();}
+		Q_SCRIPTABLE inline void toggleRandomMode() {emit controlToggleRandom();}
+		
 		
 		Q_SCRIPTABLE inline int getSequence() {return vmap.value("sequence").toInt();}
 		Q_SCRIPTABLE inline QString getUri() {return vmap.value("uri").toString();}
@@ -86,6 +90,9 @@ class IPC_Agent : public QObject, protected QDBusContext
 		void controlPlaypause();
 		void controlPlaylistNext();
 		void controlPlaylistBack();
+		void controlToggleWrap();
+		void controlToggleConsume();
+		void controlToggleRandom();
 		
 	private:
 		// data members

@@ -155,6 +155,21 @@ resource = :/images/images/16x16/finish.png
 fdo_name = go-last
 
 [icon]
+icon_name = playlist_wrap
+resource = :/images/images/16x16/kaboodleloop.png
+fdo_name = media-playlist-repeat
+
+[icon]
+icon_name = playlist_random
+resource = :/images/images/16x16/mix_unknown.png
+fdo_name = media-playlist-shuffle
+
+[icon]
+icon_name = playlist_consume
+resource = :/images/images/16x16/trashcan_full.png
+theme_names = user-trash-full
+
+[icon]
 icon_name = visualizer 
 resource = :/images/images/16x16/kwikdisk.png
 fdo_name = preferences-desktop-screensaver

@@ -9,6 +9,9 @@
     <file>media/silence.ogg</file>
   </qresource>
   <qresource prefix="images">
+    <file>images/16x16/trashcan_full.png</file>
+    <file>images/16x16/mix_unknown.png</file>
+    <file>images/16x16/kaboodleloop.png</file>
     <file>images/16x16/help.png</file>
     <file>images/16x16/kscd.png</file>
     <file>images/16x16/view_text.png</file>

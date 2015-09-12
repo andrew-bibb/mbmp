@@ -260,14 +260,35 @@
    </property>
   </action>
   <action name="actionAddPlaylist">
-   <property name="icon">
-    <iconset theme="text-x-generic"/>
-   </property>
    <property name="text">
     <string>Add Playlist</string>
    </property>
    <property name="toolTip">
     <string>Add Files from .m3u playlist</string>
+   </property>
+  </action>
+  <action name="actionToggleWrap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Wrap</string>
+   </property>
+  </action>
+  <action name="actionToggleConsume">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Consume</string>
+   </property>
+  </action>
+  <action name="actionToggleRandom">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Random</string>
    </property>
   </action>
  </widget>
@@ -282,12 +303,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>114</x>
-     <y>290</y>
+     <x>156</x>
+     <y>251</y>
     </hint>
     <hint type="destinationlabel">
-     <x>38</x>
-     <y>290</y>
+     <x>49</x>
+     <y>251</y>
     </hint>
    </hints>
   </connection>
@@ -298,12 +319,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>38</x>
-     <y>290</y>
+     <x>49</x>
+     <y>251</y>
     </hint>
     <hint type="destinationlabel">
-     <x>114</x>
-     <y>290</y>
+     <x>156</x>
+     <y>251</y>
     </hint>
    </hints>
   </connection>
