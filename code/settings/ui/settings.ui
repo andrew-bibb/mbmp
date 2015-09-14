@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>601</width>
-    <height>441</height>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="0" column="0">
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -88,7 +88,7 @@
             <bool>true</bool>
            </property>
            <property name="whatsThis">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the system desktop notification daemon will popup a notify message when a significant connman related event is received.&lt;/p&gt;&lt;p&gt;Notifications can be handled by the System Tray Icon, or by a Notification daemon if one is installed. Both can not be active at the same time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the system desktop notification daemon will popup a notify message when a significant connman related event is received. This option will only be available if MBMP is able to detect a notification daemon running on your system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Notification Daemon</string>
@@ -115,8 +115,18 @@
        </item>
        <item row="6" column="0">
         <widget class="QCheckBox" name="checkBox_disablexscreensaver">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked the XScreenSaver will not engage while MBMP is playing. This option will only be available if MBMP is able to detect XScreenSaver running on your system.&lt;/p&gt;&lt;p&gt;The option is a bit misnamed as XScreenSaver is not actually disabled, in fact just the opposite. If this option is checked MBMP will send a message periodically to XScreenSaver saying that the system is in use. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Disable XScreenSaver</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -128,17 +138,10 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>317</height>
+           <height>40</height>
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="3" column="0">
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -201,7 +204,7 @@
           <string> kbps</string>
          </property>
          <property name="maximum">
-          <number>1844674407</number>
+          <number>184467441</number>
          </property>
          <property name="singleStep">
           <number>128</number>
@@ -436,11 +439,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>448</x>
-     <y>413</y>
+     <y>495</y>
     </hint>
     <hint type="destinationlabel">
      <x>501</x>
-     <y>-13</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -452,11 +455,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>538</x>
-     <y>415</y>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
      <x>525</x>
-     <y>-3</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -483,12 +486,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>352</x>
-     <y>186</y>
+     <x>401</x>
+     <y>214</y>
     </hint>
     <hint type="destinationlabel">
-     <x>448</x>
-     <y>181</y>
+     <x>579</x>
+     <y>215</y>
     </hint>
    </hints>
   </connection>

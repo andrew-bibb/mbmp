@@ -181,7 +181,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (loglevel > 4 ) loglevel = 4; 	
 	b_logtofile = logfile.open(QIODevice::Append | QIODevice::Text);
 					
-	// setup the connection speed
+	// setup the connection speed - note that gstreamer takes a guint64, but
+	// the spinbox in the UI maxes out at quite a bit lower number.  Not sure
+	// exaxtly what the units are supposed to be.  The one example I can find
+	// on the internet uses a value of 56 which looks like an old dialup modem
+	// to me.  If that is the case it seems kind of excessive to send a guint64.  
 	quint64 cnxnspeed = 0;
 	ok = false;
 	if (parser.isSet("connection-speed") ) {

@@ -78,7 +78,7 @@ Settings::Settings(QWidget *parent)
 	
 	// See if we can find XScreenSaver disable settings if we can't
 	QProcess::execute("xscreensaver-command -version") == 0 ? ui.checkBox_disablexscreensaver->setEnabled(true) : ui.checkBox_disablexscreensaver->setEnabled(false);		
-			
+		
 	return;  
 }  
 
