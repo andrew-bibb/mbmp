@@ -1,0 +1,70 @@
+.TH	MBMP 1 "13 September 2015" "Version: 2015.09.13"
+.SH NAME
+MBMP - Media Player
+.SH SYNOPSIS
+Usage: mbmp [options] [filelist]
+.SH DESCRIPTION
+A QT5 and GStreamer 1.0 series media player.
+.SH OPTIONS
+.TP
+\fB-b, --stream-buffering\fP
+Enable buffering of the demuxed or parsed data in the stream (default is no stream buffering).
+.TP
+\fB-c, --connection-speed <connection-speed>\fP
+Specify the network connection speed in kbps.  The default is 0 meaning unknown.  GStreamer uses this internally to make decisions
+regarding buffering.
+.TP
+\fB-d, --download-buffering\fP
+Enable progressive download buffering of selected formats.  The default is no download buffering.  Setting this can improve viewing
+of internet streams.
+.TP
+\fB-f, --fullscreen\fP
+Start the player in fullscreen mode.
+.TP
+\fB-g, --gui\fP
+Start the player with the GUI showing.
+.TP
+\fB-h, --help\fP
+Displays this help.
+.TP
+\fB-i, --icon-theme <Icon Theme Name>\fP
+Use a specific icon theme from your system. The Icon Theme name is optional and if specified CMST will try to use icons from that
+theme.  If no name is provided and if a system wide icon theme is defined (via your DE) it will be used.  If the icon theme cannot
+be found CMST will fallback to using internal built in icons. 
+.TP
+\fB-l, --loglevel\fP
+Set the log level from 0-4.  Higher numbers write more information to the log file and to the screen if you started the program
+in a terminal.  Default is 1.
+.TP
+\fB-s, --subtitles\fP
+Enable display of subtitles if a subtitle stream is found.  Default is no subtitles.
+.TP
+\fB-v, --version\fP
+Displays version information.
+.TP
+\fB-C, --CD <CD Drive>\fP
+Specify which optical drive is used to play Audio CD's.  Default is /dev/sr0.
+.TP
+\fB-D, --DVD <DVD Drive>\fP
+Specify which optical drive is used to play DVD's.  Default is /dev/sr0.
+.TP
+\fB-w, --wait-time <seconds>\fP
+Specify the wait time in seconds before starting the system tray icon (default is 0 seconds).  If CMST is started and tries to
+create a tray icon before the system tray itself is created a dialog will be displayed explaining that.  This sometimes happens when the 
+program is started automatically.  If you know the tray will exist once the system is up you may specify a wait time and CMST 
+will wait that number of seconds before trying to create the tray icon.  This is to give the window manager or panel time to create 
+the tray before we try to place the icon there.
+.TP
+\fB-V, --visualizer\fP
+Enable a visualizer when playing audio tracks.  Default is no visualizer. 
+.SH FILELIST
+The filelist is an optional list of media files you would like queue up into the playlist.  Each file should be separated from any
+other by whitespace.  There will be fewer errors if each file is listed between double quotes.  Example: "/path01/file01" "path02/file02"
+.SH BUGS
+We have found a very few DVD's which won't play in MBMP.  They also won't play from the GStreamer gst-play-1.0 command.  This command
+uses the GStreamer playbin element as does MBMP, so we do not believe it is an issue with this program.  Interestingly the DVD's can 
+be opened and read by building a pipeline manually without using the autoplugging from playbin.  It does not seem to have anything to do
+with encryption or protection as the disks we've seen it on are not protected, and we can play ARccOS protected DVD's.  
+.SH Author
+Andrew J. Bibb.  Project web page: https://github.com/andrew-bibb/mbmp
+

@@ -3,6 +3,12 @@ CONFIG += qt
 CONFIG += warn_on
 CONFIG += release
 
+# define a path for the man page
+MBMP_DOC_PATH = $$(USE_MANPATH)
+isEmpty ( MBMP_DOC_PATH ) {
+	MBMP_DOC_PATH = "/usr/share/man"
+}
+
 #  Widgets needed for QT5, 
 QT += widgets
 QT += core
