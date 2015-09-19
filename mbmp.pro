@@ -1,4 +1,4 @@
-#  We need the qt libraries, we want compiler warnings on, and this is a release version of the program  
+mak#  We need the qt libraries, we want compiler warnings on, and this is a release version of the program  
 CONFIG += qt
 CONFIG += warn_on
 CONFIG += release
@@ -8,6 +8,13 @@ MBMP_DOC_PATH = $$(USE_MANPATH)
 isEmpty ( MBMP_DOC_PATH ) {
 	MBMP_DOC_PATH = "/usr/share/man"
 }
+
+# documentation (manpage)
+documentation.path = $$MBMP_DOC_PATH/man1
+documentation.files = ./misc/manpage/mbmp.1.gz
+documentation.CONFIG = no_check_exist
+documentation.extra = gzip --force --keep ./misc/manpage/mbmp.1
+INSTALLS += documentation
 
 #  Widgets needed for QT5, 
 QT += widgets
