@@ -5,12 +5,13 @@ MBMP is a fairly conventional media player using QT5 for the user interface and 
 
 Becasue we use GStreamer most any media format can be played provided the GStreamer plugins are installed on your system. Additionally audio CD's and DVD's can be played, and for DVD's interaction with onscreen menus is implemented with either mouse or keyboard control. There is a basic playlist available and it is also possible to play media from an internet URL.
 
-There are three modes available to control the player.  The basic interface is an MPlayer like one with keyboard control. Key bindings are completely cusomizable for each user.  There is also a GUI built in (default keybind 'g' to raise it).
-Third mode is an extensive popup menu system similar to ROX-Filer, with some menus tearoff enabled.  Activate the menus by a right mouse click anywhere in the player window.
+There are three modes available to control the player.  The basic interface is an MPlayer like one with keyboard control. Key bindings are completely cusomizable for each user.  There is also a GUI built in (default keybind 'g' to raise it). The third mode is an extensive popup menu system similar to ROX-Filer, with some menus tearoff enabled.  Activate the menus by a right mouse click anywhere in the player window.
 
 If you have a notification daemon running it is possible to send playlist track changes to it.  This is controlled from the settings dialog.
 
 A DBUS based interprocess communication (IPC) interface has also been implemented.  Documentation is in the wiki.
 
 Update (September 2015)
-The interface is essentially complete.  There are still a few advanced items to implement (color balance, av sync, etc), but all the main parts are there and working.  Future development effort will be aimed at improving the playlist and eventually downloading metadata from online sources.
+The interface is essentially complete.  There are still a few advanced items to implement (color balance, av sync, etc), but all the main parts are there and working.
+
+Future development effort will be aimed at improving the playlist or a separate media manager and eventually downloading metadata (tags and album art) from online sources. It is my intention to keep the media player as a media player so it is not clear at the moment how these featurs will be implemented.  Possibly as plugins, or possibly as stand alone programs that communicate with the player via the IPC.     
