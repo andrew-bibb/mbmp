@@ -161,7 +161,6 @@ void Settings::setNotificationsTrying(const QString& s)
 {
 	ui.label_serverstatus->setText(s);
 	ui.checkBox_notifydaemon->setToolTip("");
-  ui.checkBox_notifydaemon->setWhatsThis("");
 	
 	return;
 }
