@@ -60,7 +60,7 @@ class Settings : public QDialog
   	QStringList getPlaylist();
   	QVariant getSetting(const QString&, const QString&);
   	void setNotificationsTrying(const QString&); 
-  	void setNotificationsConnected(const QString&, const QString&);
+  	void setNotificationsConnected(const QString&);
   	void setNotificationsFailed(); 	    
     
   private:

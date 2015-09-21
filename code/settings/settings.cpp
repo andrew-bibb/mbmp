@@ -168,12 +168,11 @@ void Settings::setNotificationsTrying(const QString& s)
 
 //
 // Function to set ui elements if a notification daemon is connected
-void Settings::setNotificationsConnected(const QString& tt, const QString& wt)
+void Settings::setNotificationsConnected(const QString& ttip)
 {
 	ui.label_serverstatus->clear();
   ui.label_serverstatus->setDisabled(true);
-  ui.checkBox_notifydaemon->setToolTip(tt);
-  ui.checkBox_notifydaemon->setWhatsThis(wt);
+  ui.checkBox_notifydaemon->setToolTip(ttip);
 	return;
 }
 

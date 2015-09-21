@@ -88,10 +88,10 @@
             <bool>true</bool>
            </property>
            <property name="whatsThis">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the system desktop notification daemon will popup a notify message when a significant connman related event is received. This option will only be available if MBMP is able to detect a notification daemon running on your system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the system desktop notification daemon will popup a notify message the playlist starts playing a new track.&lt;/p&gt;&lt;p&gt;This option will only be available if MBMP is able to detect a notification daemon running on your system.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
-            <string>Notification Daemon</string>
+            <string>Use Notifications</string>
            </property>
           </widget>
          </item>

@@ -1339,7 +1339,7 @@ void PlayerControl::connectNotifyClient()
       .arg(notifyclient->getServerVersion() )
       .arg(vendor)
       .arg(notifyclient->getServerSpecVersion() );
-    diag_settings->setNotificationsConnected(tr("%1 detected").arg(name), lab);
+    diag_settings->setNotificationsConnected(lab);
   }
   // not successful, try again or abandon if counter is at limit
   else {
