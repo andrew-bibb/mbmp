@@ -78,6 +78,16 @@ Settings::Settings(QWidget *parent)
 	
 	// See if we can find XScreenSaver disable settings if we can't
 	QProcess::execute("xscreensaver-command -version") == 0 ? ui.checkBox_disablexscreensaver->setEnabled(true) : ui.checkBox_disablexscreensaver->setEnabled(false);		
+
+	// See if we can find something xdg-open can open
+	QProcess* qp = new QProcess(this);
+	qp->start("xdg-mime query default text/plain");
+	qp->waitForFinished(2000);	// give 2 seconds to finish
+	bool b_disable = (QString(qp->readAllStandardOutput()).isEmpty() ? true : false);
+	ui.checkBox_startfresh->setDisabled(b_disable);
+	ui.pushButton_editkeyfile->setDisabled(b_disable);
+	ui.pushButton_editiconfile->setDisabled(b_disable);
+
 		
 	return;  
 }  

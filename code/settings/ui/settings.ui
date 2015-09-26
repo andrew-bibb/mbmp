@@ -143,6 +143,42 @@
          </property>
         </spacer>
        </item>
+       <item row="8" column="0">
+        <widget class="QGroupBox" name="groupBox_edit">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the user copy of the &lt;span style=&quot; font-weight:600;&quot;&gt;mbmp.keys&lt;/span&gt; and&lt;span style=&quot; font-weight:600;&quot;&gt; mbmp.icon&lt;/span&gt; files. &lt;/p&gt;&lt;p&gt;This uses xdg-open and if there mime type for text/plain found the controls will be disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="title">
+          <string>Edit Configuration Files</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="pushButton_editkeyfile">
+            <property name="text">
+             <string>Key Binds</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pushButton_editiconfile">
+            <property name="text">
+             <string>Icons</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBox_startfresh">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked a fresh copy of the configuration file will be used when you click one of the edit buttons.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Warning: Checking this box will overwrite any customizations which you've already made.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Start Fresh</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QGroupBox" name="groupBox_startoptions">
