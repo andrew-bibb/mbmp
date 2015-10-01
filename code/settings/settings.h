@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QPoint>
 # include <QVariant>
 # include <QStringList>
+# include <QButtonGroup>
 
 # include "ui_settings.h"
 
@@ -62,11 +63,15 @@ class Settings : public QDialog
   	void setNotificationsTrying(const QString&); 
   	void setNotificationsConnected(const QString&);
   	void setNotificationsFailed(); 	    
-    
+  
   private:
   // members 
     Ui::Settings ui;    
     QSettings* settings;
+    QButtonGroup* bg01;
+    
+  private slots:
+		void openEditor(QAbstractButton*);
 
 };
 

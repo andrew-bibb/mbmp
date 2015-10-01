@@ -27,6 +27,8 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QtCore/QDebug>
 # include <QProcess>
+# include <QDir>
+# include <QInputDialog>
 
 # include "./code/settings/settings.h"
 # include "./code/resource.h"
@@ -76,17 +78,16 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_blacklisted->setText(settings->value("blacklisted-elements").toString() );
 	settings->endGroup();
 	
+	// Set up the buttonGroup for the editing buttons
+	bg01 = new QButtonGroup(this);
+	bg01->addButton(ui.pushButton_editiconfile);
+	bg01->addButton(ui.pushButton_editkeyfile);
+	
+	// Connect signals and slots
+	connect(bg01, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(openEditor(QAbstractButton*)));
+	
 	// See if we can find XScreenSaver disable settings if we can't
 	QProcess::execute("xscreensaver-command -version") == 0 ? ui.checkBox_disablexscreensaver->setEnabled(true) : ui.checkBox_disablexscreensaver->setEnabled(false);		
-
-	// See if we can find something xdg-open can open
-	QProcess* qp = new QProcess(this);
-	qp->start("xdg-mime query default text/plain");
-	qp->waitForFinished(2000);	// give 2 seconds to finish
-	bool b_disable = (QString(qp->readAllStandardOutput()).isEmpty() ? true : false);
-	ui.checkBox_startfresh->setDisabled(b_disable);
-	ui.pushButton_editkeyfile->setDisabled(b_disable);
-	ui.pushButton_editiconfile->setDisabled(b_disable);
 
 		
 	return;  
@@ -220,4 +221,36 @@ QStringList Settings::getPlaylist()
 	return sl;
 }
 
+//////////////////////////////////// Private Slots /////////////////
+//
+void Settings::openEditor(QAbstractButton* button)
+{
+	QString filename;
+	
+	if (button == ui.pushButton_editiconfile) filename = "mbmp.icon";
+	else if (button == ui.pushButton_editkeyfile) filename = "mbmp.keys";
+	 
+	// Try xdg-open for the editor.  if that fails have the user specify the editor to use 
+	if (QProcess::execute(QString("xdg-open %1/.config/mbmp/%2").arg(QDir::homePath()).arg(filename)) != 0) {
+		bool ok;
+		QString text = QInputDialog::getText(this, tr("Text Editor Not Found"),
+				tr("xdg-open is not configured to open files of type: <b>text/plain</b>."
+				"<br>An editor needs to be specified if you wish to continue."
+				"<p>For GUI editors entering the name of the editor should be sufficient."
+				"<br>If you want a console editor enter the terminal command<br>which you wish to run the editor in. (example: xterm -e vi)"
+				"<p>Please enter the name of the editor to use."),
+				QLineEdit::Normal, QString(), &ok);
+	
+		if (ok && ! text.isEmpty() ) {
+			text = text.simplified();
+			QStringList args = text.split(' ');
+			QString editor = args.first();
+			args.removeFirst();
+			args << QString(QDir::homePath() + "/.config/mbmp/" + filename);
+			QProcess* proc = new QProcess(this);
+			proc->start(editor, args);			  
+		}	// if ok and editor defined
+	}	// if xdg-open failed
 
+	return;
+}
