@@ -69,7 +69,7 @@ class Settings : public QDialog
     Ui::Settings ui;    
     QSettings* settings;
     QButtonGroup* bg01;
-    QString texteditor;
+    QString editor_string;
     
   private slots:
 		void openEditor(QAbstractButton*);

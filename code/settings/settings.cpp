@@ -43,7 +43,7 @@ Settings::Settings(QWidget *parent)
   ui.setupUi(this);	
   
   // data members
-  texteditor = QString();
+  editor_string = QString();
   
   // read the settings
   settings = new QSettings(ORG, APP, this);
@@ -84,7 +84,7 @@ Settings::Settings(QWidget *parent)
 	
 	// external programs
 	settings->beginGroup("ExternalPrograms");
-	texteditor = settings->value("text_editor").toString();
+	editor_string = settings->value("text_editor").toString();
 	settings->endGroup();
 	
 	// Set up the buttonGroup for the editing buttons
@@ -135,7 +135,7 @@ void Settings::writeSettings()
   settings->endGroup();
   
  	settings->beginGroup("ExternalPrograms");
-	settings->setValue("text_editor", texteditor);
+	settings->setValue("text_editor", editor_string);
 	settings->endGroup();
   
   return;
@@ -286,18 +286,18 @@ void Settings::openEditor(QAbstractButton* button)
 				"<p>For GUI editors entering the name of the editor should be sufficient."
 				"<br>If you want a console editor enter the terminal command<br>which you wish to run the editor in. (example: xterm -e vi)"
 				"<p>Please enter editor start command below."),
-				QLineEdit::Normal, texteditor, &ok);
+				QLineEdit::Normal, editor_string, &ok);
 	
 		if (ok && ! text.isEmpty() ) {
 			text = text.simplified();
-			texteditor = text;	// save for future use
+			editor_string = text;	// save for future use
 			QStringList args = text.split(' ');
 			QString editor = args.first();
 			args.removeFirst();
 			args << filename;
 			QProcess* proc = new QProcess(this);
 			proc->startDetached(editor, args);			  
-		}	// if ok and editor defined
+		}	// if ok and text not empty
 	
 	return;
 }
