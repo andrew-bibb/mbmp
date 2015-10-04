@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QProcess>
 # include <QDir>
 # include <QInputDialog>
+# include <QFile>
 
 # include "./code/settings/settings.h"
 # include "./code/resource.h"
@@ -40,6 +41,9 @@ Settings::Settings(QWidget *parent)
 {	
   // setup the user interface
   ui.setupUi(this);	
+  
+  // data members
+  texteditor = QString();
   
   // read the settings
   settings = new QSettings(ORG, APP, this);
@@ -76,6 +80,11 @@ Settings::Settings(QWidget *parent)
 	ui.spinBox_connectionspeed->setValue(settings->value("connection_speed").toInt() );
 	ui.lineEdit_promoted->setText(settings->value("promoted-elements").toString() );
 	ui.lineEdit_blacklisted->setText(settings->value("blacklisted-elements").toString() );
+	settings->endGroup();
+	
+	// external programs
+	settings->beginGroup("ExternalPrograms");
+	texteditor = settings->value("text_editor").toString();
 	settings->endGroup();
 	
 	// Set up the buttonGroup for the editing buttons
@@ -124,6 +133,10 @@ void Settings::writeSettings()
   settings->setValue("promoted-elements", ui.lineEdit_promoted->text() );
   settings->setValue("blacklisted-elements", ui.lineEdit_blacklisted->text() );
   settings->endGroup();
+  
+ 	settings->beginGroup("ExternalPrograms");
+	settings->setValue("text_editor", texteditor);
+	settings->endGroup();
   
   return;
 }
@@ -226,31 +239,65 @@ QStringList Settings::getPlaylist()
 void Settings::openEditor(QAbstractButton* button)
 {
 	QString filename;
+	QString qrc;
 	
-	if (button == ui.pushButton_editiconfile) filename = "mbmp.icon";
-	else if (button == ui.pushButton_editkeyfile) filename = "mbmp.keys";
+	if (button == ui.pushButton_editiconfile) {
+		filename = "mbmp.icon";
+		qrc = QString(":/text/text/icon_def.txt");	
+	}
+	else if (button == ui.pushButton_editkeyfile) {
+		filename = "mbmp.keys";
+		qrc = QString(":/text/text/sc_def.txt");
+	}
+	
+	// Convert filename to full path and name
+	filename = QString(QDir::homePath() + "/.config/mbmp/" + filename);
+		
+	// Initialize the text file if requested
+	if (ui.checkBox_startfresh->isChecked() ) {
+		ui.checkBox_startfresh->setChecked(false);
+	
+		// The target directory must already exist since that is checked when
+		// the iconmanager and scmanager are initialized so no need to check here.
+		QFile s(qrc);	
+
+		if (s.remove(filename) ) {	
+			if (s.copy(filename) ) 
+				QFile::setPermissions(filename, QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+			else	
+			#if QT_VERSION >= 0x050400 
+				qCritical("Failed copying %s to %s", qUtf8Printable(qrc), qUtf8Printable(filename) );
+			#else	
+				qCritical("Failed copying %s to %s", qPrintable(qrc), qPrintable(filename) );		
+			#endif
+		}	// if s.remove
+		else 
+		#if QT_VERSION >= 0x050400 
+			qCritical("Failed removing: %s", qUtf8Printable(filename) );
+		#else	
+			qCritical("Failed removing: %s", qPrintable(filename) );		
+		#endif	
+	}	// if startfresh
 	 
-	// Try xdg-open for the editor.  if that fails have the user specify the editor to use 
-	if (QProcess::execute(QString("xdg-open %1/.config/mbmp/%2").arg(QDir::homePath()).arg(filename)) != 0) {
+	// Prompt for an editor to use.
 		bool ok;
-		QString text = QInputDialog::getText(this, tr("Text Editor Not Found"),
-				tr("xdg-open is not configured to open files of type: <b>text/plain</b>."
-				"<br>An editor needs to be specified if you wish to continue."
+		QString text = QInputDialog::getText(this, tr("Supply Text Editor Command"),
+				tr("A text editor start command needs to be specified if you wish to continue."
 				"<p>For GUI editors entering the name of the editor should be sufficient."
 				"<br>If you want a console editor enter the terminal command<br>which you wish to run the editor in. (example: xterm -e vi)"
-				"<p>Please enter the name of the editor to use."),
-				QLineEdit::Normal, QString(), &ok);
+				"<p>Please enter editor start command below."),
+				QLineEdit::Normal, texteditor, &ok);
 	
 		if (ok && ! text.isEmpty() ) {
 			text = text.simplified();
+			texteditor = text;	// save for future use
 			QStringList args = text.split(' ');
 			QString editor = args.first();
 			args.removeFirst();
-			args << QString(QDir::homePath() + "/.config/mbmp/" + filename);
+			args << filename;
 			QProcess* proc = new QProcess(this);
-			proc->start(editor, args);			  
+			proc->startDetached(editor, args);			  
 		}	// if ok and editor defined
-	}	// if xdg-open failed
-
+	
 	return;
 }

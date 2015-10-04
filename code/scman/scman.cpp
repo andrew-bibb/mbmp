@@ -45,12 +45,12 @@ ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent)
 	// Set the qrc data member
 	qrc = QString(":/text/text/sc_def.txt");
 	
-	//// Initialize key_map and shifted key string
+	// Initialize key_map and shifted key string
 	key_map.clear();
 	shiftedkeys.clear();
 	
-	//// Make the local conf file if necessary
-	this->makeLocalFile();	
+	// Make the local conf file if necessary
+	if (! QFileInfo::exists(cfg) ) this->makeLocalFile();	
 	
 	// Create the key_map.   
 	QFile f1(cfg);
@@ -143,11 +143,7 @@ QString ShortCutManager::getCheatSheet()
 //
 // Function to make a local version of the configuration fiqle
 void ShortCutManager::makeLocalFile()
-{
-	// if the conf file exists return now
-	if (QFileInfo::exists(cfg) )
-		return;	
-		
+{		
 	// make the directory if it does not exist and copy the hardconded
 	// conf file to the directory
 	QDir d;

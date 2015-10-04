@@ -49,7 +49,7 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 	icon_map.clear();
 	
 	// Make the local conf file if necessary
-	this->makeLocalFile();	
+	if (! QFileInfo::exists(cfg) ) this->makeLocalFile();	
 	
 	// Create the icon_map.   
 	QFile f1(qPrintable(cfg) );
@@ -283,12 +283,7 @@ QString IconManager::getFallback(const QString& name)
 //
 // Function to make a local version of the configuration fiqle
 void IconManager::makeLocalFile()
-{
-	// if the conf file exists return now
-	if (QFileInfo::exists(cfg) )
-		return;
-		
-		
+{		
 	// make the directory if it does not exist and copy the hardconded
 	// conf file to the directory
 	QDir d;
