@@ -1,7 +1,7 @@
 <RCC>
   <qresource prefix="text">
-    <file>text/sc_def.txt</file>
     <file>text/icon_def.txt</file>
+    <file>text/sc_def.txt</file>
     <file>text/changelog.txt</file>
     <file>text/license.txt</file>
   </qresource>

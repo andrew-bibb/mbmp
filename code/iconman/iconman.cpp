@@ -34,6 +34,10 @@ DEALINGS IN THE SOFTWARE.
 # include <QTextStream>
 # include <QDebug>
 # include <QList>
+# include <QPainter>
+# include <QCryptographicHash>
+# include <QSettings>
+# include <QMessageBox>
 
 // Constructor
 IconManager::IconManager(QObject* parent) : QObject(parent) 
@@ -45,13 +49,18 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 	// Set the qrc data member
 	qrc = QString(":/text/text/icon_def.txt");
 	
+	// Color and list of icons for the colorization function
+	icon_color = QColor();
+	colorizemap.clear();
+		
+	
 	// Initialize icon_map
 	icon_map.clear();
 	
 	// Make the local conf file if necessary
-	if (! QFileInfo::exists(cfg) ) this->makeLocalFile();	
+	this->makeLocalFile();	
 	
-	// Create the icon_map.   
+	// Create the icon_ map.   
 	QFile f1(qPrintable(cfg) );
 	if (!f1.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		#if QT_VERSION >= 0x050400 
@@ -59,9 +68,7 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 		# else	
 			qCritical("Error opening icon_def file: %s", qPrintable(cfg) );
 		# endif
-		return;
-	}	// if
-
+	}
 			
 	QTextStream in(&f1);
 	QString line;
@@ -70,16 +77,16 @@ IconManager::IconManager(QObject* parent) : QObject(parent)
 		line = line.simplified();
 		if (line.startsWith("[icon]", Qt::CaseInsensitive) ) {
 			IconElement ie;
-			QString iconname;
+			QString iconame;
 			do {
 				line = in.readLine();
-				if (line.startsWith("icon_name", Qt::CaseInsensitive) ) iconname = extractValue(line);
+				if (line.startsWith("icon_name", Qt::CaseInsensitive) ) iconame = extractValue(line);
 					else if (line.startsWith("resource", Qt::CaseInsensitive) ) ie.resource_path = extractValue(line);
 						else if (line.startsWith("fdo_name", Qt::CaseInsensitive) ) ie.fdo_name = extractValue(line);
 							else if (line.startsWith("theme_names", Qt::CaseInsensitive) ) ie.name_list = extractValue(line).split(',', QString::SkipEmptyParts) ;
 			} while ( ! line.isEmpty() );
 		
-			icon_map[iconname] = ie;
+			icon_map[iconame] = ie;
 		}	// if [icon]
 	}	// while not atEnd()
 	f1.close();
@@ -173,8 +180,8 @@ QString IconManager::getIconName(const QString& name)
 //
 // Function to make an icon from resource file(s).  A reference to the Icon
 // is sent to this function and is modified by this function.  If the name
-// argument contains a comma the name to the left is used for the on state
-// and the next name is used for the off state.  Additional text is ignored.
+// argument contains a | the name to the left is used for the "on" state
+// and the next name is used for the "off" state.  Additional text is ignored.
 // return true if we could find the resource files
 bool IconManager::buildResourceIcon(QIcon& icon, const QString& name)
 {
@@ -185,12 +192,18 @@ bool IconManager::buildResourceIcon(QIcon& icon, const QString& name)
 	if (QFileInfo(name_on).exists() ) {
 		if (! name_off.isEmpty() ) {
 			if (QFileInfo(name_off).exists() )
-				icon.addPixmap(name_off, QIcon::Normal, QIcon::Off);
+				if (colorizemap.contains(name_off) )
+					icon.addPixmap(colorizeIcon(name_off), QIcon::Normal, QIcon::Off);
+				else	
+					icon.addPixmap(name_off, QIcon::Normal, QIcon::Off);
 			else
 				return false;
 		}	// if name_off not empty
 		
-		icon.addPixmap(name_on, QIcon::Normal, QIcon::On);
+		if (colorizemap.contains(name_on) )
+			icon.addPixmap(colorizeIcon(name_on), QIcon::Normal, QIcon::On);
+		else	
+			icon.addPixmap(name_on, QIcon::Normal, QIcon::On);
 		return true;
 	}	// if name_on exists
 		
@@ -201,8 +214,8 @@ bool IconManager::buildResourceIcon(QIcon& icon, const QString& name)
 //
 // Function to make an icon from theme file(s).  A reference to the Icon
 // is sent to this function and is modified by this function.  If the name
-// argument contains a comma the name to the left is used for the on state
-// and the next name is used for the off state.  Additional text is ignored.
+// argument contains a | the name to the left is used for the "on" state
+// and the next name is used for the "off" state.  Additional text is ignored.
 // return true if we could find the theme files
 bool IconManager::buildThemeIcon(QIcon& icon, const QString& name)
 {
@@ -283,22 +296,114 @@ QString IconManager::getFallback(const QString& name)
 //
 // Function to make a local version of the configuration fiqle
 void IconManager::makeLocalFile()
-{		
-	// make the directory if it does not exist and copy the hardconded
-	// conf file to the directory
-	QDir d;
-	if (d.mkpath(QFileInfo(cfg).path()) ) {
-		QFile s(qrc);	
-		if (s.copy(cfg) ) 
-			QFile::setPermissions(cfg, QFileDevice::ReadOwner | QFileDevice::WriteOwner);
-		else	
-		#if QT_VERSION >= 0x050400 
-			qCritical("Failed copying the icon definition file from %s to %s", qUtf8Printable(qrc), qUtf8Printable(cfg) );
-		#else	
-			qCritical("Failed copying the icon definition file from %s to %s", qPrintable(qrc), qPrintable(cfg) );		
-		#endif
-	}	// if mkpath returned ture			
+{
+	// constants
+	const int maxloop = 50;
+	
+	// Get information about the last installed icon def file from the settings
+	QSettings* settings = new QSettings(ORG, APP, this);
+	settings->beginGroup("IconManager");
+  QString lastmd5 = settings->value("last_installed_icon_def_file").toString();
+  settings->endGroup();
   
+  // Get the MD5 sum of the current
+  QFile src(qrc);	
+  src.open(QIODevice::ReadOnly);
+  QCryptographicHash hash(QCryptographicHash::Md5);
+  hash.addData(&src);
+  src.close();
+  QString currentmd5 = QString::fromLatin1(hash.result().toHex() );   
+
+     
+	// If the user's local conf file exists
+	if (QFileInfo::exists(cfg) ) {
+		if (lastmd5 == currentmd5) {	// this should be the typical case
+			settings->deleteLater();
+			return;		
+		}
+		
+		// MD5 sums don't match so make a backup of the existing local file
+		else {
+			// Find a backup name we can use
+			int ctr = 0;
+			QString bak;
+			do {
+				bak = QString(cfg + ".%1").arg(++ctr, 2, 10, QChar('0'));
+			} while (QFileInfo::exists(bak) && ctr <= maxloop);
+			
+			// Now make the backup
+			QFile f_cfg(cfg);
+			if (ctr <= maxloop && f_cfg.copy(bak) ) { 
+				QMessageBox::StandardButton dia_rtn = QMessageBox::information(0, QString(APP),
+					tr("A new icon definition file will be installed to <b>%1</b> and a backup of the old definition file has been created as <b>%2</b> \
+						<p>If the original definition file was customized you wish to retain those changes you will need to manually merge them into the new file.	\
+						<p>If the original was never customized or you just wish to delete the backup now you may select <i>Discard</i> to delete the backup or <i>Save</i> to retain it.").arg(cfg).arg(bak),
+					QMessageBox::Save | QMessageBox::Discard,
+					QMessageBox::Save);
+				if (dia_rtn == QMessageBox::Discard)
+					if (! QFile::remove(bak))
+					#if QT_VERSION >= 0x050400 
+						qCritical("Failed to remove the backup file: %s", qUtf8Printable(bak) );
+					#else	
+						qCritical("Failed to remove the backup file: %s", qPrintable(bak) );		
+					#endif
+			}	// if creating a backup copy worked		
+			else {	
+			#if QT_VERSION >= 0x050400 
+				qCritical("Failed creating the icon definition backup file: %s", qUtf8Printable(bak) );
+			#else	
+				qCritical("Failed creating the icon definition backup file: %s", qPrintable(bak) );		
+			#endif
+				settings->deleteLater();
+				return;
+			}	// else creating a backup failed so return, don't continue
+			
+			// Have a backup, now create the new file
+			QFile::remove(cfg);
+			QFile s(qrc);
+			if (s.copy(cfg) ) { 
+				QFile::setPermissions(cfg, QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+				settings->beginGroup("IconManager");
+				settings->setValue("last_installed_icon_def_file", currentmd5);
+				settings->endGroup();
+			}	// if creating new file worked
+			else {	
+			#if QT_VERSION >= 0x050400 
+				qCritical("Failed creating a new icon definition file: %s", qUtf8Printable(qrc) );
+			#else	
+				qCritical("Failed creating a new icon definition file: %s", qPrintable(qrc) );		
+			#endif
+			}	// failed creating the new file (next step is return so no reason to call it here)
+		}	// qrc is different than the last installed
+	}	// if local icon_def exists
+	
+	// Local icon_def does not exist so create the directory (if need be) and copy the icon_def file
+	else {
+		QDir d;
+		if (d.mkpath(QFileInfo(cfg).path()) ) {
+			QFile s(qrc);
+			if (s.copy(cfg) ) { 
+				QFile::setPermissions(cfg, QFileDevice::ReadOwner | QFileDevice::WriteOwner);
+				settings->beginGroup("IconManager");
+				settings->setValue("last_installed_icon_def_file", currentmd5);
+				settings->endGroup();
+			}	// if creating new file worked
+			else	
+			#if QT_VERSION >= 0x050400 
+				qCritical("Failed creating a new icon definition file: %s", qUtf8Printable(qrc) );
+			#else	
+				qCritical("Failed creating a new icon definition file: %s", qPrintable(qrc) );		
+			#endif
+		}	// if mkpath returned true
+		else 
+		#if QT_VERSION >= 0x050400 
+			qCritical("Failed creating directory %s for the icon definition file.", qUtf8Printable(QFileInfo(cfg).path()) );
+		#else	
+			qCritical("Failed creating directory %s for the icon definition file.", qPrintable(QFileInfo(cfg).path()) );
+		#endif
+	}	// else local icon_def did not exist			
+  
+  settings->deleteLater();
 	return;
 }
 
@@ -325,5 +430,30 @@ QString IconManager::extractKey(const QString& sk)
 	return s.simplified();
 }
 
-
-
+// Function to colorize an icon.  Called from buildResourceIcon and if we
+// get here we've already checked that the resource exists
+QPixmap IconManager::colorizeIcon(const QString& res)
+{
+	QImage src = QImage(res);
+	QImage dest = QImage(src.width(), src.height(), QImage::Format_ARGB32);
+	
+	// Colorize the image
+	QPainter painter(&dest);
+	painter.setCompositionMode(QPainter::CompositionMode_Source);
+	painter.fillRect(dest.rect(), icon_color);
+	painter.setCompositionMode(QPainter::CompositionMode_DestinationAtop);
+	painter.drawImage(0, 0, src);
+  
+  // Now add overlays - overlay names have the same name as the icon they
+  // need to overlay.
+	if (colorizemap.contains(res) ) {
+		QFileInfo fi = QFileInfo(colorizemap.value(res) );
+		if (fi.exists() ) {
+			QImage ovl = QImage(fi.absoluteFilePath() );
+			painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+			painter.drawImage(0, 0, ovl);
+		}
+	}
+	
+	return QPixmap::fromImage(dest);
+}

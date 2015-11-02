@@ -27,7 +27,7 @@ DEALINGS IN THE SOFTWARE.
 # ifndef GST_INTERFACE
 # define GST_INTERFACE
 
-# include <gst/gst.h>
+//# include <gst/gst.h>
 # include <gst/video/navigation.h>
 
 # include <QWidget>

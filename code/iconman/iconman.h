@@ -34,7 +34,8 @@ DEALINGS IN THE SOFTWARE.
 # include <QStringList>
 # include <QIcon>
 # include <QMap>
-
+# include <QColor>
+# include <QMap>
 # include "../resource.h"
 
 struct IconElement
@@ -55,12 +56,16 @@ class IconManager : public QObject
   // functions
 		QIcon getIcon(const QString&);
 		QString getIconName(const QString&);
+		inline void setIconColor(const QColor& col) {icon_color = col;}
   
   private:
   // members
 		QMap<QString, IconElement> icon_map; 
 		QString cfg;
 		QString qrc;
+		QColor icon_color;
+		QMap<QString,QString> colorizemap;
+		
 		
 	// functions
 		bool buildResourceIcon(QIcon&, const QString&);
@@ -69,6 +74,7 @@ class IconManager : public QObject
 		void makeLocalFile();	
 		QString extractValue(const QString&);
 		QString extractKey(const QString&);
+		QPixmap colorizeIcon(const QString&);
   
 };
 #endif

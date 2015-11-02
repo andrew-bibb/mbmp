@@ -81,6 +81,8 @@ RESOURCES 	+= mbmp.qrc
 INCLUDEPATH += /usr/include/gstreamer-1.0
 INCLUDEPATH += /usr/include/glib-2.0
 INCLUDEPATH += /usr/lib/glib-2.0/include
+INCLUDEPATH += /usr/lib/gstreamer-1.0
+
 
 # gstreamer libraries
 CONFIG += link_pkgconfig

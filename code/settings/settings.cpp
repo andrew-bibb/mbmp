@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QDir>
 # include <QInputDialog>
 # include <QFile>
+# include <QColorDialog>
 
 # include "./code/settings/settings.h"
 # include "./code/resource.h"
@@ -56,6 +57,7 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_retainplaylist->setChecked(settings->value("retain_playlist").toBool() );
 	ui.checkBox_disabletooltips->setChecked(settings->value("disable_tooltips").toBool() );
 	ui.checkBox_disablexscreensaver->setChecked(settings->value("disable_xscreensaver").toBool() );
+	ui.lineEdit_colorize->setText(settings->value("colorize_icons").toString() );
 	settings->endGroup();
 	
 	// notification settings
@@ -94,6 +96,8 @@ Settings::Settings(QWidget *parent)
 	
 	// Connect signals and slots
 	connect(bg01, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(openEditor(QAbstractButton*)));
+	connect(ui.toolButton_colorize, SIGNAL(clicked()), this, SLOT(callColorDialog()));
+	connect(ui.lineEdit_colorize, SIGNAL(textChanged(const QString&)), this, SLOT(iconColorChanged(const QString&)));
 	
 	// See if we can find XScreenSaver disable settings if we can't
 	QProcess::execute("xscreensaver-command -version") == 0 ? ui.checkBox_disablexscreensaver->setEnabled(true) : ui.checkBox_disablexscreensaver->setEnabled(false);		
@@ -111,6 +115,7 @@ void Settings::writeSettings()
   settings->setValue("retain_playlist", ui.checkBox_retainplaylist->isChecked() );
   settings->setValue("disable_tooltips", ui.checkBox_disabletooltips->isChecked() );
   settings->setValue("disable_xscreensaver", ui.checkBox_disablexscreensaver->isChecked() );
+  settings->setValue("colorize_icons", ui.lineEdit_colorize->text() );
   settings->endGroup();
   
   settings->beginGroup("Notifications");
@@ -270,7 +275,7 @@ void Settings::openEditor(QAbstractButton* button)
 			#else	
 				qCritical("Failed copying %s to %s", qPrintable(qrc), qPrintable(filename) );		
 			#endif
-		}	// if s.remove
+		}	// if s.copy
 		else 
 		#if QT_VERSION >= 0x050400 
 			qCritical("Failed removing: %s", qUtf8Printable(filename) );
@@ -299,5 +304,23 @@ void Settings::openEditor(QAbstractButton* button)
 			proc->startDetached(editor, args);			  
 		}	// if ok and text not empty
 	
+	return;
+}
+
+// 
+// Slot to open the color selection dialog and request input.
+void Settings::callColorDialog()
+{
+	QColor color = QColorDialog::getColor(QColor(ui.lineEdit_colorize->text()), this, tr("Colorize Icons"));
+	if (color.isValid() ) ui.lineEdit_colorize->setText(color.name() );
+	
+	return;
+}	
+
+//
+// Slot to process things when the user changes the icon color
+void Settings::iconColorChanged(const QString& col)
+{
+	qDebug() << "ICON COLOR CHANGED - NEED CODE HERE";
 	return;
 }

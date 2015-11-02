@@ -73,6 +73,8 @@ class Settings : public QDialog
     
   private slots:
 		void openEditor(QAbstractButton*);
+		void callColorDialog();
+		void iconColorChanged(const QString&);
 
 };
 
