@@ -29,6 +29,12 @@
 # select another valid resource which must already exist.  You cannot add
 # resources using this file.  This key/value pair is mandatory.
 #
+#	colorize = (no/yes, 0/1, or a color in the format RRGGBB) if yes or 1
+# the internal icons will be colorized according to the value specified 
+# from preferences.  If a color number is provided the icon will be colorized
+# to the specified color.  If no or 0 then the icon is not colorized.
+# Colorizing is only available for internal icons defined in the resource line. 
+#
 # fdo_name = is the name of one of the official Freedesktop.org named icons.
 # This key/value pair is optional.
 #
@@ -42,6 +48,12 @@
 # theme icon name. Text to the left is the ON state of the icon, to the right
 # is the OFF state. This is used for icons which show a different picture
 # depending on state.  Play/Pause in a media player would be a classic example.
+#
+#	The text in a resource value field may also contain whitespace.  If
+# it does the text on each side should be a complete resource path.  Left
+# of the whitespace is the base picture in raw_art, to the right is the
+# overlay file to place over the raw_art icon. This is only for
+# internal icons from the resource file.
 #
 # If this file becomes corrupted by editing or by other means is can be 
 # regenerated simply by deleting it, then stopping and starting CMST.
@@ -58,8 +70,6 @@
 #   fdo_name
 #   resource location as specified in this file
 #   hard coded internal icon
-#
-
 #
 # playlist icons
 [icon]

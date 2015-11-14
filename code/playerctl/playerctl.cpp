@@ -90,9 +90,12 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   // options to start fullscreen 
 	if (parser.isSet("fullscreen") ) this->showFullScreen();
 	else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->showFullScreen();
+	
+	// Setup the icon manager and give it a color
+	IconManager iconman(this);
+	iconman.setIconColor(QColor(diag_settings->getSetting("Preferences", "colorize_icons").toString()) );
 			
 	// assign icons to actions
-	IconManager iconman(this);
 	ui.actionPlaylistNext->setIcon(iconman.getIcon("playlist_next"));
 	ui.actionPlaylistBack->setIcon(iconman.getIcon("playlist_back"));
 	ui.actionTogglePlaylist->setIcon(iconman.getIcon("toggle_playlist"));
