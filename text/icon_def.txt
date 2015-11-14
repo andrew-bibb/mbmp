@@ -104,22 +104,26 @@ fdo_name = application-exit
 
 [icon]
 icon_name = add_files 
-resource = :/images/images/16x16/folder.png
+resource = :/images/images/24x24/raw_art/folder.png
+colorize = yes
 fdo_name = folder
 
 [icon]
 icon_name = add_url
-resource = :/images/images/16x16/network.png
+resource = :/images/images/24x24/raw_art/emblem-remote.png
+colorize = yes
 fdo_name = folder-remote
 
 [icon]
 icon_name = add_audio 
-resource = :/images/images/16x16/folder_sound.png
+resource = :/images/images/24x24/raw_art/sonata.png
+colorize = yes
 fdo_name = audio-x-generic
 
 [icon]
 icon_name = add_video 
-resource = :/images/images/16x16/folder_video.png
+resource = :/images/images/24x24/raw_art/video-x-generic2.png
+colorize = yes
 fdo_name = video-x-generic
 
 [icon]
@@ -130,14 +134,15 @@ fdo_name = edit-delete
 
 [icon]
 icon_name = save_playlist 
-resource = :/images/images/24x24/raw_art/document-save.png
+resource = :/images/images/24x24/raw_art/document-save.png\
 colorize = yes
 fdo_name = document-save
 
 [icon]
 icon_name = add_playlist 
-resource = :/images/images/16x16/view_text.png
-fdo_name = text-x-generic
+resource = :/images/images/24x24/raw_art/bmp.png
+colorize = yes
+fdo_name = audio-x-generic
 
 #
 # interface icons
@@ -209,13 +214,15 @@ theme_names = view-list-text, ascii
 
 [icon]
 icon_name = cd_drive 
-resource = :/images/images/16x16/cdaudio_unmount.png
+resource = :/images/images/24x24/raw_art/media-optical-cd1.png
+colorize = no
 fdo_name = media-optical
 theme_names = media-optical-audio
 
 [icon]
 icon_name = dvd_drive
-resource = :/images/images/16x16/dvd_mount.png
+resource = :/images/images/24x24/raw_art/media-optical-video1.png
+colorize = no
 fdo_name = media-optical
 theme_names = drive-optical, media-optical-dvd
 
