@@ -59,8 +59,16 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   geometry = QRect();
   ui.listWidget_playlist->clear();
   
+  // Iconmanager with constructor only scope
+  IconManager iconman(this);
+  
+  // Get information about icon colors from settings
+	QSettings* settings = new QSettings(ORG, APP, this);
+	settings->beginGroup("Preferences");
+  iconman.setIconColor(settings->value("colorize_icons").toString() );
+  settings->endGroup();
+  
   // assign icons to actions
-	IconManager iconman(this);
 	ui.actionMoveUp->setIcon(iconman.getIcon("move_up"));
 	ui.actionMoveDown->setIcon(iconman.getIcon("move_down"));
 	ui.actionAddMedia->setIcon(iconman.getIcon("add_media"));
@@ -165,6 +173,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionToggleWrap, SIGNAL(triggered()), this, SLOT(toggleWrapMode()));
   connect (ui.actionToggleConsume, SIGNAL(triggered()), this, SLOT(toggleConsumeMode()));
   connect (ui.actionToggleRandom, SIGNAL(triggered()), this, SLOT(toggleRandomMode()));
+  
+ settings->deleteLater();
+ return;
 }
 
 ////////////////////////////// Public Slots ////////////////////////////

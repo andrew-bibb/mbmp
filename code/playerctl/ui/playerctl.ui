@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>725</width>
-    <height>437</height>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -882,7 +882,7 @@
   <action name="actionOptions">
    <property name="icon">
     <iconset theme="preferences-system">
-     <normaloff>../../../../../../../../../../../../../../.designer/backup</normaloff>../../../../../../../../../../../../../../.designer/backup</iconset>
+     <normaloff>../../../../../../../../../../../../../../../../../../.designer/backup</normaloff>../../../../../../../../../../../../../../../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Options</string>

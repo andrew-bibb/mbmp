@@ -9,13 +9,34 @@
     <file>media/silence.ogg</file>
   </qresource>
   <qresource prefix="images">
+    <file>images/24x24/raw_art/pacman.png</file>
+    <file>images/24x24/raw_art/configure.png</file>
+    <file>images/24x24/raw_art/document-save.png</file>
+    <file>images/24x24/raw_art/vol-down.png</file>
+    <file>images/24x24/raw_art/vol-up.png</file>
+    <file>images/24x24/raw_art/applications-system.png</file>
+    <file>images/24x24/raw_art/bmp.png</file>
+    <file>images/24x24/raw_art/media-playback-pause.png</file>
+    <file>images/24x24/raw_art/media-playback-start.png</file>
+    <file>images/24x24/raw_art/info2.png</file>
+    <file>images/24x24/raw_art/go-up.png</file>
+    <file>images/24x24/raw_art/go-down.png</file>
+    <file>images/24x24/raw_art/edit-delete.png</file>
+    <file>images/24x24/raw_art/remove2.png</file>
+    <file>images/24x24/raw_art/media-playlist-repeat.png</file>
+    <file>images/24x24/raw_art/add2.png</file>
+    <file>images/24x24/raw_art/media-playlist-shuffle.png</file>
+    <file>images/24x24/raw_art/go-first.png</file>
+    <file>images/24x24/raw_art/go-last.png</file>
+    <file>images/24x24/raw_art/go-next.png</file>
+    <file>images/24x24/raw_art/go-previous.png</file>
+    <file>images/24x24/raw_art/audio-volume-zero.png</file>
+    <file>images/24x24/raw_art/media-playback-stop.png</file>
+    <file>images/24x24/raw_art/audio-volume-muted.png</file>
+    <file>images/24x24/overlay/mute.png</file>
+    <file>images/24x24/raw_art/application-exit2.png</file>
     <file>images/16x16/trashcan_full.png</file>
-    <file>images/16x16/mix_unknown.png</file>
-    <file>images/16x16/kaboodleloop.png</file>
-    <file>images/16x16/help.png</file>
-    <file>images/16x16/kscd.png</file>
     <file>images/16x16/view_text.png</file>
-    <file>images/16x16/filesave.png</file>
     <file>images/16x16/configure.png</file>
     <file>images/16x16/cdaudio_unmount.png</file>
     <file>images/16x16/dvd_mount.png</file>
@@ -26,33 +47,15 @@
     <file>images/16x16/2leftarrow.png</file>
     <file>images/16x16/2rightarrow.png</file>
     <file>images/16x16/view_choose.png</file>
-    <file>images/16x16/player_stop.png</file>
     <file>images/16x16/kwikdisk.png</file>
-    <file>images/16x16/2downarrow.png</file>
-    <file>images/16x16/2uparrow.png</file>
-    <file>images/16x16/kmixdocked.png</file>
-    <file>images/16x16/kmixdocked_error.png</file>
-    <file>images/16x16/editdelete.png</file>
-    <file>images/16x16/start.png</file>
-    <file>images/16x16/finish.png</file>
     <file>images/16x16/folder_sound.png</file>
     <file>images/16x16/folder_video.png</file>
     <file>images/16x16/network.png</file>
     <file>images/16x16/folder.png</file>
     <file>images/16x16/view_fullscreen.png</file>
     <file>images/16x16/folder_inbox.png</file>
-    <file>images/16x16/player_pause.png</file>
-    <file>images/16x16/sound.png</file>
-    <file>images/16x16/player_play.png</file>
     <file>images/16x16/player_fwd.png</file>
-    <file>images/16x16/back.png</file>
-    <file>images/16x16/forward.png</file>
     <file>images/16x16/player_rev.png</file>
-    <file>images/16x16/exit.png</file>
-    <file>images/16x16/1downarrow.png</file>
-    <file>images/16x16/1uparrow.png</file>
-    <file>images/16x16/edit_add.png</file>
-    <file>images/16x16/edit_remove.png</file>
   </qresource>
   <qresource prefix="translations">
     <file>translations/mbmp_ru_RU.qm</file>

@@ -74,27 +74,32 @@
 # playlist icons
 [icon]
 icon_name = move_up
-resource = :/images/images/16x16/1uparrow.png
+resource = :/images/images/24x24/raw_art/go-up.png
+colorize = yes
 fdo_name = go-up
 
 [icon]
 icon_name = move_down 
-resource = :/images/images/16x16/1downarrow.png
+resource = :/images/images/24x24/raw_art/go-down.png
+colorize = yes
 fdo_name = go-down
 
 [icon]
 icon_name = add_media 
-resource = :/images/images/16x16/edit_add.png
+resource = :/images/images/24x24/raw_art/add2.png
+colorize = 77B428
 fdo_name = list-add
 
 [icon]
 icon_name = remove_item 
-resource = :/images/images/16x16/edit_remove.png
+resource = :/images/images/24x24/raw_art/remove2.png
+colorize = CC0000
 fdo_name = list-remove
 
 [icon]
 icon_name = hide_playlist 
-resource = :/images/images/16x16/exit.png
+resource = :/images/images/24x24/raw_art/application-exit2.png
+colorize = CC0000
 fdo_name = application-exit
 
 [icon]
@@ -119,12 +124,14 @@ fdo_name = video-x-generic
 
 [icon]
 icon_name = remove_all 
-resource = :/images/images/16x16/editdelete.png
+resource = :/images/images/24x24/raw_art/edit-delete.png
+colorize = no
 fdo_name = edit-delete
 
 [icon]
 icon_name = save_playlist 
-resource = :/images/images/16x16/filesave.png
+resource = :/images/images/24x24/raw_art/document-save.png
+colorize = yes
 fdo_name = document-save
 
 [icon]
@@ -136,47 +143,56 @@ fdo_name = text-x-generic
 # interface icons
 [icon]
 icon_name = help_about
-resource = :/images/images/16x16/help.png
+resource = :/images/images/24x24/raw_art/info2.png
+colorize = 4B6BEB
 fdo_name = help-about
 
 [icon]
 icon_name = playlist_next
-resource = :/images/images/16x16/forward.png
+resource = :/images/images/24x24/raw_art/go-next.png
+colorize = yes
 fdo_name = go-next
 
 [icon]
 icon_name = playlist_back
-resource = :/images/images/16x16/back.png
+resource = :/images/images/24x24/raw_art/go-previous.png
+colorize = yes
 fdo_name = go-previous
 
 [icon]
 icon_name = toggle_playlist
-resource = :/images/images/16x16/sound.png
+resource = :/images/images/24x24/raw_art/bmp.png
+colorize = yes
 fdo_name = audio-x-generic
 
 [icon]
 icon_name = playlist_first
-resource = :/images/images/16x16/start.png
+resource = :/images/images/24x24/raw_art/go-first.png
+colorize = yes
 fdo_name = go-first
 
 [icon]
 icon_name = playlist_last
-resource = :/images/images/16x16/finish.png
+resource = :/images/images/24x24/raw_art/go-last.png
+colorize = yes
 fdo_name = go-last
 
 [icon]
 icon_name = playlist_wrap
-resource = :/images/images/16x16/kaboodleloop.png
+resource = :/images/images/24x24/raw_art/media-playlist-repeat.png
+colorize = yes
 fdo_name = media-playlist-repeat
 
 [icon]
 icon_name = playlist_random
-resource = :/images/images/16x16/mix_unknown.png
+resource = :/images/images/24x24/raw_art/media-playlist-shuffle.png
+colorize = yes
 fdo_name = media-playlist-shuffle
 
 [icon]
 icon_name = playlist_consume
-resource = :/images/images/16x16/trashcan_full.png
+resource = :/images/images/24x24/raw_art/pacman.png
+colorize = F3F808
 theme_names = user-trash-full
 
 [icon]
@@ -235,22 +251,26 @@ fdo_name = media-skip-forward
 
 [icon]
 icon_name = player_stop
-resource = :/images/images/16x16/player_stop.png
+resource = :/images/images/24x24/raw_art/media-playback-stop.png
+colorize = CC0000
 fdo_name = media-playback-stop
 
 [icon]
 icon_name = volume_step_down 
-resource = :/images/images/16x16/2downarrow.png
+resource = :/images/images/24x24/raw_art/vol-down.png
+colorize = yes
 fdo_name = go-down
 
 [icon]
 icon_name = volume_step_up
-resource = :/images/images/16x16/2uparrow.png
+resource = :/images/images/24x24/raw_art/vol-up.png
+colorize = yes
 fdo_name = go-up
 
 [icon]
 icon_name = quit
-resource = :/images/images/16x16/exit.png
+resource = :/images/images/24x24/raw_art/application-exit2.png
+colorize = CC0000
 fdo_name = application-exit
 
 [icon]
@@ -265,19 +285,16 @@ fdo_name = view-fullscreen
 
 [icon]
 icon_name = options
-resource = :/images/images/16x16/kscd.png
+resource = :/images/images/24x24/raw_art/configure.png
+colorize = yes
 fdo_name = preferences-system 
-
-[icon]
-icon_name = settings
-resource = :/images/images/16x16/configure.png
-fdo_name = emblem-system
 theme_names = configure
 
 [icon]
-icon_name = add_media
-resource = :/images/images/16x16/edit_add.png
-fdo_name = list-add
+icon_name = settings
+resource = :/images/images/24x24/raw_art/applications-system.png
+colorize = yes
+fdo_name = emblem-system
 
 [icon]
 icon_name = av_sync
@@ -293,11 +310,13 @@ fdo_name = applications-graphics
 # on/off (toggle action) icons
 [icon]
 icon_name = playpause
-resource = :/images/images/16x16/player_pause.png | :/images/images/16x16/player_play.png
+resource = :/images/images/24x24/raw_art/media-playback-pause.png | :/images/images/24x24/raw_art/media-playback-start.png
+colorize = yes
 fdo_name = media-playback-pause | media-playback-start
 
 [icon]
 icon_name = mute
-resource = :/images/images/16x16/kmixdocked_error.png | :/images/images/16x16/kmixdocked.png 
+resource = :/images/images/24x24/raw_art/audio-volume-muted.png :/images/images/24x24/overlay/mute.png | :/images/images/24x24/raw_art/audio-volume-zero.png
+colorize = yes 
 fdo_name = audio-volume-muted | audio-volume-high
 
