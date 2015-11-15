@@ -11,9 +11,7 @@
 #
 # Keys are not case sensitive.  The following strings are recognized:  
 # "Ctrl", "Alt" and "Meta. Each must be followed by a plus sign
-# and then the key (example: Ctrl+S).  Shift is also recognized but
-# we implement special processing for characters accessible by using
-# shift.  This is described at the bottom of this file.  
+# and then the key (example: Ctrl+S).  
 #
 # The following non-character keys are parsed. Entries in the Text
 # column are what should be used to describe the key. 
@@ -114,9 +112,4 @@ cmd_cycleaudio =      ~               # Cycle through available audio streams   
 cmd_cyclevideo =      !               # Cycle through available video streams         w       y     e       e
 cmd_cyclesubtitle =   @               # Cycle through availabe subtitle streams       w       y     e       e
 #
-#
-#	We need a list of all keys only accessible by using the Shift key.  This does not include any letter
-# character as QKeySequence does not care (or deal with) letter case.  List below is for a US standard
-# keyhboard.  Modify as necessary for your keyboard (don't forgot you can't list # or " in the string)
-# By having the list below it is not necessary to add Shift+ before the character in the list above.
-shifted_keys =	~!@$%^&*()_+{}|:<>?"
+

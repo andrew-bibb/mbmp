@@ -50,7 +50,6 @@ class ShortCutManager : public QObject
   private:
   // members
 		QMap<QString, QStringList > key_map;
-		QString shiftedkeys;
 		QString cfg;
 		QString qrc;
 		

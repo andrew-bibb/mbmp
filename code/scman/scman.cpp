@@ -50,7 +50,6 @@ ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent)
 	
 	// Initialize key_map and shifted key string
 	key_map.clear();
-	shiftedkeys.clear();
 	
 	// Make the local conf file if necessary
 	this->makeLocalFile();	
@@ -82,10 +81,7 @@ ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent)
 		line = line.section("#", 0, 0);	// remove comments
 		if (line.size() > 0 ) {	
 			QString cmd = line.section('=', 0, 0).simplified();
-			if (cmd.startsWith("shifted_keys", Qt::CaseInsensitive) )
-				shiftedkeys = line.section('=', 1, 1).simplified();
-			else 
-				key_map[cmd] = line.section('=', 1, -1).simplified().split(' ');
+			key_map[cmd] = line.section('=', 1, -1).simplified().split(' ');
 		} // if size > 0		
 	}	// while not atEnd()
 	f1.close();	
@@ -103,14 +99,10 @@ QList<QKeySequence> ShortCutManager::getKeySequence(const QString& cmd)
 	QList<QKeySequence> keyseq;
 	keyseq.clear();
 	
-	// modify for shifted keys if necessary
 	if (key_map.contains(cmd) ) {
 		QStringList sl = key_map.value(cmd);
 		for (int i = 0; i < sl.count(); ++i) {			
-			if (sl.at(i).size() == 1 && shiftedkeys.contains(sl.at(i)) )
-				keyseq.append(QKeySequence::fromString(QString("Shift+" + sl.at(i))) );
-			else
-				keyseq.append(QKeySequence::fromString(sl.at(i)) );		
+			keyseq.append(QKeySequence::fromString(sl.at(i)) );		
 		}	// for
 	}	// if
 		
