@@ -427,7 +427,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionShowCheatsheet->setShortcuts(scman.getKeySequence("cmd_cheatsheet"));
 	ui.actionAbout->setShortcuts(scman.getKeySequence("cmd_about"));
 	ui.actionAboutMBMP->setShortcuts(scman.getKeySequence("cmd_aboutmbmp"));
-	ui.actionAboutIconSet->setShortcuts(scman.getKeySequence("cmd_aboutnuvola"));
+	ui.actionAboutIconSet->setShortcuts(scman.getKeySequence("cmd_abouticonset"));
 	ui.actionAboutQT->setShortcuts(scman.getKeySequence("cmd_aboutqt"));
 	ui.actionShowLicense->setShortcuts(scman.getKeySequence("cmd_showlicense"));
 	ui.actionShowChangeLog->setShortcuts(scman.getKeySequence("cmd_showchangelog"));
@@ -483,7 +483,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionShowSettingsDialog, SIGNAL (triggered()), this, SLOT(toggleSettingsDialog()));
 	connect (ui.actionAbout, SIGNAL (triggered()), this, SLOT(showAbout()));
 	connect (ui.actionAboutMBMP, SIGNAL (triggered()), this, SLOT(aboutMBMP()));
-	connect (ui.actionAboutIconSet, SIGNAL (triggered()), this, SLOT(aboutNuvola()));
+	connect (ui.actionAboutIconSet, SIGNAL (triggered()), this, SLOT(aboutIconSet()));
 	connect (ui.actionAboutQT, SIGNAL (triggered()), qApp, SLOT(aboutQt()));
 	connect (ui.actionShowLicense, SIGNAL (triggered()), this, SLOT(showLicense())); 
 	connect (ui.actionShowChangeLog, SIGNAL (triggered()), this, SLOT(showChangeLog()));
@@ -984,7 +984,6 @@ void PlayerControl::aboutIconSet()
           "<br>Attribution-Share Alike 3.0"
           "<br>Unported License"
           "<br><a href=\"url\">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a>"
-          "<br><center>The CMST icon is a derivative work from the AwOken icon set."
                   ) );
 }
 

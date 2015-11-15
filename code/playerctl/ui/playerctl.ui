@@ -488,7 +488,7 @@
   </action>
   <action name="actionAboutIconSet">
    <property name="text">
-    <string>About About Icon Set</string>
+    <string>About Icon Set</string>
    </property>
    <property name="toolTip">
     <string>About Icon Set</string>
