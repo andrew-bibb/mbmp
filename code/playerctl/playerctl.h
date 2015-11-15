@@ -73,7 +73,7 @@ class PlayerControl : public QDialog
 		void toggleSettingsDialog();
 		void showAbout();
 		void aboutMBMP();
-		void aboutNuvola();
+		void aboutIconSet();
 		void showLicense();
 		void showChangeLog();
 		

@@ -93,13 +93,13 @@ fdo_name = list-add
 [icon]
 icon_name = remove_item 
 resource = :/images/images/24x24/raw_art/remove2.png
-colorize = CC0000
+colorize = AF0605
 fdo_name = list-remove
 
 [icon]
 icon_name = hide_playlist 
 resource = :/images/images/24x24/raw_art/application-exit2.png
-colorize = CC0000
+colorize = AF0605
 fdo_name = application-exit
 
 [icon]
@@ -134,7 +134,7 @@ fdo_name = edit-delete
 
 [icon]
 icon_name = save_playlist 
-resource = :/images/images/24x24/raw_art/document-save.png\
+resource = :/images/images/24x24/raw_art/document-save.png
 colorize = yes
 fdo_name = document-save
 
@@ -202,13 +202,15 @@ theme_names = user-trash-full
 
 [icon]
 icon_name = visualizer 
-resource = :/images/images/16x16/kwikdisk.png
+resource = :/images/images/24x24/raw_art/preferences-color.png
+colorize = no
 fdo_name = preferences-desktop-screensaver
 theme_names = view-media-visualization
 
 [icon]
 icon_name = stream_info
-resource = :/images/images/16x16/view_choose.png
+resource = :/images/images/24x24/raw_art/view-list-column.png
+colorize = yes
 fdo_name = text-x-generic
 theme_names = view-list-text, ascii 
 
@@ -228,38 +230,44 @@ theme_names = drive-optical, media-optical-dvd
 
 [icon]
 icon_name = back_10
-resource = :/images/images/16x16/1leftarrow.png
+resource = :/images/images/24x24/raw_art/r10.png
+colorize = yes
 theme_names = draw-triangle1, media-playback-start-rtl
 
 [icon]
 icon_name = forward_10
-resource = :/images/images/16x16/1rightarrow.png
+resource = :/images/images/24x24/raw_art/f10.png
+colorize = yes
 theme_names = draw-triangle2, media-playback-start
 
 [icon]
 icon_name = back_60
-resource = :/images/images/16x16/2leftarrow.png
+resource = :/images/images/24x24/raw_art/r60.png
+colorize = yes
 fdo_name = media-seek-backward
 
 [icon]
 icon_name = forward_60
-resource = :/images/images/16x16/2rightarrow.png
+resource = :/images/images/24x24/raw_art/f60.png
+colorize = yes
 fdo_name = media-seek-forward
 
 [icon]
 icon_name = back_600
-resource = :/images/images/16x16/player_rev.png
+resource = :/images/images/24x24/raw_art/r600.png
+colorize = yes
 fdo_name = media-skip-backward
 
 [icon]
 icon_name = forward_600
-resource = :/images/images/16x16/player_fwd.png
+resource = :/images/images/24x24/raw_art/f600.png
+colorize = yes
 fdo_name = media-skip-forward
 
 [icon]
 icon_name = player_stop
 resource = :/images/images/24x24/raw_art/media-playback-stop.png
-colorize = CC0000
+colorize = AF0605
 fdo_name = media-playback-stop
 
 [icon]
@@ -277,17 +285,19 @@ fdo_name = go-up
 [icon]
 icon_name = quit
 resource = :/images/images/24x24/raw_art/application-exit2.png
-colorize = CC0000
+colorize = AF0605
 fdo_name = application-exit
 
 [icon]
 icon_name = toggle_gui
-resource = :/images/images/16x16/folder_inbox.png
+resource = :/images/images/24x24/raw_art/user-desktop6.png
+colorize = yes
 fdo_name = computer
 
 [icon]
 icon_name = toggle_fullscreen
-resource = :/images/images/16x16/view_fullscreen.png
+resource = :/images/images/24x24/raw_art/view-fullscreen.png
+colorize = yes
 fdo_name = view-fullscreen
 
 [icon]
@@ -305,12 +315,14 @@ fdo_name = emblem-system
 
 [icon]
 icon_name = av_sync
-resource = :/images/images/16x16/noatunloopsong.png
+resource = :/images/images/24x24/raw_art/av-sync.png
+colorize = yes
 fdo_name = emblem-synchronizing
 
 [icon]
 icon_name = color_balance
-resource = :/images/images/16x16/blend.png
+resource = :/images/images/24x24/raw_art/darktable1.png
+colorize = no
 fdo_name = applications-graphics
 
 #

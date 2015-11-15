@@ -10,6 +10,7 @@
   </qresource>
   <qresource prefix="images">
     <file>images/24x24/raw_art/emblem-remote.png</file>
+    <file>images/24x24/raw_art/view-list-column.png</file>
     <file>images/24x24/raw_art/sonata.png</file>
     <file>images/24x24/raw_art/pacman.png</file>
     <file>images/24x24/raw_art/configure.png</file>
@@ -37,22 +38,21 @@
     <file>images/24x24/raw_art/audio-volume-muted.png</file>
     <file>images/24x24/overlay/mute.png</file>
     <file>images/24x24/raw_art/application-exit2.png</file>
-    <file>images/16x16/blend.png</file>
     <file>images/24x24/raw_art/media-optical-cd1.png</file>
+    <file>images/24x24/raw_art/darktable1.png</file>
     <file>images/24x24/raw_art/media-optical-video1.png</file>
-    <file>images/16x16/noatunloopsong.png</file>
-    <file>images/16x16/1leftarrow.png</file>
-    <file>images/16x16/1rightarrow.png</file>
-    <file>images/16x16/2leftarrow.png</file>
-    <file>images/16x16/2rightarrow.png</file>
-    <file>images/16x16/view_choose.png</file>
-    <file>images/16x16/kwikdisk.png</file>
+    <file>images/24x24/raw_art/av-sync.png</file>
+    <file>images/24x24/raw_art/r10.png</file>
+    <file>images/24x24/raw_art/r60.png</file>
+    <file>images/24x24/raw_art/r600.png</file>
     <file>images/24x24/raw_art/video-x-generic2.png</file>
-    <file>images/16x16/view_fullscreen.png</file>
+    <file>images/24x24/raw_art/preferences-color.png</file>
     <file>images/24x24/raw_art/folder.png</file>
-    <file>images/16x16/folder_inbox.png</file>
-    <file>images/16x16/player_fwd.png</file>
-    <file>images/16x16/player_rev.png</file>
+    <file>images/24x24/raw_art/view-fullscreen.png</file>
+    <file>images/24x24/raw_art/user-desktop6.png</file>
+    <file>images/24x24/raw_art/f10.png</file>
+    <file>images/24x24/raw_art/f60.png</file>
+    <file>images/24x24/raw_art/f600.png</file>
   </qresource>
   <qresource prefix="translations">
     <file>translations/mbmp_ru_RU.qm</file>

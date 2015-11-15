@@ -1,6 +1,11 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>In Progress</b>
+<ul>
+<li>Internal icon set changed to Awoken set.</li>
+<li>Ability to colorize internal icons.</li>
+</ul>
 <b>15 September 2015</b>
 <ul>
 <li>Option to disable XScreenSaver while playing if it is present.<li>

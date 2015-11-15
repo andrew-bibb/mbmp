@@ -219,7 +219,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->ui.toolButton_settings->setDefaultAction(ui.actionShowSettingsDialog);
 	this->addAction(ui.actionAbout);
 	this->addAction(ui.actionAboutMBMP);
-	this->addAction(ui.actionAboutNuvola);
+	this->addAction(ui.actionAboutIconSet);
 	this->addAction(ui.actionAboutQT);
 	this->addAction(ui.actionShowLicense);
 	this->addAction(ui.actionShowChangeLog);
@@ -396,10 +396,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	control_menu->addAction(ui.actionPlayerStop);
 	control_menu->addSeparator();	
 	control_menu->addAction(ui.actionSeekBack10);
-	control_menu->addAction(ui.actionSeekFrwd10);
 	control_menu->addAction(ui.actionSeekBack60);
-	control_menu->addAction(ui.actionSeekFrwd60);	
 	control_menu->addAction(ui.actionSeekBack600);
+	control_menu->addSeparator();	
+	control_menu->addAction(ui.actionSeekFrwd10);
+	control_menu->addAction(ui.actionSeekFrwd60);	
 	control_menu->addAction(ui.actionSeekFrwd600);
 	control_menu->addSeparator();	
 	control_menu->addAction(ui.actionPlaylistFirst);
@@ -426,7 +427,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionShowCheatsheet->setShortcuts(scman.getKeySequence("cmd_cheatsheet"));
 	ui.actionAbout->setShortcuts(scman.getKeySequence("cmd_about"));
 	ui.actionAboutMBMP->setShortcuts(scman.getKeySequence("cmd_aboutmbmp"));
-	ui.actionAboutNuvola->setShortcuts(scman.getKeySequence("cmd_aboutnuvola"));
+	ui.actionAboutIconSet->setShortcuts(scman.getKeySequence("cmd_aboutnuvola"));
 	ui.actionAboutQT->setShortcuts(scman.getKeySequence("cmd_aboutqt"));
 	ui.actionShowLicense->setShortcuts(scman.getKeySequence("cmd_showlicense"));
 	ui.actionShowChangeLog->setShortcuts(scman.getKeySequence("cmd_showchangelog"));
@@ -482,7 +483,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionShowSettingsDialog, SIGNAL (triggered()), this, SLOT(toggleSettingsDialog()));
 	connect (ui.actionAbout, SIGNAL (triggered()), this, SLOT(showAbout()));
 	connect (ui.actionAboutMBMP, SIGNAL (triggered()), this, SLOT(aboutMBMP()));
-	connect (ui.actionAboutNuvola, SIGNAL (triggered()), this, SLOT(aboutNuvola()));
+	connect (ui.actionAboutIconSet, SIGNAL (triggered()), this, SLOT(aboutNuvola()));
 	connect (ui.actionAboutQT, SIGNAL (triggered()), qApp, SLOT(aboutQt()));
 	connect (ui.actionShowLicense, SIGNAL (triggered()), this, SLOT(showLicense())); 
 	connect (ui.actionShowChangeLog, SIGNAL (triggered()), this, SLOT(showChangeLog()));
@@ -947,7 +948,7 @@ void PlayerControl::showAbout()
 	QMenu about_menu(this);
 
 	about_menu.addAction(ui.actionAboutMBMP);
-	about_menu.addAction(ui.actionAboutNuvola);
+	about_menu.addAction(ui.actionAboutIconSet);
 	about_menu.addAction(ui.actionAboutQT);
 	about_menu.addSeparator();	
 	about_menu.addAction(ui.actionShowLicense);	
@@ -974,14 +975,16 @@ void PlayerControl::aboutMBMP()
 
 //
 // slot to display an about box for the icons we used
-void PlayerControl::aboutNuvola()
+void PlayerControl::aboutIconSet()
 {
- QMessageBox::about(this, tr("About Nuvola"),
-       tr("<center>This program uses the version 1.0 <b>Nuvola</b> icon set"                       
-                  "<br>copyright c 2004<br>by"
-                  "<br>David Vignoni"
-                  "<br>Released under the"
-		  "<br>GNU Lesser General Public License, version 2.1"
+ QMessageBox::about(this, tr("About AwOken"),
+       tr("<center>This program uses the <b>AwOken</b> icon set version 2.5"
+          "<br><br>Released under the"
+          "<br>Creative Commons"
+          "<br>Attribution-Share Alike 3.0"
+          "<br>Unported License"
+          "<br><a href=\"url\">http://creativecommons.org/licenses/by-sa/3.0/legalcode</a>"
+          "<br><center>The CMST icon is a derivative work from the AwOken icon set."
                   ) );
 }
 
