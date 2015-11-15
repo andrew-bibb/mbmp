@@ -321,6 +321,7 @@ void Settings::callColorDialog()
 // Slot to process things when the user changes the icon color
 void Settings::iconColorChanged(const QString& col)
 {
-	qDebug() << "ICON COLOR CHANGED - NEED CODE HERE";
+	// can't change icons in QActions once they are set so just return
+	(void) col;
 	return;
 }
