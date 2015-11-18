@@ -39,9 +39,9 @@ DEALINGS IN THE SOFTWARE.
 # include <QFileInfo>
 # include <QTime>
 # include <QTableWidgetItem>
-# include <QDir>
 # include <QFile>
 # include <QTextStream>
+# include <QProcessEnvironment>
 
 
 // NOTES: There are a couple of things to keep in mind if we need to expand
@@ -67,6 +67,13 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	settings->beginGroup("Preferences");
   iconman.setIconColor(settings->value("colorize_icons").toString() );
   settings->endGroup();
+  
+  // Setup the data directory (where we store playlists)
+  // APP defined in resource.h
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QString home = env.value("HOME");
+  data_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/playlists").arg(QString(APP).toLower()) );
+	if (! data_dir.exists()) data_dir.mkpath(data_dir.absolutePath() );   
   
   // assign icons to actions
 	ui.actionMoveUp->setIcon(iconman.getIcon("move_up"));
@@ -189,22 +196,13 @@ void Playlist::savePlaylist()
 	
 	// constants
 	const QString playlistfiles = "*.m3u";	
-	
-	// default file path to store the playlist  
-  // APP defined in resource.h
-	QString filepath = QDir::homePath();
-	filepath.append(QString("/.%1/playlists").arg(QString(APP).toLower()) );    
-	
-	// make the directory if it does not exist
-	QDir d = QDir(filepath);
-	if (! d.exists()) d.mkpath(filepath);
-
+		
 	// Get the filename to save as
 	QString sfiles = tr("Playlists (%1);;All Files (*.*)").arg(playlistfiles);
 	QString filename = QFileDialog::getSaveFileName(
 											this,
 											tr("Save the playlist"),
-                      filepath,
+                      data_dir.absolutePath(),
                       sfiles );
   
   // if filename is empty return
@@ -332,7 +330,7 @@ void Playlist::addFile(QAction* a)
 	else if (a == ui.actionAddVideo ) s_files = tr("Video (%1);;All Files (*.*)").arg(video);
 		else if (a == ui.actionAddPlaylist) {
 			s_files = tr("Playlist (%1);;All Files (*.*)").arg(plext);
-			startdir.append(QString("/.%1/playlists").arg(QString(APP).toLower()) );
+			startdir = data_dir.absolutePath();
 		}
 	
 	// Open a file dialog to select media files
@@ -646,8 +644,6 @@ void Playlist::contextMenuEvent(QContextMenuEvent* e)
 //
 // Function to process a .m3u (playlist) file.  Called from addFile() when
 // a file ends with .m3u
-
-
 void Playlist::processM3U(const QString& plfile)
 {
 	// Make a QDir out of the input string, if plfile contains relative

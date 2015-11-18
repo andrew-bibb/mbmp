@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QMenu>
 # include <QList>
 # include <QListWidgetItem>
+# include <QDir>
 
 # include "ui_playlist.h"
 # include "./code/playlist/playlistitem.h"
@@ -120,6 +121,7 @@ class Playlist : public QDialog
 		QActionGroup* media_group;
 		QMenu* playlist_menu;
 		QMenu* media_menu;
+		QDir data_dir;
 	       
 	// functions
 		void processM3U(const QString&);
