@@ -1,7 +1,7 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>In Progress</b>
+<b>19 November 2015</b>
 <ul>
 <li>Internal icon set changed to Awoken set.</li>
 <li>Ability to colorize internal icons.</li>
