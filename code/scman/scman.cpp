@@ -37,13 +37,17 @@ DEALINGS IN THE SOFTWARE.
 # include <QCryptographicHash>
 # include <QSettings>
 # include <QMessageBox>
+# include <QProcessEnvironment>
+
 
 // Constructor
 ShortCutManager::ShortCutManager(QObject* parent) : QObject(parent) 
 {
-	// Set the cfg member (path to ${home}/.config/mbmp
-	// APP defined in resource.h
-	cfg = QDir::homePath().append(QString("/.config/%1/%1.keys").arg(QString(APP).toLower()) );	
+  // Setup the config path and filename (where we store shortcuts)
+  // APP defined in resource.h
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QString home = env.value("HOME");
+  cfg = QString(env.value("XDG_CONFIG_HOME", QString(QDir::homePath())) + "/.config/%1/%1.keys").arg(QString(APP).toLower() );
 	
 	// Set the qrc data member
 	qrc = QString(":/text/text/sc_def.txt");

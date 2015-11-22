@@ -425,7 +425,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionToggleGUI->setShortcuts(scman.getKeySequence("cmd_gui"));
 	ui.actionToggleFullscreen->setShortcuts(scman.getKeySequence("cmd_fullscreen"));
 	ui.actionShowCheatsheet->setShortcuts(scman.getKeySequence("cmd_cheatsheet"));
-	qDebug() << "cheat sheet " << scman.getKeySequence("cmd_cheatsheet");
 	ui.actionAbout->setShortcuts(scman.getKeySequence("cmd_about"));
 	ui.actionAboutMBMP->setShortcuts(scman.getKeySequence("cmd_aboutmbmp"));
 	ui.actionAboutIconSet->setShortcuts(scman.getKeySequence("cmd_abouticonset"));
