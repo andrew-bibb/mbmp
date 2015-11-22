@@ -16,6 +16,11 @@ documentation.CONFIG = no_check_exist
 documentation.extra = gzip --force --keep ./misc/manpage/mbmp.1
 INSTALLS += documentation
 
+# desktop file
+desktop.path = /usr/share/applications
+desktop.files = ./misc/desktop/mbmp.desktop
+INSTALLS += desktop
+
 #  Widgets needed for QT5, 
 QT += widgets
 QT += core

@@ -71,6 +71,14 @@
 #   resource location as specified in this file
 #   hard coded internal icon
 #
+#
+#	application icon
+[icon]
+icon_name = mbmp
+resource = :/images/images/app/ipod_mount2.svg
+colorize = yes
+fdo_name = multimedia-player
+
 # playlist icons
 [icon]
 icon_name = move_up

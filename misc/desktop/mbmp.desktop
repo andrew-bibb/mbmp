@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=2015.11.22
+Name=MBMP
+GenericName=Multi-Media Player
+Comment=GStreamer based multi-media player 
+Categories=Qt;Audio,Video,AudioVideo
+Icon=multimedia-player
+Terminal=false
+Exec=mbmp
+StartupNotify=false

@@ -59,7 +59,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "use_icon_theme").toBool() )
 			QIcon::setThemeName(diag_settings->getSetting("StartOptions", "icon_theme_name").toString() );
 		else QIcon::setThemeName(INTERNAL_THEME);
-	
+			
 	// data members
 	playlist = new Playlist(this); 
 	gstiface = new GST_Interface(this);
@@ -94,6 +94,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// Setup the icon manager and give it a color
 	IconManager iconman(this);
 	iconman.setIconColor(QColor(diag_settings->getSetting("Preferences", "colorize_icons").toString()) );
+	
+	// Set the window icon
+	setWindowIcon(iconman.getIcon("mbmp") );
 			
 	// assign icons to actions
 	ui.actionPlaylistNext->setIcon(iconman.getIcon("playlist_next"));
@@ -970,7 +973,7 @@ void PlayerControl::aboutMBMP()
                   "<center>Vermont, USA"
 									"<br><center><b>Translations:</b>"
                   "<center>Ilya Shestopalov (Russian)"                  
-                  ).arg(APP).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
+                  ).arg(QString(APP).toUpper()).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
 }
 
 //
