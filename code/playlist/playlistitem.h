@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QListWidget>
 # include <QListWidgetItem>
 # include <QString>
-
+# include <QMap>
 
 //	Class based on a QListWidget item, used for entries in the Playlist class below
 class PlaylistItem : public QListWidgetItem
@@ -67,6 +67,7 @@ class PlaylistItem : public QListWidgetItem
 		QString album;				// the album	
 		QString description;	// a tag comment
 		QString genre;				// a genre tag
+		QMap<QString,QString> map_tags;  // all tags found by discoverer
 		QString errors;				// compliation of any errors encountered in creating the item		
 		
 	// functions	

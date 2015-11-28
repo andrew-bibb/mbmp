@@ -52,6 +52,7 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 	description = QString();
 	genre = QString();		
 	errors = QString();	
+	map_tags.clear();
 	
 	// Somewhat of a hack, but to display text in nice columns we either need a full QTableWidget (or worse a QTableView),
 	// or QListWidgetItems with monospace text.  Since we're only looking for appearance, not function, monospace fonts
@@ -176,8 +177,7 @@ void PlaylistItem::makeDisplayText()
 void PlaylistItem::makeToolTip()
 {
 	QString s_tt = QString();
-	//s_tt.prepend(QObject::tr("<p style='white-space:pre'>"));
-
+	
 	// If the error string is not empty show the errors
 	if (! isPlayable() ) {
 		this->setToolTip(QString("<p style='white-space:pre'>%1").arg(errors));
@@ -204,13 +204,14 @@ void PlaylistItem::makeToolTip()
 		
 	s_tt.append(QObject::tr("<br>  Seekable: %1").arg(seekable ? QObject::tr("yes") : QObject::tr("no")) );
 	
-	QString s_tags = QString();
-	if (! description.isEmpty()) s_tags.append(QObject::tr("<br>    description: %1").arg(description));
-	if (! artist.isEmpty()) s_tags.append(QObject::tr("<br>    artist: %1").arg(artist));
-	if (! title.isEmpty()) s_tags.append(QObject::tr("<br>    title: %1").arg(title));
-	if (! album.isEmpty()) s_tags.append(QObject::tr("<br>    album: %1").arg(album));
-	if (sequence > 0 ) s_tags.append(QObject::tr("<br>    track number: %1").arg(sequence));
-	if (! s_tags.isEmpty()) s_tt.append(QObject::tr("<br>  Tags:%1").arg(s_tags));
+	if (map_tags.count() > 0) {
+		s_tt.append(QObject::tr("<br>  Tags:") );
+		QMapIterator<QString, QString> itr(map_tags);
+			while (itr.hasNext()) {
+				itr.next();
+				s_tt.append(QString("<br>    %1 : %2").arg(itr.key()).arg(itr.value()) ) ;
+			}	// while
+		}	// if
 	
 	this->setToolTip(s_tt);
 	
@@ -326,8 +327,27 @@ void PlaylistItem::runDiscoverer()
 			if (str) genre = QString(str);
 			g_free (str);
 		}
+
+	// put all the tags from GstDiscoverer into a QMap
+  for (int i = 0; i < gst_tag_list_n_tags(tags); ++i) {
+		GValue val = G_VALUE_INIT;
+    gchar *str;
+       
+    gst_tag_list_copy_value (&val, tags, gst_tag_list_nth_tag_name(tags, i));             
+    
+    if (G_VALUE_HOLDS_STRING (&val))
+      str = g_value_dup_string (&val);
+    else
+      str = gst_value_serialize (&val);
+      
+    map_tags[gst_tag_get_nick(gst_tag_list_nth_tag_name(tags, i)) ] = QString::fromUtf8(str);
+ 
+    g_free (str);
+    g_value_unset (&val);
+		}	// for loop
+
 	}	// if there were tags
-						
+
 	// clean up discoverer stuff
 	gst_discoverer_info_unref(info);
 	g_object_unref (disc);	

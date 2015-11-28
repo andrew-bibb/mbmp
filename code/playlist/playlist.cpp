@@ -673,7 +673,7 @@ void Playlist::processM3U(const QString& plfile)
 
 //
 // Function to update the summary text. Called at the end of the add functions,
-// at the end of seePlaylist(), and at the end of removeItem()
+// at the end of seedPlaylist(), and at the end of removeItem()
 void Playlist::updateSummary()
 {
 	// Variables
