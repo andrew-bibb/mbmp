@@ -214,17 +214,6 @@ void Settings::setNotificationsFailed()
 }
 
 //
-// Function to save the playlist
-void Settings::savePlaylist(const QStringList& pl, const int& cur, const int& pos)
-{
-	settings->beginGroup("Playlist");
-	settings->setValue("entries", pl);
-	settings->setValue("current", cur);
-	settings->setValue("position", pos);
-	settings->endGroup();
-}
-
-//
 // Function to return the playlist
 QStringList Settings::getPlaylist()
 {

@@ -110,6 +110,7 @@ class Playlist : public QDialog
 		void lockControls(bool);
 		QStringList getCurrentList();
 		QString getWindowTitle();
+		void saveSettings(const int&);
 
 	protected:
 		void hideEvent(QHideEvent*);

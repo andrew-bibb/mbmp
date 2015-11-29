@@ -1306,7 +1306,7 @@ void PlayerControl::cleanUp()
   diag_settings->saveElementGeometry("playerctl", true, this->size(), this->pos() );
 	diag_settings->saveElementGeometry("playlist", playlist->isVisible(),  playlist->size(), playlist->pos() );	
   diag_settings->writeSettings();
-  diag_settings->savePlaylist(playlist->getCurrentList(), playlist->getCurrentRow(), ui.horizontalSlider_position->sliderPosition() );
+  playlist->saveSettings(ui.horizontalSlider_position->sliderPosition() );
   			
   // close b_logtofile			
 	logfile.close();

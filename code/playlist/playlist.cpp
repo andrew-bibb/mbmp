@@ -62,11 +62,19 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // Iconmanager with constructor only scope
   IconManager iconman(this);
   
-  // Get information about icon colors from settings
+  // Process playlist related settings. The geometry and playlist contents
+  // are set in Playerctl.
 	QSettings* settings = new QSettings(ORG, APP, this);
 	settings->beginGroup("Preferences");
   iconman.setIconColor(settings->value("colorize_icons").toString() );
   settings->endGroup();
+ 
+	settings->beginGroup("Playlist_Settings");
+	ui.checkBox_wrap->setChecked(settings->value("wrap").toBool() );
+	ui.checkBox_consume->setChecked(settings->value("consume").toBool() );
+	ui.checkBox_random->setChecked(settings->value("random").toBool() );
+	ui.checkBox_showinfo->setChecked(settings->value("details").toBool() );
+	settings->endGroup();
   
   // Show or hide the details box. After this show and hide controlled
   // by signals and slots in the UI.
@@ -526,14 +534,27 @@ void Playlist::moveItemDown()
 void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 {
 	(void) old;
+	if (cur == NULL) return;
 	
 	ui.label_iteminfo->clear();
 	ui.label_artwork->clear();
 	
-	QString s = static_cast<PlaylistItem*>(cur)->getInfoText();
-	if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
-	
-	ui.label_artwork->setPixmap(static_cast<PlaylistItem*>(cur)->getArtwork() ); 
+	// If we're playing a local file
+	if (this->currentItemType() == MBMP_PL::File) {
+		QString s = static_cast<PlaylistItem*>(cur)->getInfoText();
+		if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
+		
+		if (static_cast<PlaylistItem*>(cur)->hasArtwork())
+			ui.label_artwork->setPixmap(static_cast<PlaylistItem*>(cur)->getArtwork() ); 
+		else {
+			QFileInfo fi(this->getCurrentUri().remove("file://") );
+			QDir d(fi.path());
+			QStringList nf = (QStringList() << "*.jpg" << "*.png << *.gif");
+			QStringList sl = d.entryList(nf, QDir::Files, QDir::NoSort);
+			if (sl.count() > 0)
+				ui.label_artwork->setPixmap(d.absoluteFilePath(sl.at(0)) );
+		}
+	}	// if playing file
 	
 	return;	
 }
@@ -634,6 +655,29 @@ QString Playlist::getWindowTitle()
 	if (! title.isEmpty() ) 
 		return (artist.isEmpty() ? title : QString("%1 - %2").arg(artist).arg(title) );
 	else return (pli->getUri()).section("//", 1, 1);
+}
+
+//
+// Function to save playlist settings.  pos is the slider position
+// sent to this function from PlayerControl
+void Playlist::saveSettings(const int& pos)
+{
+	QSettings* settings = new QSettings(ORG, APP, this);	
+	settings->beginGroup("Playlist");
+	settings->setValue("entries", this->getCurrentList());
+	settings->setValue("current", this->getCurrentRow());
+	settings->setValue("position", pos);
+	settings->endGroup();
+	
+	settings->beginGroup("Playlist_Settings");
+	settings->setValue("wrap", ui.checkBox_wrap->isChecked() );
+	settings->setValue("consume", ui.checkBox_consume->isChecked() );
+	settings->setValue("random", ui.checkBox_random->isChecked() );
+	settings->setValue("details", ui.checkBox_showinfo->isChecked() );
+	
+	settings->deleteLater();
+ 
+	return;
 }
 
 //////////////////////////// Protected Functions ////////////////////////////
