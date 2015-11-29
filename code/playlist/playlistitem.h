@@ -31,13 +31,19 @@ DEALINGS IN THE SOFTWARE.
 # include <QListWidget>
 # include <QListWidgetItem>
 # include <QString>
-# include <QMap>
+# include <QPixmap>
+
+// Use GStreamer to process media tags
+# include <gst/gst.h>
+# include <gst/tag/tag.h>
+# include <gst/pbutils/pbutils.h>
 
 //	Class based on a QListWidget item, used for entries in the Playlist class below
 class PlaylistItem : public QListWidgetItem
 {
 	public:
 		PlaylistItem (const QString&, QListWidget*, int);
+		~PlaylistItem();
 		
 		// get functions
 		inline qint16 getSequence() {return sequence;}
@@ -46,29 +52,31 @@ class PlaylistItem : public QListWidgetItem
 		inline QString getTitle() {return title;}
 		inline qint32 getDuration() {return duration;}
 		inline bool isPlayable() {return errors.isEmpty() ? true : false;}
+		inline QString getInfoText() {return toolTip();}
+		inline bool hasArtwork() {return b_has_artwork;}
+		QPixmap getArtwork();
 		
 		// set functions
 		inline void setSequence(uint seq) {sequence = seq;}
 		inline void setDuration(qint16 dur) {duration = dur;}
 		inline void setTitle(QString ttl) {title = ttl;}
-		inline void setArtist(QString art) {artist = art;}
+		//inline void setArtist(QString art) {artist = art;} // not currently used for anything
 		
 		// functions
 		void makeDisplayText();
 		
 	private:
 	// members - which ones are used depends upon the item type
-		qint16 sequence;					// track or chapter number
+		qint16 sequence;			// ACD track or chapter number or file track tag 
 		qint32 duration;			// length in seconds, or a negative number for duation not known		
 		QString uri;					// the uri of the media 
 		bool seekable;				// true if we can seek in the stream, false otherwise	
-		QString title;				// the title of the media file	
-		QString artist;				// the artist
-		QString album;				// the album	
-		QString description;	// a tag comment
-		QString genre;				// a genre tag
-		QMap<QString,QString> map_tags;  // all tags found by discoverer
+		QString title;				// the title tag of the media file
+		QString artist;				// the artist tag
+		QString album;				// the album tag
+		GstTagList* taglist;	// the taglist as returned by discoverer
 		QString errors;				// compliation of any errors encountered in creating the item		
+		bool b_has_artwork;		// true if the tags contain artwork 
 		
 	// functions	
 		void makeToolTip();

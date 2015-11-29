@@ -31,12 +31,6 @@ DEALINGS IN THE SOFTWARE.
 # include <QtCore/QDebug>
 # include <QTime>
 
-// Use GStreamer to process media tags
-# include <gst/gst.h>
-# include <gst/tag/tag.h>
-#include <gst/pbutils/pbutils.h>
-
-
 PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) : QListWidgetItem(text, parent, type)
 {
 	// Data members.  Not all are used for any single PlaylistItem.  We probably could have used the QListWidgetItem::data
@@ -49,10 +43,9 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 	title = QString();
 	artist = QString();
 	album = QString();
-	description = QString();
-	genre = QString();		
 	errors = QString();	
-	map_tags.clear();
+	taglist = NULL;
+	b_has_artwork = false;
 	
 	// Somewhat of a hack, but to display text in nice columns we either need a full QTableWidget (or worse a QTableView),
 	// or QListWidgetItems with monospace text.  Since we're only looking for appearance, not function, monospace fonts
@@ -87,6 +80,14 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 		
 	return;
 }
+
+//
+// Destructor
+PlaylistItem::~PlaylistItem()
+{
+	if (taglist != NULL) gst_tag_list_unref(taglist);
+}
+
 
 //////////////////////////// Public Functions ////////////////////////////
 
@@ -161,13 +162,41 @@ void PlaylistItem::makeDisplayText()
 			break; }	// case PlaylistItem is a DVD chapter
 	
 		default:
-			break;
-			
+			break;			
 	}	// switch
 	
 	this->makeToolTip();
 	
 	return;
+}
+
+//
+// Function to return the artwork data
+QPixmap PlaylistItem::getArtwork()
+{
+	QPixmap pm_art = QPixmap();
+	
+	if (b_has_artwork) {	
+		GstSample* sam;   
+		
+		if (gst_tag_list_get_sample(taglist, GST_TAG_IMAGE, &sam) || gst_tag_list_get_sample(taglist, GST_TAG_PREVIEW_IMAGE, &sam) ) {	 		
+			GstBuffer* buffer = gst_sample_get_buffer (sam); 
+			gsize bufsize;
+			gsize bufoff;
+			bufsize = gst_buffer_get_sizes(buffer, &bufoff, NULL);
+			
+			void* dest = malloc (bufsize);
+			gst_buffer_extract_dup(buffer, bufoff, bufsize, &dest, &bufsize);				
+			
+			pm_art.loadFromData( (uchar*)dest, bufsize);
+			
+			g_free(dest);
+			gst_sample_unref(sam);
+		}	// if creating sample worked
+		
+	}	// if
+	 
+	return pm_art;
 }
 
 //////////////////////////// Private Functions ////////////////////////////
@@ -204,21 +233,36 @@ void PlaylistItem::makeToolTip()
 		
 	s_tt.append(QObject::tr("<br>  Seekable: %1").arg(seekable ? QObject::tr("yes") : QObject::tr("no")) );
 	
-	if (map_tags.count() > 0) {
+	if (taglist) {
 		s_tt.append(QObject::tr("<br>  Tags:") );
-		QMapIterator<QString, QString> itr(map_tags);
-			while (itr.hasNext()) {
-				itr.next();
-				s_tt.append(QString("<br>    %1 : %2").arg(itr.key()).arg(itr.value()) ) ;
-			}	// while
-		}	// if
+		
+		// scan through tags find the ones we want to display
+		QStringList blacklist;
+		blacklist << GST_TAG_IMAGE << GST_TAG_PREVIEW_IMAGE;
+  
+		for (int i = 0; i < gst_tag_list_n_tags(taglist); ++i) {
+			GValue val = G_VALUE_INIT;
+			gchar *str;
+       
+			gst_tag_list_copy_value (&val, taglist, gst_tag_list_nth_tag_name(taglist, i));                
+			
+			if (G_VALUE_HOLDS_STRING (&val))
+				str = g_value_dup_string (&val);
+			else
+				str = gst_value_serialize (&val);
+			
+			if (! blacklist.contains(gst_tag_list_nth_tag_name(taglist, i)) ) {
+				s_tt.append(QString("<br>    %1 : %2").arg(gst_tag_get_nick(gst_tag_list_nth_tag_name(taglist, i))).arg(QString::fromUtf8(str)) ) ;
+			} // if not in blacklist 
+			g_free (str);
+		} //for
+	}	// if taglist is not NULL
 	
 	this->setToolTip(s_tt);
 	
 	return;
 }
 
-//
 //
 // Function to run gstDiscoverer on the uri to try and get some information about the media.  
 // Called from the constructor
@@ -294,59 +338,35 @@ void PlaylistItem::runDiscoverer()
 	seekable = static_cast<bool>(gst_discoverer_info_get_seekable(info) ); 		
 	
 	// Get tags and try to extract information from them
-	tags = gst_discoverer_info_get_tags(info);
-	if (tags) {
+	tags = gst_discoverer_info_get_tags(info);	// tags belongs to info
+	taglist = gst_tag_list_copy(tags);					// save the taglist
+	if (taglist) {
 		gchar* str = NULL;
-		uint val = 0;			
+		uint val = 0;		
+		GstSample* sam = NULL;	
 		
-		if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
+		if (gst_tag_list_get_string (taglist, GST_TAG_TITLE, &str)) {
 			if (str) title = QString(str);
-			g_free (str);
 		}
 		
-		if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
+		if (gst_tag_list_get_string (taglist, GST_TAG_ARTIST, &str)) {
 			if (str) artist = QString(str);
-			g_free (str);
 		}
 		
-		if (gst_tag_list_get_string (tags, GST_TAG_ALBUM, &str)) {
+		if (gst_tag_list_get_string (taglist, GST_TAG_ALBUM, &str)) {
 			if (str) album = QString(str);
-			g_free (str);
 		}
 		
-		if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &val)) {
+		if (gst_tag_list_get_uint (taglist, GST_TAG_TRACK_NUMBER, &val)) {
 			if (val) sequence = val;
 		}
 		
-		if (gst_tag_list_get_string (tags, GST_TAG_DESCRIPTION, &str)) {
-			if (str) description = QString(str);
-			g_free (str);
-		}
+		if (gst_tag_list_get_sample(taglist, GST_TAG_IMAGE, &sam) || gst_tag_list_get_sample(taglist, GST_TAG_PREVIEW_IMAGE, &sam) )
+			b_has_artwork = true;
 		
-		if (gst_tag_list_get_string (tags, GST_TAG_GENRE, &str)) {
-			if (str) genre = QString(str);
-			g_free (str);
-		}
-
-	// put all the tags from GstDiscoverer into a QMap
-  for (int i = 0; i < gst_tag_list_n_tags(tags); ++i) {
-		GValue val = G_VALUE_INIT;
-    gchar *str;
-       
-    gst_tag_list_copy_value (&val, tags, gst_tag_list_nth_tag_name(tags, i));             
-    
-    if (G_VALUE_HOLDS_STRING (&val))
-      str = g_value_dup_string (&val);
-    else
-      str = gst_value_serialize (&val);
-      
-    map_tags[gst_tag_get_nick(gst_tag_list_nth_tag_name(tags, i)) ] = QString::fromUtf8(str);
- 
-    g_free (str);
-    g_value_unset (&val);
-		}	// for loop
-
-	}	// if there were tags
+		if (sam != NULL) gst_sample_unref(sam);
+		g_free (str);
+		}	// if there were tags
 
 	// clean up discoverer stuff
 	gst_discoverer_info_unref(info);

@@ -68,6 +68,10 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   iconman.setIconColor(settings->value("colorize_icons").toString() );
   settings->endGroup();
   
+  // Show or hide the details box. After this show and hide controlled
+  // by signals and slots in the UI.
+  ui.widget_details->setVisible(ui.checkBox_showinfo->isChecked() );
+  
   // Setup the data directory (where we store playlists)
   // APP defined in resource.h
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -180,8 +184,10 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionToggleWrap, SIGNAL(triggered()), this, SLOT(toggleWrapMode()));
   connect (ui.actionToggleConsume, SIGNAL(triggered()), this, SLOT(toggleConsumeMode()));
   connect (ui.actionToggleRandom, SIGNAL(triggered()), this, SLOT(toggleRandomMode()));
+  connect (ui.listWidget_playlist, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
   
  settings->deleteLater();
+ 
  return;
 }
 
@@ -511,6 +517,23 @@ void Playlist::moveItemDown()
 		ui.listWidget_playlist->insertItem(row + 1, ui.listWidget_playlist->takeItem(row)); 	
 		ui.listWidget_playlist->setCurrentRow(row + 1);
 	}	// if
+	
+	return;	
+}
+
+//
+// Slot called when the current item is changed
+void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
+{
+	(void) old;
+	
+	ui.label_iteminfo->clear();
+	ui.label_artwork->clear();
+	
+	QString s = static_cast<PlaylistItem*>(cur)->getInfoText();
+	if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
+	
+	ui.label_artwork->setPixmap(static_cast<PlaylistItem*>(cur)->getArtwork() ); 
 	
 	return;	
 }

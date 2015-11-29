@@ -103,6 +103,8 @@ class Playlist : public QDialog
 		inline int currentItemType() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentItem()->type() : MBMP_PL::None;}
 		inline bool currentIsPlayable() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable() : false;}
 	
+		void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
+		
 	public:
 		void seedPlaylist(const QStringList&);
 		void lockControls(bool);
