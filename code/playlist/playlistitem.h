@@ -55,6 +55,7 @@ class PlaylistItem : public QListWidgetItem
 		inline QString getInfoText() {return toolTip();}
 		inline bool hasArtwork() {return b_has_artwork;}
 		QPixmap getArtwork();
+		QString getTagAsString(const QString&);
 		
 		// set functions
 		inline void setSequence(uint seq) {sequence = seq;}

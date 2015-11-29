@@ -132,7 +132,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// hide the buffering progress bar
 	ui.progressBar_buffering->hide();	
 	
-	// set up an event filter on the position slider
+	// set up an event filter 
 	qApp->installEventFilter(this);
 	
 	// find the the optical drives, or at least the first five

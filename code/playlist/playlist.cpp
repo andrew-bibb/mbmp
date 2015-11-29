@@ -43,6 +43,10 @@ DEALINGS IN THE SOFTWARE.
 # include <QTextStream>
 # include <QProcessEnvironment>
 
+// Use GStreamer to process media tags
+# include <gst/gst.h>
+# include <gst/tag/tag.h>
+
 
 // NOTES: There are a couple of things to keep in mind if we need to expand
 // functionality in the future.  In the function seedPlaylist() we assume
@@ -58,6 +62,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // initialize class members
   geometry = QRect();
   ui.listWidget_playlist->clear();
+  
+  // set up an event filter 
+	qApp->installEventFilter(this);
   
   // Iconmanager with constructor only scope
   IconManager iconman(this);
@@ -80,13 +87,15 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // by signals and slots in the UI.
   ui.widget_details->setVisible(ui.checkBox_showinfo->isChecked() );
   
-  // Setup the data directory (where we store playlists)
+  // Setup the data directories 
   // APP defined in resource.h
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QString home = env.value("HOME");
-  data_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/playlists").arg(QString(APP).toLower()) );
-	if (! data_dir.exists()) data_dir.mkpath(data_dir.absolutePath() );   
-  
+  plist_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/playlists").arg(QString(APP).toLower()) );
+	if (! plist_dir.exists()) plist_dir.mkpath(plist_dir.absolutePath() );   
+	artwork_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/artwork").arg(QString(APP).toLower()) );
+	if (! artwork_dir.exists()) artwork_dir.mkpath(plist_dir.absolutePath() ); 
+	 
   // assign icons to actions
 	ui.actionMoveUp->setIcon(iconman.getIcon("move_up"));
 	ui.actionMoveDown->setIcon(iconman.getIcon("move_down"));
@@ -216,7 +225,7 @@ void Playlist::savePlaylist()
 	QString filename = QFileDialog::getSaveFileName(
 											this,
 											tr("Save the playlist"),
-                      data_dir.absolutePath(),
+                      plist_dir.absolutePath(),
                       sfiles );
   
   // if filename is empty return
@@ -344,7 +353,7 @@ void Playlist::addFile(QAction* a)
 	else if (a == ui.actionAddVideo ) s_files = tr("Video (%1);;All Files (*.*)").arg(video);
 		else if (a == ui.actionAddPlaylist) {
 			s_files = tr("Playlist (%1);;All Files (*.*)").arg(plext);
-			startdir = data_dir.absolutePath();
+			startdir = plist_dir.absolutePath();
 		}
 	
 	// Open a file dialog to select media files
@@ -544,17 +553,48 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 		QString s = static_cast<PlaylistItem*>(cur)->getInfoText();
 		if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
 		
+		// First see if the art is contained in the tag
 		if (static_cast<PlaylistItem*>(cur)->hasArtwork())
-			ui.label_artwork->setPixmap(static_cast<PlaylistItem*>(cur)->getArtwork() ); 
+			ui.label_artwork->setPixmap(static_cast<PlaylistItem*>(cur)->getArtwork() ); 	
+		
+		// Then search directories in the computer
+		// Look first in the directory containing the media file
 		else {
+			QStringList ext = (QStringList() << ".jpg" << ".png" << ".gif" << ".jpeg" << ".bmp");
+			QStringList nf;
+			QStringList entlist;
+			
+			// Look in the directory containing the file
 			QFileInfo fi(this->getCurrentUri().remove("file://") );
 			QDir d(fi.path());
-			QStringList nf = (QStringList() << "*.jpg" << "*.png << *.gif");
-			QStringList sl = d.entryList(nf, QDir::Files, QDir::NoSort);
-			if (sl.count() > 0)
-				ui.label_artwork->setPixmap(d.absoluteFilePath(sl.at(0)) );
-		}
-	}	// if playing file
+			nf.clear();
+			for (int i = 0; i < ext.count(); ++i) {
+				nf << QString("*%1").arg(ext.at(i));
+			}
+			entlist = d.entryList(nf, QDir::Files, QDir::NoSort);
+			if (entlist.count() > 0)
+				ui.label_artwork->setPixmap(d.absoluteFilePath(entlist.at(0)) );
+			
+			// Look next in our artwork directory, first by albumid then by album name
+			else {
+				QStringList searchtags;
+				searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_MUSICBRAINZ_ALBUMID);
+				searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM);
+				
+				for (int i = 0; i < searchtags.count(); ++i) {
+					nf.clear();
+					for (int j = 0; j < ext.count(); ++j) {
+						nf << QString("%1%2").arg(searchtags.at(i)).arg(ext.at(j));
+					}
+					entlist = artwork_dir.entryList(nf, QDir::Files, QDir::NoSort);
+					if (entlist.count() > 0) {
+						ui.label_artwork->setPixmap(artwork_dir.absoluteFilePath(entlist.at(0)) );
+						break;
+					}	// if found cover
+				}	// for searchtags
+			}	// else search artwork directory
+		}	// else didn't find one in the music directory
+	}	// if playing local file
 	
 	return;	
 }
@@ -706,6 +746,25 @@ void Playlist::contextMenuEvent(QContextMenuEvent* e)
 {
 	playlist_menu->popup(e->globalPos());
 }	
+
+//
+// Event filter used to filter out tooltip events. Show tooltips unless
+// the ui.checkBox_details is checked. In that case all the tooltips are
+// shown in the details area.
+bool Playlist::eventFilter(QObject* watched, QEvent* event)
+{
+	(void) watched;
+	
+	if (event->type() == QEvent::ToolTip) {
+    if (ui.checkBox_showinfo->isChecked() )
+			return true;
+		else
+			return false;
+	}	// if tooltip	
+	
+  // default case
+  return false;
+}
 
 //////////////////////////// Private Functions ////////////////////////////
 //

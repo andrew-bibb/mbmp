@@ -199,6 +199,28 @@ QPixmap PlaylistItem::getArtwork()
 	return pm_art;
 }
 
+//
+// Function to return a tag value as a QString
+QString PlaylistItem::getTagAsString(const QString& tag)
+{
+	QString rtn = QString();
+	GValue val = G_VALUE_INIT;
+  gchar *str;
+       
+  if (gst_tag_list_copy_value (&val, taglist, qPrintable(tag)) ) {  
+		if (G_VALUE_HOLDS_STRING (&val))
+			str = g_value_dup_string (&val);
+		else
+			str = gst_value_serialize (&val);
+    
+    g_value_unset (&val);
+    g_free (str);  
+		rtn = QString::fromUtf8(str);
+	}	// if copy worked
+	
+	return rtn;
+} 
+
 //////////////////////////// Private Functions ////////////////////////////
 //
 // Function to set the tooltip text for the PlaylistItem

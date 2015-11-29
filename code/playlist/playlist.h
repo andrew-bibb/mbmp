@@ -115,7 +115,8 @@ class Playlist : public QDialog
 	protected:
 		void hideEvent(QHideEvent*);
 		void showEvent(QShowEvent*);
-		void contextMenuEvent(QContextMenuEvent*);
+		void contextMenuEvent(QContextMenuEvent*);	
+		bool eventFilter(QObject*, QEvent*);
 
   private:
   // members 
@@ -124,7 +125,8 @@ class Playlist : public QDialog
 		QActionGroup* media_group;
 		QMenu* playlist_menu;
 		QMenu* media_menu;
-		QDir data_dir;
+		QDir plist_dir;
+		QDir artwork_dir;
 	       
 	// functions
 		void processM3U(const QString&);
