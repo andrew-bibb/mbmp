@@ -213,9 +213,9 @@ QString PlaylistItem::getTagAsString(const QString& tag)
 		else
 			str = gst_value_serialize (&val);
     
+    rtn = QString::fromUtf8(str);
     g_value_unset (&val);
     g_free (str);  
-		rtn = QString::fromUtf8(str);
 	}	// if copy worked
 	
 	return rtn;
