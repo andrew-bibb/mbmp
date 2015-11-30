@@ -936,6 +936,8 @@ void PlayerControl::toggleGUI()
 // Slot to toggle shademode on and off
 void PlayerControl::toggleShade()
 {
+	static QSize savedsize;
+	
 	if (videowidget->isVisible() ) {
 		savedsize = this->size();
 		videowidget->setVisible(false);

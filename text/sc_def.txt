@@ -106,6 +106,7 @@ cmd_saveplaylist =  ctrl+S            # Save the playlist to disk               
 cmd_togglewrap	=		ctrl+W						# Toggle the wrap action												w		y					e		e
 cmd_toggleconsume = ctrl+C						# Toggle the consume action											w		y					e		e
 cmd_togglerandom	= ctrl+R						#	Toggle the random action											w		y					e		e
+cmd_toggledetail  = ctrl+D						# Toggle the detail action													y							e
 
 #
 # These are streaminfo related actions

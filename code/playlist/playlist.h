@@ -92,6 +92,7 @@ class Playlist : public QDialog
 		inline void toggleWrapMode() {ui.checkBox_consume->setChecked(false); ui.checkBox_wrap->toggle();}
 		inline void toggleConsumeMode() {ui.checkBox_wrap->setChecked(false); ui.checkBox_consume->toggle();}
 		inline void toggleRandomMode() {ui.checkBox_random->toggle();}
+		inline void toggleDetailMode() {ui.checkBox_showinfo->toggle();}
 	
 		inline QString getCurrentUri() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri() : QString();}
 		inline qint16 getCurrentSeq() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getSequence() : -1;}

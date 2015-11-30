@@ -1,6 +1,14 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>In Progress</b>
+<ul>
+<li>Playlist can display album art if it exists and can be found.</li>
+<li>Added details checkbox to playlist to display art and media details.</li>
+<li>Playlist tooltips are automatically turned off when playlist details are active.</li>
+<li>Playlist checkboxes now restored from settings.</li>
+<li>Added shade mode to the GUI.</li>
+</ul>
 <b>19 November 2015</b>
 <ul>
 <li>Internal icon set changed to Awoken set.</li>
@@ -12,7 +20,6 @@
 <li>-v (--version) command line option now works.</li>
 <li>Added wrap, consume and random modes to IPC, keybinds and as menu actions.</li>
 </ul>
-<br>
 <b>6 September 2015</b>
 <ul>
 <li>Added Russian Translation (by Ilya Shestopalov).<li>
@@ -29,14 +36,12 @@
 <li>Option to save settings and window state to disk.</li>
 <li>Stream position slider works.</li>
 </ul>
-<br>
 <b>27 April 2014 - Playlist reworked</b>
 <ul>
 <li>Created PlaylistItems that contain data, major rework on the playlist itself to deal with them.</li>
 <li>Playlists (*.m3u) can be saved and read.</li>
 <li>Fixed (really hard to find) bug where playlist would not automatically advance to next track</li>  
 </ul>
-<br>
 <b>14 April 2014 - Initial Release on GitHub</b>
 <ul>
 <li>Added command line option to specify network connection speed</li>
@@ -51,24 +56,10 @@
 <li>Create a config file in the user's home directory</li>
 <li>Added options menu for subtitles and visualizer</li>
 </ul>
-<br>
 <b>9 March 2014 - Initial Version</b>
 <ul>
 <li>Basic media playback and controls are functional</li>
 <li>Playlist is functional</li>
 <li>Visualizers and visualizer menus are functional</li>
 <li>StreamInfo to select audio, video and subtitle streams is functional</li>
-</ul>
-<br>
-<b>To Do</b>
-<ul>
-<li>Still a problem with dvd keyboard navigation, seems to lose where it is - verify, maybe not</li>
-<li>Improve PlaylistItem tooltip display</li>
-<li>Put more information from DVD and CD into PlaylistItems</li>
-<li>Add libquvi support to parse YouTube and similar URL's</li>
-<li>Need a proper man page</li>
-<li>Try to figure out progressive downloading</li>
-<li>Color balance adjustments</li>
-<li>Modifiy playback speed<li>
-<li>Read subtitles from external file<li>
 </ul>

@@ -209,6 +209,12 @@ colorize = F3F808
 theme_names = user-trash-full
 
 [icon]
+icon_name = playlist_detail
+resource = :/images/images/24x24/raw_art/gtk-zoom-fit.png
+colorize = yes
+fdo_name = zoom-fit-best
+
+[icon]
 icon_name = visualizer 
 resource = :/images/images/24x24/raw_art/preferences-color.png
 colorize = no

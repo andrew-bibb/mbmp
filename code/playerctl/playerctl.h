@@ -106,7 +106,6 @@ class PlayerControl : public QDialog
     IPC_Agent* ipcagent;
     QTimer* pos_timer;
     bool b_logtofile;
-    QSize savedsize;	// for the shade function
  
   // plain members 
 		QActionGroup* playlist_group;    

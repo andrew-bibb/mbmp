@@ -112,6 +112,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	ui.actionToggleWrap->setIcon(iconman.getIcon("playlist_wrap"));
 	ui.actionToggleConsume->setIcon(iconman.getIcon("playlist_consume"));
 	ui.actionToggleRandom->setIcon(iconman.getIcon("playlist_random"));
+	ui.actionToggleDetail->setIcon(iconman.getIcon("playlist_detail"));
   
   // Assign actions defined in the UI to toolbuttons.  This also has the
   // effect of adding actions to this dialog so shortcuts work.  If there
@@ -134,6 +135,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	this->addAction(ui.actionToggleWrap);
 	this->addAction(ui.actionToggleConsume);
 	this->addAction(ui.actionToggleRandom);
+	this->addAction(ui.actionToggleDetail);
 	
 	// add actions to action groups
 	media_group = new QActionGroup(this);	
@@ -169,6 +171,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	playlist_menu->addAction(ui.actionToggleWrap);
 	playlist_menu->addAction(ui.actionToggleConsume);
 	playlist_menu->addAction(ui.actionToggleRandom);
+	playlist_menu->addAction(ui.actionToggleDetail);
 		  
   // add the shortcuts defined by the user to the actions
   ShortCutManager scman(this);
@@ -186,6 +189,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   ui.actionToggleWrap->setShortcuts(scman.getKeySequence("cmd_togglewrap") );
   ui.actionToggleConsume->setShortcuts(scman.getKeySequence("cmd_toggleconsume") );
   ui.actionToggleRandom->setShortcuts(scman.getKeySequence("cmd_togglerandom") );
+  ui.actionToggleDetail->setShortcuts(scman.getKeySequence("cmd_toggledetail") );
   
   // connect signals to slots
   connect (ui.actionMoveUp, SIGNAL(triggered()), this, SLOT(moveItemUp()));
@@ -201,6 +205,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionToggleWrap, SIGNAL(triggered()), this, SLOT(toggleWrapMode()));
   connect (ui.actionToggleConsume, SIGNAL(triggered()), this, SLOT(toggleConsumeMode()));
   connect (ui.actionToggleRandom, SIGNAL(triggered()), this, SLOT(toggleRandomMode()));
+  connect (ui.actionToggleDetail, SIGNAL(triggered()), this, SLOT(toggleDetailMode()));
   connect (ui.listWidget_playlist, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
   
  settings->deleteLater();

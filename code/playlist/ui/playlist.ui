@@ -340,6 +340,17 @@
     <string>Random</string>
    </property>
   </action>
+  <action name="actionToggleDetail">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Toggle Detail</string>
+   </property>
+   <property name="toolTip">
+    <string>Detail</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../../../mbmp.qrc"/>
