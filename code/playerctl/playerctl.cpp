@@ -120,6 +120,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionVolumeIncreaseStep->setIcon(iconman.getIcon("volume_step_up"));
 	ui.actionQuit->setIcon(iconman.getIcon("quit"));
 	ui.actionToggleGUI->setIcon(iconman.getIcon("toggle_gui"));
+	ui.actionToggleShade->setIcon(iconman.getIcon("toggle_shade"));
 	ui.actionToggleFullscreen->setIcon(iconman.getIcon("toggle_fullscreen"));
 	ui.actionOptions->setIcon(iconman.getIcon("options"));
 	ui.actionShowSettingsDialog->setIcon(iconman.getIcon("settings"));	
@@ -215,6 +216,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->ui.toolButton_quit->setDefaultAction(ui.actionQuit);
 	this->addAction(ui.actionToggleGUI);
 	this->ui.toolButton_togglegui->setDefaultAction(ui.actionToggleGUI);
+	this->addAction(ui.actionToggleShade);
+	this->ui.toolButton_toggleshade->setDefaultAction(ui.actionToggleShade);
 	this->addAction(ui.actionToggleFullscreen);
 	this->ui.toolButton_fullscreen->setDefaultAction(ui.actionToggleFullscreen);
 	this->addAction(ui.actionShowCheatsheet);
@@ -391,6 +394,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	control_menu->addAction(ui.actionToggleStreamInfo);
 	control_menu->addSeparator();
 	control_menu->addAction(ui.actionToggleGUI);
+	control_menu->addAction(ui.actionToggleShade);
 	control_menu->addAction(ui.actionToggleFullscreen);
 	control_menu->addAction(ui.actionShowCheatsheet);
 	control_menu->addMenu(advanced_menu);
@@ -426,6 +430,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionToggleStreamInfo->setShortcuts(scman.getKeySequence("cmd_streaminfo"));
 	ui.actionQuit->setShortcuts(scman.getKeySequence("cmd_quit"));
 	ui.actionToggleGUI->setShortcuts(scman.getKeySequence("cmd_gui"));
+	ui.actionToggleShade->setShortcuts(scman.getKeySequence("cmd_shade"));
 	ui.actionToggleFullscreen->setShortcuts(scman.getKeySequence("cmd_fullscreen"));
 	ui.actionShowCheatsheet->setShortcuts(scman.getKeySequence("cmd_cheatsheet"));
 	ui.actionAbout->setShortcuts(scman.getKeySequence("cmd_about"));
@@ -481,6 +486,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   connect (ui.actionToggleStreamInfo, SIGNAL (triggered()), gstiface, SLOT(toggleStreamInfo()));
 	connect (ui.actionQuit, SIGNAL (triggered()), qApp, SLOT(quit()));
 	connect (ui.actionToggleGUI, SIGNAL (triggered()), this, SLOT(toggleGUI()));
+	connect (ui.actionToggleShade, SIGNAL (triggered()), this, SLOT(toggleShade()));
 	connect (ui.actionToggleFullscreen, SIGNAL (triggered()), this, SLOT(toggleFullScreen()));
 	connect (ui.actionShowCheatsheet, SIGNAL (triggered()), this, SLOT(toggleCheatsheet()));
 	connect (ui.actionShowSettingsDialog, SIGNAL (triggered()), this, SLOT(toggleSettingsDialog()));
@@ -923,6 +929,23 @@ void PlayerControl::toggleGUI()
 {
 	ui.widget_control->isVisible() ? ui.widget_control->hide() : ui.widget_control->show();
 	
+	return;
+}
+
+//
+// Slot to toggle shademode on and off
+void PlayerControl::toggleShade()
+{
+	if (videowidget->isVisible() ) {
+		savedsize = this->size();
+		videowidget->setVisible(false);
+		this->resize(this->sizeHint().width(), ui.widget_control->height());
+	}
+	else {
+		videowidget->setVisible(true);
+		this->resize(savedsize);
+	}
+		
 	return;
 }
 

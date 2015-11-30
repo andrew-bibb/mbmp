@@ -69,6 +69,7 @@ class PlayerControl : public QDialog
 		void toggleFullScreen();
 		void togglePlaylist();
 		void toggleGUI();
+		void toggleShade();
 		void toggleCheatsheet();
 		void toggleSettingsDialog();
 		void showAbout();
@@ -105,6 +106,7 @@ class PlayerControl : public QDialog
     IPC_Agent* ipcagent;
     QTimer* pos_timer;
     bool b_logtofile;
+    QSize savedsize;	// for the shade function
  
   // plain members 
 		QActionGroup* playlist_group;    

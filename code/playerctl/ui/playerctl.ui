@@ -173,6 +173,9 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="toolButton_toggleshade"/>
+        </item>
+        <item>
          <widget class="QToolButton" name="toolButton_fullscreen">
           <property name="checkable">
            <bool>true</bool>
@@ -897,6 +900,14 @@
    </property>
    <property name="toolTip">
     <string>Show Settings Dialog</string>
+   </property>
+  </action>
+  <action name="actionToggleShade">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Toggle Shade</string>
    </property>
   </action>
  </widget>

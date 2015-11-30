@@ -303,6 +303,12 @@ colorize = yes
 fdo_name = computer
 
 [icon]
+icon_name = toggle_shade
+resource = :/images/images/24x24/raw_art/view-restore.png
+colorize = yes
+fdo_name = view-restore
+
+[icon]
 icon_name = toggle_fullscreen
 resource = :/images/images/24x24/raw_art/view-fullscreen.png
 colorize = yes

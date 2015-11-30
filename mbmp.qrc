@@ -9,6 +9,7 @@
     <file>media/silence.ogg</file>
   </qresource>
   <qresource prefix="images">
+    <file>images/24x24/raw_art/view-restore.png</file>
     <file>images/24x24/raw_art/emblem-remote.png</file>
     <file>images/app/ipod_mount2.png</file>
     <file>images/24x24/raw_art/view-list-column.png</file>
