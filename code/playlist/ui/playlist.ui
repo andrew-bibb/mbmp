@@ -390,7 +390,7 @@
   </connection>
   <connection>
    <sender>checkBox_showinfo</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>widget_details</receiver>
    <slot>setVisible(bool)</slot>
    <hints>
