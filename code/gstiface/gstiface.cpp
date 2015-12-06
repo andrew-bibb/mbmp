@@ -4,6 +4,7 @@
 
 Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
 
+
 Copyright (C) 2014-2015
 by: Andrew J. Bibb
 License: MIT 
@@ -29,9 +30,6 @@ DEALINGS IN THE SOFTWARE.
 
 # include "./code/gstiface/gstiface.h"
 # include "./code/playerctl/playerctl.h"  
-
-# include <gst/video/videooverlay.h>
-# include <gst/tag/tag.h>
 
 # include "./code/resource.h"
 
@@ -719,7 +717,7 @@ gint64 GST_Interface::queryStreamPosition()
   return position;
 } 
 
-// Function to process bus messages and eemit signals for messages we 
+// Function to process bus messages and emit signals for messages we 
 // choose to deal with. Called by busCallback().  Do minimal processing here
 // and emit the signalMessage signal for PlayerControl::processBusMessage
 // to pickup and complete the processing.  Basically anything that needs
@@ -920,8 +918,6 @@ void GST_Interface::busHandler(GstMessage* msg)
 			break; }
 		
 		// TAG message.  Can be used to signal we need to query CDDB or MUSICBRAINZ
-		// we have not implemented these as of yet, so for now just send a notification
-		// to PlayerCtl that we got a tag
 		case GST_MESSAGE_TAG: {
 			gchar* str = NULL;
 			guint num = 0;
@@ -948,6 +944,7 @@ void GST_Interface::busHandler(GstMessage* msg)
 					}
 					if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID, &str)) {
 						map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID] = QString(str);
+						emit signalMessage(MBMP_GI::NewMBID, tr("New Musicbrianz CD discid: %1").arg(map_md_cd[GST_TAG_CDDA_MUSICBRAINZ_DISCID].toString()) );
 						g_free (str);
 					}
 					if (!map_md_cd.contains(GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL) && gst_tag_list_get_string (tags, GST_TAG_CDDA_MUSICBRAINZ_DISCID_FULL, &str)) {

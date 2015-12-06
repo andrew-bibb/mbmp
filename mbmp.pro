@@ -25,6 +25,7 @@ INSTALLS += desktop
 QT += widgets
 QT += core
 QT += dbus
+QT += network
 
 TARGET = mbmp
 TEMPLATE = app

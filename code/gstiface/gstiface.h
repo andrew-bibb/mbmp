@@ -27,8 +27,9 @@ DEALINGS IN THE SOFTWARE.
 # ifndef GST_INTERFACE
 # define GST_INTERFACE
 
-//# include <gst/gst.h>
 # include <gst/video/navigation.h>
+# include <gst/video/videooverlay.h>
+# include <gst/tag/tag.h>
 
 # include <QWidget>
 # include <QString>
@@ -62,6 +63,7 @@ namespace MBMP_GI
     TagCC       = 0x0f,   // received a TAG and extracted a new current chapter
     NewTrack		= 0x10,		// tags indicate a new track
     StreamStatus= 0x11,		// stream status message
+    NewMBID			= 0x12,		// new musicbrainz CD discid
     Unhandled   = 0x2f,   // an unhandled message
     // return codes
     NoCDPipe    = 0x31,   // not able to create an Audio CD pipe
@@ -133,6 +135,7 @@ class GST_Interface : public QObject
     inline QMap<QString, int> getStreamMap() {return streammap;} 
     inline int getChapterCount() {return map_md_dvd.value("chaptercount").toInt();}
     inline int getCurrentChapter() {return map_md_dvd.value("currentchapter").toInt();}
+    inline QString getMBDiscID() {return map_md_cd.value(GST_TAG_CDDA_MUSICBRAINZ_DISCID).toString();}
     
     inline bool currentIsNone() {return checkCurrent(MBMP_GI::None);}
 		inline bool currentIsFile() {return checkCurrent(MBMP_GI::File);}

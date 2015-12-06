@@ -1198,16 +1198,23 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			// send the tracklist to the playlist to create playlist entries
 			playlist->addTracks(gstiface->getTrackList());
 			if (playlist->isHidden()) playlist->show();
-
 			break;
 			
-		case MBMP_GI::Tag:	// a TAG message 
+		case MBMP_GI::Tag:	// a TAG message 				
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
-			}	// loglevel if
+			}	// loglevel if					
 			break;
 		
+		case MBMP_GI::NewMBID: // a new musicbrainz CD track id
+		if (loglevel > 3) {
+			stream1 << msg <<endl;
+			if (b_logtofile) stream2 << msg << endl;
+		}
+		playlist->discIDChanged(gstiface->getMBDiscID() );
+		break;	
+					
 		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count
 			if (loglevel >= 3) {
 				stream1 << msg << endl;

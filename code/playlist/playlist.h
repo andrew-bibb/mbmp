@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QList>
 # include <QListWidgetItem>
 # include <QDir>
+# include <QNetworkReply>
 
 # include "ui_playlist.h"
 # include "./code/playlist/playlistitem.h"
@@ -62,7 +63,43 @@ namespace MBMP_PL
   };
 } // namespace MBMP_PL
 
-		
+//  Structure to contain CD track information
+struct Track
+{
+  QString title;
+  QString tracknumber;
+  QString  duration;
+};
+
+//  Class to hold and access CD information
+class MetaData : public QObject
+{
+  public:
+    MetaData (QObject*);
+    void clear();
+    inline void setTitle(const QString& t) {title = t;}
+    inline void setDate(const QString& d) {date = d;}
+    inline void setStatus(const QString& s) {status = s;}
+    inline void setLabel(const QString& l) {label = l;}
+    inline void setDiscID(const QString& id) {discid = id;}
+    inline void setTrack(const Track& trk) {tracklist.append(trk);}
+
+    inline QString getTitle() {return title;}
+    inline QString getDate() {return date;}
+    inline QString getStatus() {return status;}
+    inline QString getLabel() {return label;}
+    inline QString getDiscID() {return discid;}
+    inline QList<Track> getTrackList() {return tracklist;}
+
+  private:
+    QString title;
+    QString date;
+    QString status;
+    QString label;
+    QString discid;
+    QList<Track> tracklist;
+};
+    
 //	This class is based on a QListWidget and a QDialog
 class Playlist : public QDialog 
 {	
@@ -82,6 +119,8 @@ class Playlist : public QDialog
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
+		void discIDChanged(const QString&);
+		void networkReplyFinished(QNetworkReply*);
 		inline void clearPlaylist() {ui.listWidget_playlist->clear(); updateSummary();}
 		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
 		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}
@@ -128,7 +167,9 @@ class Playlist : public QDialog
 		QMenu* media_menu;
 		QDir plist_dir;
 		QDir artwork_dir;
-	       
+    QDir cdmeta_dir;
+	  MetaData* cdmetadata;     
+
 	// functions
 		void processM3U(const QString&);
 		void updateSummary();

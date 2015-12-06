@@ -47,6 +47,22 @@ DEALINGS IN THE SOFTWARE.
 # include <gst/gst.h>
 # include <gst/tag/tag.h>
 
+MetaData::MetaData(QObject* parent) : QObject(parent)
+{
+	return;
+}
+
+void MetaData::clear()
+{
+	title = QString();
+	date = QString();
+	status = QString();
+	label = QString();
+	tracklist.clear();
+	
+	return;
+}
+
 
 // NOTES: There are a couple of things to keep in mind if we need to expand
 // functionality in the future.  In the function seedPlaylist() we assume
@@ -68,6 +84,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   
   // Iconmanager with constructor only scope
   IconManager iconman(this);
+  
+  // Class to hold audio CD metadata about the current disk
+  cdmetadata = new MetaData(static_cast<QObject*>(this) );
   
   // Process playlist related settings. The geometry and playlist contents
   // are set in Playerctl.
@@ -94,7 +113,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   plist_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/playlists").arg(QString(APP).toLower()) );
 	if (! plist_dir.exists()) plist_dir.mkpath(plist_dir.absolutePath() );   
 	artwork_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/artwork").arg(QString(APP).toLower()) );
-	if (! artwork_dir.exists()) artwork_dir.mkpath(plist_dir.absolutePath() ); 
+	if (! artwork_dir.exists()) artwork_dir.mkpath(artwork_dir.absolutePath() ); 
+	cdmeta_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/cdmeta").arg(QString(APP).toLower()) );
+	if (! cdmeta_dir.exists()) cdmeta_dir.mkpath(cdmeta_dir.absolutePath() );
 	 
   // assign icons to actions
 	ui.actionMoveUp->setIcon(iconman.getIcon("move_up"));
@@ -541,6 +562,172 @@ void Playlist::moveItemDown()
 	}	// if
 	
 	return;	
+}
+
+# include <QNetworkAccessManager>
+# include <QXmlStreamReader>
+# include <QXmlStreamWriter>
+
+//
+// Slot to process playlist entries when a new discid is received
+void Playlist::discIDChanged(const QString& id)
+{	
+	QNetworkAccessManager* manager = new QNetworkAccessManager(this);
+	connect(manager, SIGNAL(finished(QNetworkReply*)),
+  this, SLOT(networkReplyFinished(QNetworkReply*)));
+
+	manager->get(QNetworkRequest(QUrl(QString("http://musicbrainz.org/ws/2/discid/%1?inc=recordings+labels").arg(id))) );
+	
+	manager->deleteLater();
+	return;
+}
+
+//
+// Slot called when a network reply is received.  Connected from discIDChanged()
+// Retrieve Musicbrainz database entry for the diskid, then parse it into a MetaData
+// object.  Finally save the info to local storage so we don't need to download it
+// again.
+void Playlist::networkReplyFinished(QNetworkReply* reply)
+{
+	if (reply->error() != QNetworkReply::NoError) {
+		#if QT_VERSION >= 0x050400 
+			qCritical("Network error getting CD info from Musicbrainz: %s %s", qUtf8Printable(reply->error()), qUtf8Printable(reply->errorString()) );
+		# else	
+			qCritical("Network error getting CD info from Musicbrainz: %s %s", qPrintable(reply->error()), qPrintable(reply->errorString()) );
+		# endif
+		return;
+	}
+	
+	// prepare data container
+	cdmetadata->clear();
+	
+	QXmlStreamReader* xml = new QXmlStreamReader(reply);	
+	QStringList pos;
+	while (! xml->atEnd() ) {	
+		switch(xml->readNext() ) {
+			case QXmlStreamReader::StartElement:
+				pos.append(xml->name().toString() );
+				if (pos.join(',') == "metadata,disc") {
+					cdmetadata->setDiscID(xml->attributes().value("id").toString() );
+					}
+				else if (pos.join(',') == "metadata,disc,release-list,release,title") {
+					cdmetadata->setTitle(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+					pos.removeLast();
+				}
+				else if (pos.join(',') == "metadata,disc,release-list,release,date") {
+					cdmetadata->setDate(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+					pos.removeLast();
+				}
+				else if (pos.join(',') == "metadata,disc,release-list,release,status") {
+					cdmetadata->setStatus(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+					pos.removeLast();
+				}
+				else if (pos.join(',') == "metadata,disc,release-list,release,label-info-list,label-info,label,name") {
+					cdmetadata->setLabel(xml->readElementText(QXmlStreamReader::SkipChildElements) );	
+					pos.removeLast();
+				}
+				else if (pos.join(',') == "metadata,disc,release-list,release,medium-list,medium,track-list,track") {
+					Track track;
+					while (! xml->atEnd() ) {
+						switch (xml->readNext() ) {
+							case QXmlStreamReader::StartElement:
+								pos.append(xml->name().toString() );
+								//qDebug() << pos.join(',');
+								if (pos.join(',') == "metadata,disc,release-list,release,medium-list,medium,track-list,track,number") {
+									track.title = QString();
+									track.tracknumber = QString();
+									track.duration = QString();
+									track.tracknumber = xml->readElementText(QXmlStreamReader::SkipChildElements);
+									pos.removeLast();
+								}
+								if (pos.join(',') == "metadata,disc,release-list,release,medium-list,medium,track-list,track,recording,title") {
+									track.title =	xml->readElementText(QXmlStreamReader::SkipChildElements);
+									pos.removeLast();
+								}
+								if (pos.join(',') == "metadata,disc,release-list,release,medium-list,medium,track-list,track,recording,length") {
+									track.duration =	xml->readElementText(QXmlStreamReader::SkipChildElements);
+									pos.removeLast();
+								}   
+								break;	
+							case QXmlStreamReader::EndElement:
+								if (xml->name() == "recording") {
+									cdmetadata->setTrack(track);
+								}
+								pos.removeLast();
+								break;	
+							default:
+								continue;
+						}	// switch
+						if (xml->tokenType() == QXmlStreamReader::EndElement && xml->name() == "track-list") break;
+					}	// while
+				}	// if track-list,track
+				break;		
+			case QXmlStreamReader::EndElement:	
+				pos.removeLast();
+				break;	
+			case QXmlStreamReader::Invalid:
+				#if QT_VERSION >= 0x050400 
+					qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
+				# else	
+					qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
+				# endif
+				break;
+			default:
+				continue;
+		}	// switch
+	}	// while
+ 
+	// Now write the data to local storage
+	QFile destfile;
+	destfile.setFileName(cdmeta_dir.absoluteFilePath(QString(cdmetadata->getDiscID() + ".xml")) );
+	if (destfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		QXmlStreamWriter xmlwriter(&destfile);
+		xmlwriter.setAutoFormatting(true);
+		xmlwriter.writeStartDocument();
+		
+		//QString dtd;
+		//dtd.append("<!DOCTYPE metadata\n");
+		//dtd.append("[\n");
+		//dtd.append("<!ELEMENT metadata (discid,title,date,status,label,tracklist)>\n");
+		//dtd.append("<!ELEMENT discid (#PCDATA)>\n");
+		//dtd.append("<!ELEMENT title (#PCDATA)>\n");
+		//dtd.append("<!ELEMENT date (#PCDATA)>\n");
+		//dtd.append("<!ELEMENT status (#PCDATA)>\n");
+		//dtd.append("<!ELEMENT label (#PCDATA)>\n");
+		//dtd.append("<!ELEMENT tracklist (track)>\n");
+		//dtd.append("<!ELEMENT track (title, track_number, duration)>\n");
+		//dtd.append("<!ELEMENT track_number (#PCDATA)>\n");
+		//dtd.append("<!ELEMENT duration (#PCDATA)>\n");
+		//dtd.append("]>");
+		//xmlwriter.writeDTD(dtd);
+   
+		xmlwriter.writeStartElement("metadata");
+		xmlwriter.writeTextElement("discid", cdmetadata->getDiscID() );
+		xmlwriter.writeTextElement("title", cdmetadata->getTitle() );
+		xmlwriter.writeTextElement("date", cdmetadata->getDate() );
+		xmlwriter.writeTextElement("status", cdmetadata->getStatus() );
+		xmlwriter.writeTextElement("label", cdmetadata->getLabel() );
+		
+		xmlwriter.writeStartElement("", "tracklist");
+		QList<Track> tl = cdmetadata->getTrackList();
+		for (int i = 0; i < tl.count(); ++i) {
+			xmlwriter.writeStartElement("", "track");
+			xmlwriter.writeTextElement("title", tl.at(i).title);
+			xmlwriter.writeTextElement("track_number", tl.at(i).tracknumber);
+			xmlwriter.writeTextElement("duration", tl.at(i).duration);
+			xmlwriter.writeEndElement();	// track
+		}
+		xmlwriter.writeEndElement();	// tracklist
+		xmlwriter.writeEndElement(); // disc
+    
+		xmlwriter.writeEndDocument();
+		destfile.close();
+	}	// if file open
+ 
+ 
+	// cleanup
+	delete xml;
+	return;			
 }
 
 //
