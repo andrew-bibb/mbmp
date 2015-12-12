@@ -58,6 +58,7 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_disabletooltips->setChecked(settings->value("disable_tooltips").toBool() );
 	ui.checkBox_disablexscreensaver->setChecked(settings->value("disable_xscreensaver").toBool() );
 	ui.lineEdit_colorize->setText(settings->value("colorize_icons").toString() );
+	ui.checkBox_disableinternet->setChecked(settings->value("disable_internet").toBool() );
 	settings->endGroup();
 	
 	// notification settings
@@ -116,6 +117,7 @@ void Settings::writeSettings()
   settings->setValue("disable_tooltips", ui.checkBox_disabletooltips->isChecked() );
   settings->setValue("disable_xscreensaver", ui.checkBox_disablexscreensaver->isChecked() );
   settings->setValue("colorize_icons", ui.lineEdit_colorize->text() );
+  settings->setValue("disable_internet", ui.checkBox_disableinternet->isChecked() );
   settings->endGroup();
   
   settings->beginGroup("Notifications");

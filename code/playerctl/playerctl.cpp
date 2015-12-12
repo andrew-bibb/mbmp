@@ -48,7 +48,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	
 	// set the window title
 	this->setWindowTitle(LONG_NAME);
-	
+
 	// setup the settings dialog (and read settings)
 	diag_settings = new Settings(this);
 		  
@@ -1190,14 +1190,13 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			}	// loglevel if
 			break;
 		
-		case MBMP_GI::TOCTL: // A TOC with new tracklist
+		// A TOC with new tracklist. We just log this, tracklist it sent to
+		// the playlist in the NewMBID case
+		case MBMP_GI::TOCTL: 
 			if (loglevel >= 3) {
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
-			// send the tracklist to the playlist to create playlist entries
-			playlist->addTracks(gstiface->getTrackList());
-			if (playlist->isHidden()) playlist->show();
 			break;
 			
 		case MBMP_GI::Tag:	// a TAG message 				
@@ -1212,7 +1211,10 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			stream1 << msg <<endl;
 			if (b_logtofile) stream2 << msg << endl;
 		}
-		playlist->discIDChanged(gstiface->getMBDiscID() );
+		// send the tracklist to the playlist to create playlist entries
+		playlist->addTracks(gstiface->getTrackList());	// seed playlist
+		playlist->discIDChanged(gstiface->getMBDiscID() ); // update with Musicbrainz data if possible
+		if (playlist->isHidden()) playlist->show();
 		break;	
 					
 		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count

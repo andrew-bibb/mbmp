@@ -723,7 +723,7 @@ gint64 GST_Interface::queryStreamPosition()
 // to pickup and complete the processing.  Basically anything that needs
 // to operate immediately on the stream do here, anything that the user
 // needs to know about do in PlayerControl. 
-void GST_Interface::busHandler(GstMessage* msg)
+ void GST_Interface::busHandler(GstMessage* msg)
 {
 	switch (GST_MESSAGE_TYPE (msg)) {
 		

@@ -32,6 +32,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QListWidgetItem>
 # include <QString>
 # include <QPixmap>
+# include <QMap>
 
 // Use GStreamer to process media tags
 # include <gst/gst.h>
@@ -43,7 +44,6 @@ class PlaylistItem : public QListWidgetItem
 {
 	public:
 		PlaylistItem (const QString&, QListWidget*, int);
-		~PlaylistItem();
 		
 		// get functions
 		inline qint16 getSequence() {return sequence;}
@@ -54,14 +54,15 @@ class PlaylistItem : public QListWidgetItem
 		inline bool isPlayable() {return errors.isEmpty() ? true : false;}
 		inline QString getInfoText() {return toolTip();}
 		inline bool hasArtwork() {return b_has_artwork;}
-		QPixmap getArtwork();
-		QString getTagAsString(const QString&);
+		inline QPixmap getArtwork() {return pm_artwork;}
+		QString getTagAsString(const QString& tag);
 		
 		// set functions
 		inline void setSequence(uint seq) {sequence = seq;}
 		inline void setDuration(qint16 dur) {duration = dur;}
 		inline void setTitle(QString ttl) {title = ttl;}
-		//inline void setArtist(QString art) {artist = art;} // not currently used for anything
+		inline void setArtist(QString art) {artist = art;} // not currently used for anything
+		inline void addTag(QString key, QString val) {tag_map[key] = val;}
 		
 		// functions
 		void makeDisplayText();
@@ -75,9 +76,10 @@ class PlaylistItem : public QListWidgetItem
 		QString title;				// the title tag of the media file
 		QString artist;				// the artist tag
 		QString album;				// the album tag
-		GstTagList* taglist;	// the taglist as returned by discoverer
 		QString errors;				// compliation of any errors encountered in creating the item		
 		bool b_has_artwork;		// true if the tags contain artwork 
+		QPixmap pm_artwork;		// the artwork extracted from GStreamer tags
+		QMap<QString,QString> tag_map;	// tags and values stored in a QMap
 		
 	// functions	
 		void makeToolTip();

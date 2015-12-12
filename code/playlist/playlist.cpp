@@ -58,6 +58,9 @@ void MetaData::clear()
 	date = QString();
 	status = QString();
 	label = QString();
+	discid = QString();
+	releaseid = QString();
+	relgrpid = QString();
 	tracklist.clear();
 	
 	return;
@@ -462,15 +465,15 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 	this->setWindowTitle(tr("Audio CD - Tracklist"));
 	
 	// create the tracklist entry
-	// Currently set title to Audio CD.  If we ever hook up to a remote data
-	// base the title can be set here.
+	// Currently set title to Audio CD.  Change in updateTracks if we run
+	// that function
 	for (int i = 0; i < tracks.size(); ++i) {
 			PlaylistItem* pli = 0;
-			pli= new PlaylistItem(tr("Track"), ui.listWidget_playlist, MBMP_PL::ACD);
+			pli= new PlaylistItem(tr("Track %1").arg(tracks.at(i).track), ui.listWidget_playlist, MBMP_PL::ACD);
 			pli->setSequence(tracks.at(i).track);
 			if (tracks.at(i).end - tracks.at(i).start >= 0)
 				pli->setDuration(tracks.at(i).end - tracks.at(i).start);
-			pli->setTitle(tr("Audio CD")); 
+			pli->setTitle(pli->text() ); 
 			pli->makeDisplayText();
 	}	// for
 	
@@ -491,6 +494,44 @@ void Playlist::addTracks(QList<TocEntry> tracks)
 	this->updateSummary();
 	
 	return;
+}
+
+//
+// Slot to update the track information, called after we read CD metadata
+// stored locally or download it from Musicbrainz
+void Playlist::updateTracks()
+{
+	QList<Track> tl = cdmetadata->getTrackList();
+	
+	// playlist count must equal the metadata tracklist count
+	if (ui.listWidget_playlist->count() != tl.count() ) return;
+	
+	// update each entry
+	for (int i = 0; i < ui.listWidget_playlist->count(); ++i) {		
+		PlaylistItem* pli = static_cast<PlaylistItem*>(ui.listWidget_playlist->item(i) ) ;
+		for (int j = 0; j < tl.count(); ++j) {
+			bool ok;
+			int seq = (tl.at(j).tracknumber).toInt(&ok);	
+			if (pli->getSequence() == seq && ok) {
+				pli->setTitle(tl.at(j).title);
+				long dur = (tl.at(j).duration).toLong(&ok);
+				if (ok) pli->setDuration(dur / 1000 ); // use musicbrainz duration
+				// now add information common to the CD
+				pli->addTag("artist", cdmetadata->getArtist());
+				pli->addTag("disc_title", cdmetadata->getTitle());
+				pli->addTag("release_date", cdmetadata->getDate());
+				pli->addTag("release_status", cdmetadata->getStatus());
+				pli->addTag("release_label", cdmetadata->getLabel());
+				pli->addTag("disc_id", cdmetadata->getDiscID());
+				pli->addTag("release_id", cdmetadata->getReleaseID());
+				pli->addTag("release_group_id", cdmetadata->getRelGrpID());
+				pli->makeDisplayText();
+			}	// if
+		}	// j for
+	}	// i for
+	// update the now playing details
+	QString s = static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getInfoText();
+	if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
 }
 
 //
@@ -572,12 +613,25 @@ void Playlist::moveItemDown()
 // Slot to process playlist entries when a new discid is received
 void Playlist::discIDChanged(const QString& id)
 {	
+	// See if we've got info about the disc stored locally
+	if (readCDMetaFile(id) ) {
+		updateTracks();
+		return;
+	}
+	
+	// Nope, see if we can go out on the internet
+	QSettings* settings = new QSettings(ORG, APP, this);
+	settings->beginGroup("Preferences");
+	bool b_disable_internet = settings->value("disable_internet").toBool();
+	settings->endGroup();
+	settings->deleteLater();
+	if (b_disable_internet) return;
+		
+	// Try to find CD metadata on the internet
 	QNetworkAccessManager* manager = new QNetworkAccessManager(this);
 	connect(manager, SIGNAL(finished(QNetworkReply*)),
   this, SLOT(networkReplyFinished(QNetworkReply*)));
-
-	manager->get(QNetworkRequest(QUrl(QString("http://musicbrainz.org/ws/2/discid/%1?inc=recordings+labels").arg(id))) );
-	
+	manager->get(QNetworkRequest(QUrl(QString("http://musicbrainz.org/ws/2/discid/%1?inc=recordings+labels+release-groups+artists").arg(id))) );
 	manager->deleteLater();
 	return;
 }
@@ -607,9 +661,16 @@ void Playlist::networkReplyFinished(QNetworkReply* reply)
 		switch(xml->readNext() ) {
 			case QXmlStreamReader::StartElement:
 				pos.append(xml->name().toString() );
+				//qDebug() << pos.join(',');
 				if (pos.join(',') == "metadata,disc") {
 					cdmetadata->setDiscID(xml->attributes().value("id").toString() );
 					}
+				else if (pos.join(',') == "metadata,disc,release-list,release") {
+					cdmetadata->setReleaseID(xml->attributes().value("id").toString() );
+					}	
+				else if (pos.join(',') == "metadata,disc,release-list,release,release-group") {
+					cdmetadata->setRelGrpID(xml->attributes().value("id").toString() );
+				}
 				else if (pos.join(',') == "metadata,disc,release-list,release,title") {
 					cdmetadata->setTitle(xml->readElementText(QXmlStreamReader::SkipChildElements) );
 					pos.removeLast();
@@ -624,6 +685,10 @@ void Playlist::networkReplyFinished(QNetworkReply* reply)
 				}
 				else if (pos.join(',') == "metadata,disc,release-list,release,label-info-list,label-info,label,name") {
 					cdmetadata->setLabel(xml->readElementText(QXmlStreamReader::SkipChildElements) );	
+					pos.removeLast();
+				}
+				else if (pos.join(',') == "metadata,disc,release-list,release,artist-credit,name-credit,artist,name") {
+					cdmetadata->setArtist(xml->readElementText(QXmlStreamReader::SkipChildElements) );	
 					pos.removeLast();
 				}
 				else if (pos.join(',') == "metadata,disc,release-list,release,medium-list,medium,track-list,track") {
@@ -654,6 +719,7 @@ void Playlist::networkReplyFinished(QNetworkReply* reply)
 									cdmetadata->setTrack(track);
 								}
 								pos.removeLast();
+								//qDebug() << pos.join(',');
 								break;	
 							default:
 								continue;
@@ -664,6 +730,7 @@ void Playlist::networkReplyFinished(QNetworkReply* reply)
 				break;		
 			case QXmlStreamReader::EndElement:	
 				pos.removeLast();
+				//qDebug() << pos.join(',');
 				break;	
 			case QXmlStreamReader::Invalid:
 				#if QT_VERSION >= 0x050400 
@@ -677,7 +744,11 @@ void Playlist::networkReplyFinished(QNetworkReply* reply)
 		}	// switch
 	}	// while
  
-	// Now write the data to local storage
+	// Now write the data to local storage, Store the data using the discid as the file name as opposed to releaseid
+	// or relgrpid since we only get here when someone is playing an actual CD.  When they play it we get the discid as
+	// calculated by GStreamer (based on track offsets and other things on the physical disc).  Releaseid and relgrpid
+	// are more universal, but to use them we'd need to go online which kind of defeats the purpose of saving a file to
+	// avoid going online.   
 	QFile destfile;
 	destfile.setFileName(cdmeta_dir.absoluteFilePath(QString(cdmetadata->getDiscID() + ".xml")) );
 	if (destfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -703,7 +774,10 @@ void Playlist::networkReplyFinished(QNetworkReply* reply)
    
 		xmlwriter.writeStartElement("metadata");
 		xmlwriter.writeTextElement("discid", cdmetadata->getDiscID() );
+		xmlwriter.writeTextElement("releaseid", cdmetadata->getReleaseID() );
+		xmlwriter.writeTextElement("relgrpid", cdmetadata->getRelGrpID() );
 		xmlwriter.writeTextElement("title", cdmetadata->getTitle() );
+		xmlwriter.writeTextElement("artist", cdmetadata->getArtist() );
 		xmlwriter.writeTextElement("date", cdmetadata->getDate() );
 		xmlwriter.writeTextElement("status", cdmetadata->getStatus() );
 		xmlwriter.writeTextElement("label", cdmetadata->getLabel() );
@@ -727,7 +801,119 @@ void Playlist::networkReplyFinished(QNetworkReply* reply)
  
 	// cleanup
 	delete xml;
+	updateTracks();
 	return;			
+}
+
+// 
+// Slot to read the local file containing CD metadata.  Return false on any error
+bool Playlist::readCDMetaFile(const QString& discid)
+{	
+	QFile sourcefile;
+	sourcefile.setFileName(cdmeta_dir.absoluteFilePath(discid + ".xml") );
+	if (sourcefile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		
+		// Prepare data container
+		cdmetadata->clear();
+		
+		// Read and parse the file	
+		QXmlStreamReader* xml = new QXmlStreamReader(&sourcefile);	
+		QStringList pos;
+		while (! xml->atEnd() ) {	
+			switch(xml->readNext() ) {
+				case QXmlStreamReader::StartElement:
+					pos.append(xml->name().toString() );
+					//qDebug() << pos.join(',');
+					if (pos.join(',') == "metadata,discid") {
+						cdmetadata->setDiscID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+						}
+					else if (pos.join(',') == "metadata,releaseid") {
+						cdmetadata->setReleaseID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+						}	
+					else if (pos.join(',') == "metadata,relgrpid") {
+						cdmetadata->setRelGrpID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,title") {
+						cdmetadata->setTitle(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,artist") {
+						cdmetadata->setArtist(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,date") {
+						cdmetadata->setDate(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,status") {
+						cdmetadata->setStatus(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,label") {
+						cdmetadata->setLabel(xml->readElementText(QXmlStreamReader::SkipChildElements) );	
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,tracklist,track") {
+						Track track;
+						track.title = QString();
+						track.tracknumber = QString();
+						track.duration = QString();
+						while (! xml->atEnd() ) {
+							switch (xml->readNext() ) {
+								case QXmlStreamReader::StartElement:
+									pos.append(xml->name().toString() );
+									if (pos.join(',') == "metadata,tracklist,track,track_number") {
+										track.tracknumber = xml->readElementText(QXmlStreamReader::SkipChildElements);
+										pos.removeLast();
+									}
+									if (pos.join(',') == "metadata,tracklist,track,title") {
+										track.title =	xml->readElementText(QXmlStreamReader::SkipChildElements);
+										pos.removeLast();
+									}
+									if (pos.join(',') == "metadata,tracklist,track,duration") {
+										track.duration =	xml->readElementText(QXmlStreamReader::SkipChildElements);
+										pos.removeLast();
+									}   
+									break;	
+								case QXmlStreamReader::EndElement:
+									if (xml->name() == "track") {
+										//qDebug() << pos.join(',');
+										cdmetadata->setTrack(track);
+									}
+									pos.removeLast();
+									break;	
+								default:
+									continue;
+							}	// switch
+							if (xml->tokenType() == QXmlStreamReader::EndElement && xml->name() == "tracklist") break;
+						}	// while
+					}	// if track-list,track
+					break;		
+				case QXmlStreamReader::EndElement:	
+					pos.removeLast();
+					//qDebug() << pos.join(',');
+					break;	
+				case QXmlStreamReader::Invalid:
+					#if QT_VERSION >= 0x050400 
+						qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
+					# else	
+						qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
+					# endif
+					break;
+				default:
+					continue;
+			}	// switch
+		}	// while
+		sourcefile.close();	
+		delete xml;
+		return true;
+	}	// if
+	
+	else
+		return false;
 }
 
 //
@@ -787,6 +973,11 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 			}	// else search artwork directory
 		}	// else didn't find one in the music directory
 	}	// if playing local file
+	else if (this->currentItemType() == MBMP_PL::ACD) {
+		QString s = static_cast<PlaylistItem*>(cur)->getInfoText();
+		if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
+	}
+		
 	
 	return;	
 }

@@ -130,7 +130,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -143,7 +143,7 @@
          </property>
         </spacer>
        </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <widget class="QGroupBox" name="groupBox_edit">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the user copy of the &lt;span style=&quot; font-weight:600;&quot;&gt;mbmp.keys&lt;/span&gt; and&lt;span style=&quot; font-weight:600;&quot;&gt; mbmp.icon&lt;/span&gt; files. &lt;/p&gt;&lt;p&gt;This uses xdg-open and if there mime type for text/plain found the controls will be disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -179,7 +179,7 @@
          </layout>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QLineEdit" name="lineEdit_colorize">
@@ -209,6 +209,16 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="7" column="0">
+        <widget class="QCheckBox" name="checkBox_disableinternet">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked internet services (Musicbrainz and Cover Art Archive) will not be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Disable Internet</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

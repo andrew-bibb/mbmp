@@ -81,7 +81,10 @@ class MetaData : public QObject
     inline void setDate(const QString& d) {date = d;}
     inline void setStatus(const QString& s) {status = s;}
     inline void setLabel(const QString& l) {label = l;}
-    inline void setDiscID(const QString& id) {discid = id;}
+    inline void setDiscID(const QString i) {discid = i;}
+    inline void setReleaseID(const QString& id) {releaseid = id;}
+    inline void setRelGrpID(const QString& rgid) {relgrpid = rgid;}
+    inline void setArtist(const QString& a) {artist = a;}
     inline void setTrack(const Track& trk) {tracklist.append(trk);}
 
     inline QString getTitle() {return title;}
@@ -89,6 +92,9 @@ class MetaData : public QObject
     inline QString getStatus() {return status;}
     inline QString getLabel() {return label;}
     inline QString getDiscID() {return discid;}
+    inline QString getReleaseID() {return releaseid;}
+    inline QString getRelGrpID() {return relgrpid;}
+    inline QString getArtist() {return artist;}
     inline QList<Track> getTrackList() {return tracklist;}
 
   private:
@@ -97,6 +103,9 @@ class MetaData : public QObject
     QString status;
     QString label;
     QString discid;
+    QString releaseid;
+    QString relgrpid;
+    QString artist;
     QList<Track> tracklist;
 };
     
@@ -115,12 +124,14 @@ class Playlist : public QDialog
 		void addFile(QAction*);	
 		void addURL();
 		void addTracks(QList<TocEntry>);
+    void updateTracks();
 		void addChapters(int);
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
 		void discIDChanged(const QString&);
 		void networkReplyFinished(QNetworkReply*);
+    bool readCDMetaFile(const QString&);
 		inline void clearPlaylist() {ui.listWidget_playlist->clear(); updateSummary();}
 		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
 		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}

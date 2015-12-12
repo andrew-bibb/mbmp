@@ -44,8 +44,9 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 	artist = QString();
 	album = QString();
 	errors = QString();	
-	taglist = NULL;
+	tag_map.clear();
 	b_has_artwork = false;
+	pm_artwork = QPixmap();
 	
 	// Somewhat of a hack, but to display text in nice columns we either need a full QTableWidget (or worse a QTableView),
 	// or QListWidgetItems with monospace text.  Since we're only looking for appearance, not function, monospace fonts
@@ -69,9 +70,11 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 		// for ACD and DVD makeDisplayText() is called from the function that
 		// creates this item, in Playlist.cpp.  No reason to call it here.	
 		case MBMP_PL::ACD: {
+			seekable = true;
 			break; }
 			
 		case MBMP_PL::DVD: {
+			seekable = true;
 			break; }
 		
 		default:
@@ -81,15 +84,17 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 	return;
 }
 
-//
-// Destructor
-PlaylistItem::~PlaylistItem()
-{
-	if (taglist != NULL) gst_tag_list_unref(taglist);
-}
-
 
 //////////////////////////// Public Functions ////////////////////////////
+//
+// Function to return a tag out of the tag_map
+QString PlaylistItem::getTagAsString(const QString& tag)
+{
+	if (tag_map.contains(tag) )
+		return tag_map.value(tag);
+	else
+		return QString();
+}
 
 //
 // Function to set the display text for the PlaylistItem
@@ -146,10 +151,9 @@ void PlaylistItem::makeDisplayText()
 			const short wcol1 = -8;				
 			QTime n(0,0,0);
 			QTime t = n.addSecs(duration);
-			this->setText(QString("%1%2 %3")
+			this->setText(QString("%1 %2")
 				.arg(duration > (60 * 60) ? t.toString("h:mm:ss") : t.toString("mm:ss"), wcol1, QChar(' '))
-				.arg(QObject::tr("Track") )
-				.arg(sequence) );
+				.arg(title) );
 			break; }	// case PlaylistItem is Audio CD track
 
 		case MBMP_PL::DVD: {
@@ -169,57 +173,6 @@ void PlaylistItem::makeDisplayText()
 	
 	return;
 }
-
-//
-// Function to return the artwork data
-QPixmap PlaylistItem::getArtwork()
-{
-	QPixmap pm_art = QPixmap();
-	
-	if (b_has_artwork) {	
-		GstSample* sam;   
-		
-		if (gst_tag_list_get_sample(taglist, GST_TAG_IMAGE, &sam) || gst_tag_list_get_sample(taglist, GST_TAG_PREVIEW_IMAGE, &sam) ) {	 		
-			GstBuffer* buffer = gst_sample_get_buffer (sam); 
-			gsize bufsize;
-			gsize bufoff;
-			bufsize = gst_buffer_get_sizes(buffer, &bufoff, NULL);
-			
-			void* dest = malloc (bufsize);
-			gst_buffer_extract_dup(buffer, bufoff, bufsize, &dest, &bufsize);				
-			
-			pm_art.loadFromData( (uchar*)dest, bufsize);
-			
-			g_free(dest);
-			gst_sample_unref(sam);
-		}	// if creating sample worked
-		
-	}	// if
-	 
-	return pm_art;
-}
-
-//
-// Function to return a tag value as a QString
-QString PlaylistItem::getTagAsString(const QString& tag)
-{
-	QString rtn = QString();
-	GValue val = G_VALUE_INIT;
-  gchar *str;
-       
-  if (gst_tag_list_copy_value (&val, taglist, qPrintable(tag)) ) {  
-		if (G_VALUE_HOLDS_STRING (&val))
-			str = g_value_dup_string (&val);
-		else
-			str = gst_value_serialize (&val);
-    
-    rtn = QString::fromUtf8(str);
-    g_value_unset (&val);
-    g_free (str);  
-	}	// if copy worked
-	
-	return rtn;
-} 
 
 //////////////////////////// Private Functions ////////////////////////////
 //
@@ -254,34 +207,22 @@ void PlaylistItem::makeToolTip()
 	}
 		
 	s_tt.append(QObject::tr("<br>  Seekable: %1").arg(seekable ? QObject::tr("yes") : QObject::tr("no")) );
-	
-	if (taglist) {
+
+	if (tag_map.count() > 0) {
 		s_tt.append(QObject::tr("<br>  Tags:") );
 		
 		// scan through tags find the ones we want to display
 		QStringList blacklist;
 		blacklist << GST_TAG_IMAGE << GST_TAG_PREVIEW_IMAGE;
-  
-		for (int i = 0; i < gst_tag_list_n_tags(taglist); ++i) {
-			GValue val = G_VALUE_INIT;
-			gchar *str;
-       
-			gst_tag_list_copy_value (&val, taglist, gst_tag_list_nth_tag_name(taglist, i));                
-			
-			if (G_VALUE_HOLDS_STRING (&val))
-				str = g_value_dup_string (&val);
-			else
-				str = gst_value_serialize (&val);
-			
-			if (! blacklist.contains(gst_tag_list_nth_tag_name(taglist, i)) ) {
-				s_tt.append(QString("<br>    %1 : %2").arg(gst_tag_get_nick(gst_tag_list_nth_tag_name(taglist, i))).arg(QString::fromUtf8(str)) ) ;
-			} // if not in blacklist 
-			g_free (str);
-		} //for
+		QMapIterator<QString, QString> itr(tag_map);
+		while (itr.hasNext()) {
+			itr.next();
+			if (! blacklist.contains(itr.key()) ) 
+				s_tt.append(QString("<br>    %1 : %2").arg(itr.key()).arg(itr.value()) ) ;
+		} // while
 	}	// if taglist is not NULL
-	
+
 	this->setToolTip(s_tt);
-	
 	return;
 }
 
@@ -361,34 +302,62 @@ void PlaylistItem::runDiscoverer()
 	
 	// Get tags and try to extract information from them
 	tags = gst_discoverer_info_get_tags(info);	// tags belongs to info
-	taglist = gst_tag_list_copy(tags);					// save the taglist
-	if (taglist) {
+	
+	// Save the taglist in a QMap
+	for (int i = 0; i < gst_tag_list_n_tags(tags); ++i) {
+		GValue val = G_VALUE_INIT;
+		gchar *str;
+       
+		gst_tag_list_copy_value (&val, tags, gst_tag_list_nth_tag_name(tags, i));                
+			
+		if (G_VALUE_HOLDS_STRING (&val))
+			str = g_value_dup_string (&val);
+		else
+			str = gst_value_serialize (&val);
+			
+		tag_map[QString::fromUtf8(gst_tag_list_nth_tag_name(tags, i))] = QString::fromUtf8(str);
+		g_free (str);
+	} //for
+	
+	// Save selected values directly out of the taglist for display in the QListWidget 
+	if (tags) {
 		gchar* str = NULL;
 		uint val = 0;		
 		GstSample* sam = NULL;	
 		
-		if (gst_tag_list_get_string (taglist, GST_TAG_TITLE, &str)) {
+		if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
 			if (str) title = QString(str);
 		}
 		
-		if (gst_tag_list_get_string (taglist, GST_TAG_ARTIST, &str)) {
+		if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
 			if (str) artist = QString(str);
 		}
 		
-		if (gst_tag_list_get_string (taglist, GST_TAG_ALBUM, &str)) {
+		if (gst_tag_list_get_string (tags, GST_TAG_ALBUM, &str)) {
 			if (str) album = QString(str);
 		}
 		
-		if (gst_tag_list_get_uint (taglist, GST_TAG_TRACK_NUMBER, &val)) {
+		if (gst_tag_list_get_uint (tags, GST_TAG_TRACK_NUMBER, &val)) {
 			if (val) sequence = val;
 		}
 		
-		if (gst_tag_list_get_sample(taglist, GST_TAG_IMAGE, &sam) || gst_tag_list_get_sample(taglist, GST_TAG_PREVIEW_IMAGE, &sam) )
-			b_has_artwork = true;
+		if (gst_tag_list_get_sample(tags, GST_TAG_IMAGE, &sam) || gst_tag_list_get_sample(tags, GST_TAG_PREVIEW_IMAGE, &sam) ) {	 		
+			GstBuffer* buffer = gst_sample_get_buffer (sam); 
+			gsize bufsize;
+			gsize bufoff;
+			bufsize = gst_buffer_get_sizes(buffer, &bufoff, NULL);
+			
+			void* dest = malloc (bufsize);
+			gst_buffer_extract_dup(buffer, bufoff, bufsize, &dest, &bufsize);				
+			
+			pm_artwork.loadFromData( (uchar*)dest, bufsize);
+			
+			g_free(dest);
+			gst_sample_unref(sam);
+			b_has_artwork = ! pm_artwork.isNull();
+		}	// if saving pixmap worked
 		
-		if (sam != NULL) gst_sample_unref(sam);
-		g_free (str);
-		}	// if there were tags
+	}	// if there were tags
 
 	// clean up discoverer stuff
 	gst_discoverer_info_unref(info);
