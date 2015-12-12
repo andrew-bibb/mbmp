@@ -59,6 +59,16 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_disablexscreensaver->setChecked(settings->value("disable_xscreensaver").toBool() );
 	ui.lineEdit_colorize->setText(settings->value("colorize_icons").toString() );
 	ui.checkBox_disableinternet->setChecked(settings->value("disable_internet").toBool() );
+	QDir res(":/stylesheets/stylesheets/");
+	QStringList styles = res.entryList(QDir::Files);
+	styles << tr("None");
+	QString str = settings->value("style").toString();
+	styles.replaceInStrings(".qss", "");
+	if (! styles.contains(str)) styles << str;
+	styles.sort(Qt::CaseSensitive);
+	ui.comboBox_style->clear();
+	ui.comboBox_style->addItems(styles);
+	ui.comboBox_style->setCurrentText(str);
 	settings->endGroup();
 	
 	// notification settings
@@ -117,6 +127,7 @@ void Settings::writeSettings()
   settings->setValue("disable_tooltips", ui.checkBox_disabletooltips->isChecked() );
   settings->setValue("disable_xscreensaver", ui.checkBox_disablexscreensaver->isChecked() );
   settings->setValue("colorize_icons", ui.lineEdit_colorize->text() );
+  settings->setValue("style", ui.comboBox_style->currentText() );
   settings->setValue("disable_internet", ui.checkBox_disableinternet->isChecked() );
   settings->endGroup();
   

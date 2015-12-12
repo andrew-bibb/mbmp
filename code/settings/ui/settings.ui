@@ -130,7 +130,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="12" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -143,7 +143,7 @@
          </property>
         </spacer>
        </item>
-       <item row="10" column="0">
+       <item row="13" column="0">
         <widget class="QGroupBox" name="groupBox_edit">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the user copy of the &lt;span style=&quot; font-weight:600;&quot;&gt;mbmp.keys&lt;/span&gt; and&lt;span style=&quot; font-weight:600;&quot;&gt; mbmp.icon&lt;/span&gt; files. &lt;/p&gt;&lt;p&gt;This uses xdg-open and if there mime type for text/plain found the controls will be disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -179,7 +179,7 @@
          </layout>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QLineEdit" name="lineEdit_colorize">
@@ -203,6 +203,9 @@
          </item>
          <item>
           <widget class="QLabel" name="label__colorize">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Internal icons are meant to be colorized.  Enter the color you want in the box at the left or select the button to open a color selection dialog box. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Colorize Icons</string>
            </property>
@@ -217,6 +220,40 @@
          </property>
          <property name="text">
           <string>Disable Internet</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QComboBox" name="comboBox_style">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_style">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a style for the GUI elements.&lt;/p&gt;&lt;p&gt;A style change will only take effect after MBMP is restarted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Style</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="8" column="0">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>

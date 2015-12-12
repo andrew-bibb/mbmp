@@ -43,14 +43,25 @@ DEALINGS IN THE SOFTWARE.
 PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent) 
 	: QDialog(parent)
 {
-	// set the Locale (probably not necessary since the default is the system one anyway)
+	// Set the Locale (probably not necessary since the default is the system one anyway)
   QLocale::setDefault(QLocale::system() );	
 	
-	// set the window title
+	// Set the window title
 	this->setWindowTitle(LONG_NAME);
 
 	// setup the settings dialog (and read settings)
 	diag_settings = new Settings(this);
+	
+	// Set the style
+	QString styl = diag_settings->getSetting("Preferences", "style").toString();
+	styl.prepend(":/stylesheets/stylesheets/");
+	styl.append(".qss");
+	QFile f0(styl);
+	if (f0.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QString qss = QString(f0.readAll());
+		f0.close();
+		this->setStyleSheet(qss);
+	}
 		  
   // Set icon theme if provided on the command line or in the settings
   if (parser.isSet("icon-theme") )
