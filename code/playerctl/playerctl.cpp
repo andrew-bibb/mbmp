@@ -51,18 +51,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 
 	// setup the settings dialog (and read settings)
 	diag_settings = new Settings(this);
-	
-	// Set the style
-	QString styl = diag_settings->getSetting("Preferences", "style").toString();
-	styl.prepend(":/stylesheets/stylesheets/");
-	styl.append(".qss");
-	QFile f0(styl);
-	if (f0.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		QString qss = QString(f0.readAll());
-		f0.close();
-		this->setStyleSheet(qss);
-	}
-		  
+			  
   // Set icon theme if provided on the command line or in the settings
   if (parser.isSet("icon-theme") )
 		QIcon::setThemeName(parser.value("icon-theme"));
@@ -92,6 +81,17 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   // setup the user interface
   ui.setupUi(this);	
   ui.gridLayout->addWidget(videowidget, 0, 0);
+
+	// Set the style
+	QString styl = diag_settings->getSetting("Preferences", "style").toString();
+	styl.prepend(":/stylesheets/stylesheets/");
+	styl.append(".qss");
+	QFile f0(styl);
+	if (f0.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		QString qss = QString(f0.readAll());
+		f0.close();
+		this->setStyleSheet(qss);
+	}
   
   // show or hide GUI
   ui.widget_control->setVisible(false);

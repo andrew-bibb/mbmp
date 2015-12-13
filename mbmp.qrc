@@ -6,8 +6,8 @@
     <file>text/license.txt</file>
   </qresource>
   <qresource prefix="stylesheets">
-    <file>stylesheets/brushed_aluminum.qss</file>
     <file>stylesheets/default.qss</file>
+    <file>stylesheets/stainless_steel.qss</file>
   </qresource>
   <qresource prefix="media">
     <file>media/silence.ogg</file>
