@@ -14,15 +14,14 @@ QToolButton:hover {
 QSlider::groove:horizontal {
     height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
     background-color: #F7F6F2; 
-    margin: 2px 0;
+    margin: 2px 0px;
 }
 
 QSlider::handle:horizontal {
     background-color: #807F6D;
-    border: 1px solid #5c5c5c;
-    width: 6px;
-    margin-top: -5px;
-    margin-bottom: -5px;
+    width: 8px;
+    margin-top: -6px;
+    margin-bottom: -6px;
     border-radius: 3px;
 }	
 
