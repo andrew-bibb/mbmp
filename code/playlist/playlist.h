@@ -40,11 +40,11 @@ DEALINGS IN THE SOFTWARE.
 # include <QList>
 # include <QListWidgetItem>
 # include <QDir>
-# include <QNetworkReply>
 
 # include "ui_playlist.h"
 # include "./code/playlist/playlistitem.h"
 # include "./code/gstiface/gstiface.h"
+# include "./code/mbman/mbman.h"
 
 //	Enum's local to this program
 namespace MBMP_PL 
@@ -124,13 +124,11 @@ class Playlist : public QDialog
 		void addFile(QAction*);	
 		void addURL();
 		void addTracks(QList<TocEntry>);
-    void updateTracks();
 		void addChapters(int);
 		void removeItem();
 		void moveItemUp();
 		void moveItemDown();
 		void discIDChanged(const QString&);
-		void networkReplyFinished(QNetworkReply*);
     bool readCDMetaFile(const QString&);
 		inline void clearPlaylist() {ui.listWidget_playlist->clear(); updateSummary();}
 		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
@@ -179,11 +177,13 @@ class Playlist : public QDialog
 		QDir plist_dir;
 		QDir artwork_dir;
     QDir cdmeta_dir;
-	  MetaData* cdmetadata;     
+	  MetaData* cdmetadata;
+	  MusicBrainzManager* mbman;     
 
 	// functions
 		void processM3U(const QString&);
 		void updateSummary();
+		void updateTracks();
 };
 
 #endif

@@ -50,6 +50,7 @@ HEADERS		+= ./code/iconman/iconman.h
 HEADERS		+= ./code/notify/notify.h
 HEADERS		+= ./code/scman/scman.h
 HEADERS		+= ./code/ipc/ipcagent.h
+HEADERS		+= ./code/mbman/mbman.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
@@ -72,6 +73,7 @@ SOURCES += ./code/iconman/iconman.cpp
 SOURCES += ./code/notify/notify.cpp
 SOURCES += ./code/scman/scman.cpp
 SOURCES += ./code/ipc/ipcagent.cpp
+SOURCES += ./code/mbman/mbman.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc
