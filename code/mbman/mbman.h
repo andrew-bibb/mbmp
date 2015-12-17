@@ -43,15 +43,18 @@ class MusicBrainzManager : public QNetworkAccessManager
     
 	// functions
 		void retrieveCDMetaData(const QString&);
+		void retrieveAlbumArt(const QString&, const QString&);
 	
 	public slots:
-		void metaDataFinished(QNetworkReply*);
+		void metaDataFinished();
+		void artworkRequestFinished();
 
 	signals:
-		void metaDataRetrieved(const QString& discid);
+		void metaDataRetrieved(const QString&);
 
   private:
   QFile destfile;
+  QFile artfile;
   QDir artwork_dir;
   QDir cdmeta_dir;
     

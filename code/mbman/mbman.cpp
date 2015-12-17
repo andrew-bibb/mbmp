@@ -33,8 +33,10 @@ DEALINGS IN THE SOFTWARE.
 # include <QProcessEnvironment>
 # include <QXmlStreamReader>
 # include <QXmlStreamWriter>
+# include <QUrl>
 # include <QNetworkRequest>
 # include <QNetworkReply>
+# include <QImage>
 
 // Constructor
 MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(parent) 
@@ -68,29 +70,47 @@ void MusicBrainzManager::retrieveCDMetaData(const QString& discid)
 	// need to go online which kind of defeats the purpose of saving a file to avoid going online.   
 	destfile.setFileName(cdmeta_dir.absoluteFilePath(QString(discid + ".xml")) );
 	
-	this->get(request);
-	connect(this, SIGNAL(finished(QNetworkReply*)), this, SLOT(metaDataFinished(QNetworkReply*)));
-
+	QNetworkReply* reply = this->get(request);
+	connect(reply, SIGNAL(finished()), this, SLOT(metaDataFinished()));
 		
+	return;
+}
+
+//
+// Function to retrieve album art if we can find it. Coverartarchive will do a redirect
+// so this function has to deal with that.
+void MusicBrainzManager::retrieveAlbumArt(const QString& relgrpid, const QString& albumid)
+{
+	QNetworkRequest request;
+	request.setUrl(QUrl(QString("http://coverartarchive.org/release-group/%1/front").arg(relgrpid)) );      
+	
+	// Store the artwork using the albumid as the filename.
+	artfile.setFileName(artwork_dir.absoluteFilePath(QString(albumid + ".jpg")) );
+	QNetworkReply* reply = this->get(request);
+	connect(reply, SIGNAL(finished()), this, SLOT(artworkRequestFinished()));
+	
 	return;
 }
 
 //////////////////////////// Public Slots //////////////////////////
 //
-void MusicBrainzManager::metaDataFinished(QNetworkReply* reply)
+void MusicBrainzManager::metaDataFinished()
 {
+	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	
 	if (reply->error() != QNetworkReply::NoError) {
 		#if QT_VERSION >= 0x050400 
-			qCritical("Network error getting CD info from Musicbrainz: %s %s", qUtf8Printable(reply->error()), qUtf8Printable(reply->errorString()) );
+			qCritical("Network error getting CD info from Musicbrainz:\n %s", qUtf8Printable(reply->errorString()) );
 		# else	
-			qCritical("Network error getting CD info from Musicbrainz: %s %s", qPrintable(reply->error()), qPrintable(reply->errorString()) );
+			qCritical("Network error getting CD info from Musicbrainz:\n %s", qPrintable(reply->errorString()) );
 		# endif
+		emit metaDataRetrieved(QString() ) ; // used to cleanup the receiver
 		return;
 	}
 	
 	// Prepare to write the data to local storage, 
+	QString discid = QString();
 	if (destfile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-		QString discid;
 		QXmlStreamWriter xmlwriter(&destfile);
 		xmlwriter.setAutoFormatting(true);
 		xmlwriter.writeStartDocument();
@@ -208,10 +228,43 @@ void MusicBrainzManager::metaDataFinished(QNetworkReply* reply)
 		xmlwriter.writeEndDocument();
 		destfile.close();
 		delete xml;
-		emit metaDataRetrieved(discid);
 	}	// if destfile could be opened
 	
 	// cleanup
-	disconnect(this, SIGNAL(finished(QNetworkReply*)), 0, 0);
+	emit metaDataRetrieved(discid);
+	reply->deleteLater();
 	return;	
 }
+
+void MusicBrainzManager::artworkRequestFinished()
+{
+	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	
+	if (reply->error() != QNetworkReply::NoError) {
+		#if QT_VERSION >= 0x050400 
+			qCritical("Network error getting album art from CoverArtArchive:\n %s", qUtf8Printable(reply->errorString()) );
+		# else	
+			qCritical("Network error getting album art from CoverArtArchive:\n %s", qPrintable(reply->errorString()) );
+		# endif
+		return;
+	}
+	
+	// check for the redirection
+	if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 302 || reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 307 ) {
+		connect (get(QNetworkRequest(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl())),
+					SIGNAL(finished()),
+					this,
+					SLOT(artworkRequestFinished()) );
+	}	// if
+	else {
+		QImage img = QImage::fromData(reply->readAll() );
+		if (img.height() > 500 || img.width() > 500)
+			img = img.scaled(QSize(500, 500), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+		img.save(artfile.fileName(), "JPG");
+	}	// else
+
+	reply->deleteLater();
+	return;
+}
+
+	

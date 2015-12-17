@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QList>
 # include <QListWidgetItem>
 # include <QDir>
+# include <QPixmap>
 
 # include "ui_playlist.h"
 # include "./code/playlist/playlistitem.h"
@@ -129,7 +130,7 @@ class Playlist : public QDialog
 		void moveItemUp();
 		void moveItemDown();
 		void discIDChanged(const QString&);
-    bool readCDMetaFile(const QString&);
+		void cdMetaDataRetrieved(const QString&);
 		inline void clearPlaylist() {ui.listWidget_playlist->clear(); updateSummary();}
 		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
 		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}
@@ -183,7 +184,9 @@ class Playlist : public QDialog
 	// functions
 		void processM3U(const QString&);
 		void updateSummary();
+		bool readCDMetaFile(const QString&);
 		void updateTracks();
+		QPixmap getLocalAlbumArt(const QStringList&, const QDir& = QDir("NONE"));
 };
 
 #endif

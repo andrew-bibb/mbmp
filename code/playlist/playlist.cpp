@@ -568,11 +568,20 @@ void Playlist::moveItemDown()
 }
 
 //
-// Slot to process playlist entries when a new discid is received
+// Slot to process playlist entries when a new discid is received.  Called
+// as a function from PlayerCtl
 void Playlist::discIDChanged(const QString& id)
-{	
-	// See if we've got info about the disc stored locally
+{
+	// See if we've got info about the disc stored locally.
 	if (readCDMetaFile(id) ) {
+		this->updateTracks();
+		
+		
+		//////////TESTING
+		
+		if (mbman == NULL) mbman = new MusicBrainzManager(this);
+		mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );
+		
 		return;
 	}
 	
@@ -584,127 +593,29 @@ void Playlist::discIDChanged(const QString& id)
 	settings->deleteLater();
 	if (b_disable_internet) return;
 		
-	// Try to find CD metadata on the internet
+	// We're allowed, try to find CD metadata on the internet
 	if (mbman == NULL) mbman = new MusicBrainzManager(this);
 	mbman->retrieveCDMetaData(id);
-	connect (mbman, SIGNAL(metaDataRetrieved(const QString&)), this, SLOT(readCDMetaFile(const QString&)));
+	connect (mbman, SIGNAL(metaDataRetrieved(const QString&)), this, SLOT(cdMetaDataRetrieved(const QString&)));
 	
 	return;
 }
 
-
-// 
-// Slot to read the local file containing CD metadata.  Return false on any error.
-// The bool return is used to determine if we need to go out to MusicBrainz or not.
-bool Playlist::readCDMetaFile(const QString& discid)
-{	
-	QFile sourcefile;
-	sourcefile.setFileName(cdmeta_dir.absoluteFilePath(discid + ".xml") );
-	if (sourcefile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		
-		// Prepare data container
-		cdmetadata->clear();
-		
-		// Read and parse the file	
-		QXmlStreamReader* xml = new QXmlStreamReader(&sourcefile);	
-		QStringList pos;
-		while (! xml->atEnd() ) {	
-			switch(xml->readNext() ) {
-				case QXmlStreamReader::StartElement:
-					pos.append(xml->name().toString() );
-					//qDebug() << pos.join(',');
-					if (pos.join(',') == "metadata,discid") {
-						cdmetadata->setDiscID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
-						pos.removeLast();
-						}
-					else if (pos.join(',') == "metadata,releaseid") {
-						cdmetadata->setReleaseID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
-						pos.removeLast();
-						}	
-					else if (pos.join(',') == "metadata,relgrpid") {
-						cdmetadata->setRelGrpID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
-						pos.removeLast();
-					}
-					else if (pos.join(',') == "metadata,title") {
-						cdmetadata->setTitle(xml->readElementText(QXmlStreamReader::SkipChildElements) );
-						pos.removeLast();
-					}
-					else if (pos.join(',') == "metadata,artist") {
-						cdmetadata->setArtist(xml->readElementText(QXmlStreamReader::SkipChildElements) );
-						pos.removeLast();
-					}
-					else if (pos.join(',') == "metadata,date") {
-						cdmetadata->setDate(xml->readElementText(QXmlStreamReader::SkipChildElements) );
-						pos.removeLast();
-					}
-					else if (pos.join(',') == "metadata,status") {
-						cdmetadata->setStatus(xml->readElementText(QXmlStreamReader::SkipChildElements) );
-						pos.removeLast();
-					}
-					else if (pos.join(',') == "metadata,label") {
-						cdmetadata->setLabel(xml->readElementText(QXmlStreamReader::SkipChildElements) );	
-						pos.removeLast();
-					}
-					else if (pos.join(',') == "metadata,tracklist,track") {
-						Track track;
-						track.title = QString();
-						track.tracknumber = QString();
-						track.duration = QString();
-						while (! xml->atEnd() ) {
-							switch (xml->readNext() ) {
-								case QXmlStreamReader::StartElement:
-									pos.append(xml->name().toString() );
-									if (pos.join(',') == "metadata,tracklist,track,track_number") {
-										track.tracknumber = xml->readElementText(QXmlStreamReader::SkipChildElements);
-										pos.removeLast();
-									}
-									if (pos.join(',') == "metadata,tracklist,track,title") {
-										track.title =	xml->readElementText(QXmlStreamReader::SkipChildElements);
-										pos.removeLast();
-									}
-									if (pos.join(',') == "metadata,tracklist,track,duration") {
-										track.duration =	xml->readElementText(QXmlStreamReader::SkipChildElements);
-										pos.removeLast();
-									}   
-									break;	
-								case QXmlStreamReader::EndElement:
-									if (xml->name() == "track") {
-										//qDebug() << pos.join(',');
-										cdmetadata->setTrack(track);
-									}
-									pos.removeLast();
-									break;	
-								default:
-									continue;
-							}	// switch
-							if (xml->tokenType() == QXmlStreamReader::EndElement && xml->name() == "tracklist") break;
-						}	// while
-					}	// if track-list,track
-					break;		
-				case QXmlStreamReader::EndElement:	
-					pos.removeLast();
-					//qDebug() << pos.join(',');
-					break;	
-				case QXmlStreamReader::Invalid:
-					#if QT_VERSION >= 0x050400 
-						qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
-					# else	
-						qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
-					# endif
-					break;
-				default:
-					continue;
-			}	// switch
-		}	// while
-		
-		sourcefile.close();	
-		delete xml;
-		this->updateTracks();
-		return true;
-	}	// if file could be opened for reading
+//
+// Slot to read a newly retrieved CD metadata file.  Only called when discIDChanged() and we've gone out
+// on the internet to retrieve the metadata and received a reply
+void Playlist::cdMetaDataRetrieved(const QString& id)
+{
+	// only try to read the file if we got an id back
+	if (! id.isEmpty() ) {
+		if (readCDMetaFile(id))
+			this->updateTracks();
+	}
 	
-	else
-		return false;
+	// disconnect the signal that got us here.
+	disconnect (mbman, SIGNAL(metaDataRetrieved(const QString&)), 0, 0);
+	
+	return;
 }
 
 //
@@ -716,6 +627,9 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 	
 	ui.label_iteminfo->clear();
 	ui.label_artwork->clear();
+	QStringList searchtags;
+	searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString("musicbrainz-albumid");
+	searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM);
 	
 	// If we're playing a local file
 	if (this->currentItemType() == MBMP_PL::File) {
@@ -727,46 +641,20 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 			ui.label_artwork->setPixmap(static_cast<PlaylistItem*>(cur)->getArtwork() ); 	
 		
 		// Then search directories in the computer
-		// Look first in the directory containing the media file
-		else {
-			QStringList ext = (QStringList() << ".jpg" << ".png" << ".gif" << ".jpeg" << ".bmp");
-			QStringList nf;
-			QStringList entlist;
-			
-			// Look in the directory containing the file
+		else {		
 			QFileInfo fi(this->getCurrentUri().remove("file://") );
 			QDir d(fi.path());
-			nf.clear();
-			for (int i = 0; i < ext.count(); ++i) {
-				nf << QString("*%1").arg(ext.at(i));
-			}
-			entlist = d.entryList(nf, QDir::Files, QDir::NoSort);
-			if (entlist.count() > 0)
-				ui.label_artwork->setPixmap(d.absoluteFilePath(entlist.at(0)) );
 			
-			// Look next in our artwork directory, first by albumid then by album name
-			else {
-				QStringList searchtags;
-				searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_MUSICBRAINZ_ALBUMID);
-				searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM);
-				
-				for (int i = 0; i < searchtags.count(); ++i) {
-					nf.clear();
-					for (int j = 0; j < ext.count(); ++j) {
-						nf << QString("%1%2").arg(searchtags.at(i)).arg(ext.at(j));
-					}
-					entlist = artwork_dir.entryList(nf, QDir::Files, QDir::NoSort);
-					if (entlist.count() > 0) {
-						ui.label_artwork->setPixmap(artwork_dir.absoluteFilePath(entlist.at(0)) );
-						break;
-					}	// if found cover
-				}	// for searchtags
-			}	// else search artwork directory
+			QPixmap pm = getLocalAlbumArt(searchtags, d);
+			if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
 		}	// else didn't find one in the music directory
 	}	// if playing local file
 	else if (this->currentItemType() == MBMP_PL::ACD) {
 		QString s = static_cast<PlaylistItem*>(cur)->getInfoText();
 		if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
+		
+		QPixmap pm = getLocalAlbumArt(searchtags);
+		if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
 	}
 		
 	
@@ -1007,6 +895,119 @@ void Playlist::updateSummary()
 	return;
 }
 
+// 
+// Function to read the local file containing CD metadata.  Return false on any error.
+// The bool return is used to determine if we need to go out to MusicBrainz or not.
+bool Playlist::readCDMetaFile(const QString& discid)
+{	
+	QFile sourcefile;
+	sourcefile.setFileName(cdmeta_dir.absoluteFilePath(discid + ".xml") );
+	if (sourcefile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		
+		// Prepare data container
+		cdmetadata->clear();
+		
+		// Read and parse the file	
+		QXmlStreamReader* xml = new QXmlStreamReader(&sourcefile);	
+		QStringList pos;
+		while (! xml->atEnd() ) {	
+			switch(xml->readNext() ) {
+				case QXmlStreamReader::StartElement:
+					pos.append(xml->name().toString() );
+					//qDebug() << pos.join(',');
+					if (pos.join(',') == "metadata,discid") {
+						cdmetadata->setDiscID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+						}
+					else if (pos.join(',') == "metadata,releaseid") {
+						cdmetadata->setReleaseID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+						}	
+					else if (pos.join(',') == "metadata,relgrpid") {
+						cdmetadata->setRelGrpID(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,title") {
+						cdmetadata->setTitle(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,artist") {
+						cdmetadata->setArtist(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,date") {
+						cdmetadata->setDate(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,status") {
+						cdmetadata->setStatus(xml->readElementText(QXmlStreamReader::SkipChildElements) );
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,label") {
+						cdmetadata->setLabel(xml->readElementText(QXmlStreamReader::SkipChildElements) );	
+						pos.removeLast();
+					}
+					else if (pos.join(',') == "metadata,tracklist,track") {
+						Track track;
+						track.title = QString();
+						track.tracknumber = QString();
+						track.duration = QString();
+						while (! xml->atEnd() ) {
+							switch (xml->readNext() ) {
+								case QXmlStreamReader::StartElement:
+									pos.append(xml->name().toString() );
+									if (pos.join(',') == "metadata,tracklist,track,track_number") {
+										track.tracknumber = xml->readElementText(QXmlStreamReader::SkipChildElements);
+										pos.removeLast();
+									}
+									if (pos.join(',') == "metadata,tracklist,track,title") {
+										track.title =	xml->readElementText(QXmlStreamReader::SkipChildElements);
+										pos.removeLast();
+									}
+									if (pos.join(',') == "metadata,tracklist,track,duration") {
+										track.duration =	xml->readElementText(QXmlStreamReader::SkipChildElements);
+										pos.removeLast();
+									}   
+									break;	
+								case QXmlStreamReader::EndElement:
+									if (xml->name() == "track") {
+										//qDebug() << pos.join(',');
+										cdmetadata->setTrack(track);
+									}
+									pos.removeLast();
+									break;	
+								default:
+									continue;
+							}	// switch
+							if (xml->tokenType() == QXmlStreamReader::EndElement && xml->name() == "tracklist") break;
+						}	// while
+					}	// if track-list,track
+					break;		
+				case QXmlStreamReader::EndElement:	
+					pos.removeLast();
+					//qDebug() << pos.join(',');
+					break;	
+				case QXmlStreamReader::Invalid:
+					#if QT_VERSION >= 0x050400 
+						qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
+					# else	
+						qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
+					# endif
+					break;
+				default:
+					continue;
+			}	// switch
+		}	// while
+		
+		sourcefile.close();	
+		delete xml;
+		return true;
+	}	// if file could be opened for reading
+	
+	else
+		return false;
+}
+
 //
 // Function to update the track information, called from read CD metadata
 // and only if the read worked.
@@ -1029,13 +1030,13 @@ void Playlist::updateTracks()
 				if (ok) pli->setDuration(dur / 1000 ); // use musicbrainz duration
 				// now add information common to the CD
 				pli->addTag("artist", cdmetadata->getArtist());
-				pli->addTag("disc_title", cdmetadata->getTitle());
+				pli->addTag(GST_TAG_ALBUM, cdmetadata->getTitle());
 				pli->addTag("release_date", cdmetadata->getDate());
 				pli->addTag("release_status", cdmetadata->getStatus());
 				pli->addTag("release_label", cdmetadata->getLabel());
-				pli->addTag("disc_id", cdmetadata->getDiscID());
-				pli->addTag("release_id", cdmetadata->getReleaseID());
-				pli->addTag("release_group_id", cdmetadata->getRelGrpID());
+				pli->addTag(GST_TAG_MUSICBRAINZ_ALBUMID, cdmetadata->getDiscID());
+				pli->addTag("musicbrainz-albumid", cdmetadata->getReleaseID());
+				pli->addTag("musizbrainz-releasegroupid", cdmetadata->getRelGrpID());
 				pli->makeDisplayText();
 			}	// if
 		}	// j for
@@ -1043,6 +1044,42 @@ void Playlist::updateTracks()
 	// update the now playing details
 	QString s = static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getInfoText();
 	if (! s.isEmpty() ) ui.label_iteminfo->setText(s);
+	
 }
 
-
+//
+// Function to get local album art.  Return a null pixmap is none found
+QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& dir)
+{
+	QStringList ext = (QStringList() << ".jpg" << ".png" << ".gif" << ".jpeg" << ".bmp");
+	QStringList namefilters;
+	QStringList entlist;
+	
+	namefilters.clear();
+	entlist.clear();
+	
+	// Look for any image in the media directory first, if a directory was provided
+	if (dir.exists() ) {
+		for (int i = 0; i < ext.count(); ++i) {
+			namefilters << QString("*%1").arg(ext.at(i));
+		}
+		entlist = dir.entryList(namefilters, QDir::Files, QDir::NoSort);
+		if (entlist.count() > 0)
+			return QPixmap(dir.absoluteFilePath(entlist.at(0)) );
+	}	// if dir exists
+	
+	// Not image in media directory, look in artwork_dir			
+	namefilters.clear();
+	for (int i = 0; i < searchtags.count(); ++i) {
+		for (int j = 0; j < ext.count(); ++j) {
+			namefilters << QString("%1%2").arg(searchtags.at(i)).arg(ext.at(j));
+		}
+		entlist = artwork_dir.entryList(namefilters, QDir::Files, QDir::NoSort);
+		if (entlist.count() > 0) {
+			return QPixmap(artwork_dir.absoluteFilePath(entlist.at(0)) );
+		}	// if found cover
+	}	// for searchtags
+	
+	// no luck, return a null pixmap
+	return QPixmap();
+}
