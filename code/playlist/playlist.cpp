@@ -576,12 +576,12 @@ void Playlist::discIDChanged(const QString& id)
 	if (readCDMetaFile(id) ) {
 		this->updateTracks();
 		
-		
-		//////////TESTING
-		
+		// look for album art for the CD
 		if (mbman == NULL) mbman = new MusicBrainzManager(this);
-		mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );
-		
+		QStringList sl;
+		sl << cdmetadata->getReleaseID() << cdmetadata->getTitle();
+		if (getLocalAlbumArt(sl).isNull() )
+			mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );
 		return;
 	}
 	
@@ -608,9 +608,17 @@ void Playlist::cdMetaDataRetrieved(const QString& id)
 {
 	// only try to read the file if we got an id back
 	if (! id.isEmpty() ) {
-		if (readCDMetaFile(id))
+		if (readCDMetaFile(id)) {
 			this->updateTracks();
-	}
+			
+			// get album art if we don't already have it.
+			if (mbman == NULL) mbman = new MusicBrainzManager(this);
+			QStringList sl;
+			sl << cdmetadata->getReleaseID() << cdmetadata->getTitle();
+			if (getLocalAlbumArt(sl).isNull() )
+				mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );			
+		}	// if we can read the metadata file	
+	}	// if id not empty
 	
 	// disconnect the signal that got us here.
 	disconnect (mbman, SIGNAL(metaDataRetrieved(const QString&)), 0, 0);
