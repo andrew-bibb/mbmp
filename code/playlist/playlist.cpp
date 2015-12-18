@@ -572,31 +572,36 @@ void Playlist::moveItemDown()
 // as a function from PlayerCtl
 void Playlist::discIDChanged(const QString& id)
 {
-	// See if we've got info about the disc stored locally.
-	if (readCDMetaFile(id) ) {
-		this->updateTracks();
-		
-		// look for album art for the CD
-		if (mbman == NULL) mbman = new MusicBrainzManager(this);
-		QStringList sl;
-		sl << cdmetadata->getReleaseID() << cdmetadata->getTitle();
-		if (getLocalAlbumArt(sl).isNull() )
-			mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );
-		return;
-	}
-	
-	// Nope, see if we can go out on the internet
+	// See if we can go out on the internet
 	QSettings* settings = new QSettings(ORG, APP, this);
 	settings->beginGroup("Preferences");
 	bool b_disable_internet = settings->value("disable_internet").toBool();
 	settings->endGroup();
 	settings->deleteLater();
-	if (b_disable_internet) return;
 		
-	// We're allowed, try to find CD metadata on the internet
-	if (mbman == NULL) mbman = new MusicBrainzManager(this);
-	mbman->retrieveCDMetaData(id);
-	connect (mbman, SIGNAL(metaDataRetrieved(const QString&)), this, SLOT(cdMetaDataRetrieved(const QString&)));
+	// See if we've got info about the disc stored locally.
+	if (readCDMetaFile(id) ) {
+		this->updateTracks();
+		
+		// Now look for album art for the CD 
+		QStringList searchtags;
+		searchtags << cdmetadata->getReleaseID() << cdmetadata->getTitle();
+		QPixmap pm = getLocalAlbumArt(searchtags);
+		if (pm.isNull() && ! b_disable_internet  ) {
+			if (mbman == NULL) mbman = new MusicBrainzManager(this);
+			mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );
+		}
+		else 
+			ui.label_artwork->setPixmap(pm);
+		return;
+	}
+	
+	// Nothing local, look on Musicbrainz if allowed
+	if (! b_disable_internet) {
+		if (mbman == NULL) mbman = new MusicBrainzManager(this);
+		mbman->retrieveCDMetaData(id);
+		connect (mbman, SIGNAL(metaDataRetrieved(const QString&)), this, SLOT(cdMetaDataRetrieved(const QString&)));
+	}	// if
 	
 	return;
 }

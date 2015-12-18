@@ -249,19 +249,28 @@ void MusicBrainzManager::artworkRequestFinished()
 		return;
 	}
 	
+	// save the return code
+	int rtncode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+	
 	// check for the redirection
-	if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 302 || reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 307 ) {
+	if(rtncode == 302 || rtncode == 307 ) {
 		connect (get(QNetworkRequest(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl())),
 					SIGNAL(finished()),
 					this,
 					SLOT(artworkRequestFinished()) );
 	}	// if
+	
 	else {
+		if (rtncode == 400 || rtncode == 404 || rtncode == 405 || rtncode == 503) 
+			qCritical("Error retrieving album art: HTTP reply code %i\n", rtncode  );
+		
+		else {
 		QImage img = QImage::fromData(reply->readAll() );
 		if (img.height() > 500 || img.width() > 500)
 			img = img.scaled(QSize(500, 500), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		img.save(artfile.fileName(), "JPG");
-	}	// else
+		}	// else
+	} //else
 
 	reply->deleteLater();
 	return;

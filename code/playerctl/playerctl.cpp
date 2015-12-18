@@ -90,7 +90,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (f0.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		QString qss = QString(f0.readAll());
 		f0.close();
-		this->setStyleSheet(qss);
+		qApp->setStyleSheet(qss);
 	}
   
   // show or hide GUI
