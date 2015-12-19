@@ -224,6 +224,7 @@ void MusicBrainzManager::metaDataFinished()
 				default:
 					continue;
 			}	// switch
+			if (xml->tokenType() == QXmlStreamReader::EndElement && xml->name() == "release") break;	// break while after first release group is read
 		}	// while
 		xmlwriter.writeEndDocument();
 		destfile.close();

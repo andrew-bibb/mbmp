@@ -1006,9 +1006,9 @@ bool Playlist::readCDMetaFile(const QString& discid)
 									break;	
 								case QXmlStreamReader::EndElement:
 									if (xml->name() == "track") {
-										//qDebug() << pos.join(',');
 										cdmetadata->setTrack(track);
 									}
+									//qDebug() << pos.join(',');
 									pos.removeLast();
 									break;	
 								default:
