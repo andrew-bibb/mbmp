@@ -131,6 +131,7 @@ class Playlist : public QDialog
 		void moveItemDown();
 		void discIDChanged(const QString&);
 		void cdMetaDataRetrieved(const QString&);
+		void albumArtRetrieved();
 		inline void clearPlaylist() {ui.listWidget_playlist->clear(); updateSummary();}
 		inline void triggerAddAudio() {if (ui.actionAddAudio->isEnabled()) ui.actionAddAudio->trigger();}
 		inline void triggerAddVideo() {if (ui.actionAddVideo->isEnabled()) ui.actionAddVideo->trigger();}

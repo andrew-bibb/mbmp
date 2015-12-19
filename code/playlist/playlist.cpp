@@ -590,6 +590,7 @@ void Playlist::discIDChanged(const QString& id)
 		if (pm.isNull() && ! b_disable_internet  ) {
 			if (mbman == NULL) mbman = new MusicBrainzManager(this);
 			mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );
+			connect(mbman, SIGNAL(artworkRetrieved()), this, SLOT(albumArtRetrieved()));
 		}
 		else 
 			ui.label_artwork->setPixmap(pm);
@@ -609,25 +610,44 @@ void Playlist::discIDChanged(const QString& id)
 //
 // Slot to read a newly retrieved CD metadata file.  Only called when discIDChanged() and we've gone out
 // on the internet to retrieve the metadata and received a reply
-void Playlist::cdMetaDataRetrieved(const QString& id)
+void Playlist::cdMetaDataRetrieved(const QString& albumid)
 {
-	// only try to read the file if we got an id back
-	if (! id.isEmpty() ) {
-		if (readCDMetaFile(id)) {
+	// only try to read the file if we got an albumid back
+	if (! albumid.isEmpty() ) {
+		if (readCDMetaFile(albumid)) {
 			this->updateTracks();
 			
-			// get album art if we don't already have it.
-			if (mbman == NULL) mbman = new MusicBrainzManager(this);
+			// get album art if we don't already have it. (we can't be here unlessw mbman already exists
+			// so no need to do a new on it).
 			QStringList sl;
 			sl << cdmetadata->getReleaseID() << cdmetadata->getTitle();
-			if (getLocalAlbumArt(sl).isNull() )
-				mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );			
+			if (getLocalAlbumArt(sl).isNull() ) {
+				mbman->retrieveAlbumArt(cdmetadata->getRelGrpID(), cdmetadata->getReleaseID() );
+				connect(mbman, SIGNAL(artworkRetrieved()), this, SLOT(albumArtRetrieved()));			
+			}	// if we need to to out to the internet to find album art
 		}	// if we can read the metadata file	
-	}	// if id not empty
+	}	// if albumid not empty
 	
 	// disconnect the signal that got us here.
 	disconnect (mbman, SIGNAL(metaDataRetrieved(const QString&)), 0, 0);
 	
+	return;
+}
+
+//
+// Slot called when new album art has been retrieved
+void Playlist::albumArtRetrieved()
+{		
+	// tags from the currently playing item
+	QStringList searchtags;
+	searchtags << static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTagAsString("musicbrainz-albumid");
+	searchtags << static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTagAsString(GST_TAG_ALBUM);
+	
+	// art should now be local, look for it
+	QPixmap pm = getLocalAlbumArt(searchtags);
+	if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
+	
+	disconnect(mbman, SIGNAL(artworkRetrieved()), 0, 0);	
 	return;
 }
 
@@ -884,6 +904,8 @@ void Playlist::updateSummary()
 	// and enable all controls
 	if (ui.listWidget_playlist->count() <= 0) {
 		ui.label_summary->clear();
+		ui.label_iteminfo->clear();
+		ui.label_artwork->clear();
 		lockControls(false);
 		return;
 	}

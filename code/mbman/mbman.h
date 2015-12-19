@@ -51,6 +51,7 @@ class MusicBrainzManager : public QNetworkAccessManager
 
 	signals:
 		void metaDataRetrieved(const QString&);
+		void artworkRetrieved();
 
   private:
   QFile destfile;

@@ -1229,6 +1229,7 @@ void GST_Interface::playerStop()
 {
 	gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
 	emit signalMessage(MBMP_GI::State, QString("%1 has changed state to %2").arg(PLAYER_NAME).arg(gst_element_state_get_name(GST_STATE_NULL)) );
+	opticaldrive.clear();
 	
 	return;
 }

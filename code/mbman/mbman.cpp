@@ -269,6 +269,7 @@ void MusicBrainzManager::artworkRequestFinished()
 		if (img.height() > 500 || img.width() > 500)
 			img = img.scaled(QSize(500, 500), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 		img.save(artfile.fileName(), "JPG");
+		emit artworkRetrieved();
 		}	// else
 	} //else
 
