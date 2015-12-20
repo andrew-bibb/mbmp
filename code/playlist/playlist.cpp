@@ -676,12 +676,18 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 		// Then search directories in the computer
 		else {		
 			QFileInfo fi(this->getCurrentUri().remove("file://") );
-			QDir d(fi.path());
-			
+			QDir d(fi.path());		
 			QPixmap pm = getLocalAlbumArt(searchtags, d);
 			if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
+			else {
+				if (mbman == NULL) mbman = new MusicBrainzManager(this);
+				mbman->retrieveReleaseData(static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM), this->getCurrentArtist() );
+				connect(mbman, SIGNAL(artworkRetrieved()), this, SLOT(albumArtRetrieved()));
+			}	// else need to go out and look
 		}	// else didn't find one in the music directory
+		
 	}	// if playing local file
+	
 	else if (this->currentItemType() == MBMP_PL::ACD) {
 		QString s = static_cast<PlaylistItem*>(cur)->getInfoText();
 		if (! s.isEmpty() ) ui.label_iteminfo->setText(s);

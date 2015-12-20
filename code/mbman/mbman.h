@@ -42,10 +42,12 @@ class MusicBrainzManager : public QNetworkAccessManager
     MusicBrainzManager(QObject* parent);  
     
 	// functions
+		void retrieveReleaseData(const QString&, const QString&);
 		void retrieveCDMetaData(const QString&);
 		void retrieveAlbumArt(const QString&, const QString&);
 	
 	public slots:
+		void releaseDataFinished();
 		void metaDataFinished();
 		void artworkRequestFinished();
 

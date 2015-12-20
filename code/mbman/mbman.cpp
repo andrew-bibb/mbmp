@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QXmlStreamReader>
 # include <QXmlStreamWriter>
 # include <QUrl>
+# include <QUrlQuery>
 # include <QNetworkRequest>
 # include <QNetworkReply>
 # include <QImage>
@@ -57,6 +58,46 @@ MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(
 
 //////////////////////////// Public Functions //////////////////////////
 //
+//
+//	Function to retrieve metadata about a track based on track title and artist
+void MusicBrainzManager::retrieveReleaseData(const QString& release, const QString& artist)
+{
+	// make sure we've got both le and artist
+	if (release.isEmpty() || artist.isEmpty() ) return;
+	
+	// Process special characters for Lucene
+	QString rel = release;
+	QString art = artist;
+	QStringList sl_specials;
+	sl_specials << "+"  << "-" << "&&" << "||" << "!" << "(" << ")" << "{" << "}"  << "[" << "]" << "^" << "\"" << "~" << "*" << "?" << ":" << "\\" << "/";
+	for (int i = 0; i < sl_specials.count(); ++i) {
+		rel.replace(sl_specials.at(i), QString("%5C" + sl_specials.at(i)) );
+		art.replace(sl_specials.at(i), QString("%5C" + sl_specials.at(i)) );
+	}
+	
+	// Create the URL
+	QUrl url(QString("http://musicbrainz.org/ws/2/release") );
+	QUrlQuery urlq;
+	urlq.addQueryItem("query", QString("release:" + rel + " AND " + "artist:" + art) );
+	url.setQuery(urlq);	
+	
+	// Create the request
+	QNetworkRequest request;
+	request.setUrl(url);
+	//#if QT_VERSION >= 0x050400 
+		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
+	//# else	
+		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qPrintable(release), qPrintable(artist) );
+	//# endif
+	
+	// Create and connect the reply message to the processing slot
+	QNetworkReply* reply = this->get(request);
+	connect(reply, SIGNAL(finished()), this, SLOT(releaseDataFinished()));
+	
+	return;
+}
+
+//
 //	Function to retrieve metadata about an audio CD
 void MusicBrainzManager::retrieveCDMetaData(const QString& discid)
 {
@@ -79,13 +120,13 @@ void MusicBrainzManager::retrieveCDMetaData(const QString& discid)
 //
 // Function to retrieve album art if we can find it. Coverartarchive will do a redirect
 // so this function has to deal with that.
-void MusicBrainzManager::retrieveAlbumArt(const QString& relgrpid, const QString& albumid)
+void MusicBrainzManager::retrieveAlbumArt(const QString& relgrpid, const QString& savename)
 {
 	QNetworkRequest request;
 	request.setUrl(QUrl(QString("http://coverartarchive.org/release-group/%1/front").arg(relgrpid)) );      
 	
-	// Store the artwork using the albumid as the filename.
-	artfile.setFileName(artwork_dir.absoluteFilePath(QString(albumid + ".jpg")) );
+	// Store the artwork using the savename as the filename.
+	artfile.setFileName(artwork_dir.absoluteFilePath(QString(savename + ".jpg")) );
 	QNetworkReply* reply = this->get(request);
 	connect(reply, SIGNAL(finished()), this, SLOT(artworkRequestFinished()));
 	
@@ -93,6 +134,79 @@ void MusicBrainzManager::retrieveAlbumArt(const QString& relgrpid, const QString
 }
 
 //////////////////////////// Public Slots //////////////////////////
+//
+// 
+void MusicBrainzManager::releaseDataFinished()
+{
+	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	
+		if (reply->error() != QNetworkReply::NoError) {
+		#if QT_VERSION >= 0x050400 
+			qCritical("Network error getting Track info from Musicbrainz:\n %s", qUtf8Printable(reply->errorString()) );
+		# else	
+			qCritical("Network error getting Track info from Musicbrainz:\n %s", qPrintable(reply->errorString()) );
+		# endif
+		reply->deleteLater();
+		return;
+	}
+
+	QString relgrpid = QString();
+	QString release = QString();
+
+		// Read through the reply data and store pieces we want locally
+		QXmlStreamReader* xml = new QXmlStreamReader(reply);	
+		QStringList pos;
+		while (! xml->atEnd() ) {	
+			switch(xml->readNext() ) {
+				case QXmlStreamReader::StartElement:
+					pos.append(xml->name().toString() );
+					//qDebug() << pos.join(',');
+
+					if (pos.join(',') == "metadata,release-list,release,release-group") {
+						if (relgrpid.isEmpty() ) relgrpid = xml->attributes().value("id").toString();
+					}
+					
+					else if (pos.join(',') == "metadata,release-list,release,title") {
+						if (release.isEmpty() ) release = xml->readElementText(QXmlStreamReader::SkipChildElements);	
+						pos.removeLast();
+					}
+					break;	// startElement
+							
+				case QXmlStreamReader::EndElement:	
+					pos.removeLast();
+					//qDebug() << pos.join(',');
+					break;	
+				
+				case QXmlStreamReader::Invalid:
+					#if QT_VERSION >= 0x050400 
+						qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
+					# else	
+						qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
+					# endif
+					break;
+				default:
+					continue;
+			}	// switch
+			if (! relgrpid.isEmpty() && ! release.isEmpty() ) break;	// break once we've got what we want (and the first instance of same)
+		}	// while
+		delete xml;
+	
+	// Get Album art for the relgrpid
+	if (! relgrpid.isEmpty() && ! release.isEmpty() )
+		retrieveAlbumArt(relgrpid, release);
+	else {
+		#if QT_VERSION >= 0x050400 
+			qCritical("Error extracting XML data from Musicbrainz: relgrpid = %s; release = %s", qUtf8Printable(relgrpid), qUtf8Printable(release) );
+		# else	
+			qCritical("Error extracting XML data from Musicbrainz: relgrpid = %s; release = %s", qPrintable(relgrpid), qPrintable(release) );
+		# endif
+	}	
+	
+	// cleanup
+	reply->deleteLater();
+	return;
+}
+
 //
 void MusicBrainzManager::metaDataFinished()
 {
@@ -104,6 +218,7 @@ void MusicBrainzManager::metaDataFinished()
 		# else	
 			qCritical("Network error getting CD info from Musicbrainz:\n %s", qPrintable(reply->errorString()) );
 		# endif
+		reply->deleteLater();
 		emit metaDataRetrieved(QString() ) ; // used to cleanup the receiver
 		return;
 	}
@@ -114,22 +229,6 @@ void MusicBrainzManager::metaDataFinished()
 		QXmlStreamWriter xmlwriter(&destfile);
 		xmlwriter.setAutoFormatting(true);
 		xmlwriter.writeStartDocument();
-		
-		//QString dtd;
-		//dtd.append("<!DOCTYPE metadata\n");
-		//dtd.append("[\n");
-		//dtd.append("<!ELEMENT metadata (discid,title,date,status,label,tracklist)>\n");
-		//dtd.append("<!ELEMENT discid (#PCDATA)>\n");
-		//dtd.append("<!ELEMENT title (#PCDATA)>\n");
-		//dtd.append("<!ELEMENT date (#PCDATA)>\n");
-		//dtd.append("<!ELEMENT status (#PCDATA)>\n");
-		//dtd.append("<!ELEMENT label (#PCDATA)>\n");
-		//dtd.append("<!ELEMENT tracklist (track)>\n");
-		//dtd.append("<!ELEMENT track (title, track_number, duration)>\n");
-		//dtd.append("<!ELEMENT track_number (#PCDATA)>\n");
-		//dtd.append("<!ELEMENT duration (#PCDATA)>\n");
-		//dtd.append("]>");
-		//xmlwriter.writeDTD(dtd);
 		xmlwriter.writeStartElement("metadata");		
 			
 		// Read through the reply data and store pieces we want locally
@@ -247,6 +346,7 @@ void MusicBrainzManager::artworkRequestFinished()
 		# else	
 			qCritical("Network error getting album art from CoverArtArchive:\n %s", qPrintable(reply->errorString()) );
 		# endif
+		reply->deleteLater();
 		return;
 	}
 	
@@ -265,7 +365,7 @@ void MusicBrainzManager::artworkRequestFinished()
 		if (rtncode == 400 || rtncode == 404 || rtncode == 405 || rtncode == 503) 
 			qCritical("Error retrieving album art: HTTP reply code %i\n", rtncode  );
 		
-		else {
+		else {	
 		QImage img = QImage::fromData(reply->readAll() );
 		if (img.height() > 500 || img.width() > 500)
 			img = img.scaled(QSize(500, 500), Qt::KeepAspectRatio, Qt::SmoothTransformation);
