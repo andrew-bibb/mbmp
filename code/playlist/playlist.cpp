@@ -680,12 +680,18 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 			QPixmap pm = getLocalAlbumArt(searchtags, d);
 			if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
 			else {
-				if (mbman == NULL) mbman = new MusicBrainzManager(this);
-				mbman->retrieveReleaseData(static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM), this->getCurrentArtist() );
-				connect(mbman, SIGNAL(artworkRetrieved()), this, SLOT(albumArtRetrieved()));
+				QSettings* settings = new QSettings(ORG, APP, this);
+				settings->beginGroup("Preferences");
+				bool b_disable_internet = settings->value("disable_internet").toBool();
+				settings->endGroup();
+				settings->deleteLater();
+				if (! b_disable_internet) {
+					if (mbman == NULL) mbman = new MusicBrainzManager(this);
+					mbman->retrieveReleaseData(static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM), this->getCurrentArtist() );
+					connect(mbman, SIGNAL(artworkRetrieved()), this, SLOT(albumArtRetrieved()));
+				}	// if allowed to go out on the internet
 			}	// else need to go out and look
-		}	// else didn't find one in the music directory
-		
+		}	// else didn't find one in the music directory	
 	}	// if playing local file
 	
 	else if (this->currentItemType() == MBMP_PL::ACD) {
