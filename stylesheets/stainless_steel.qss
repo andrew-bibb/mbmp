@@ -56,12 +56,16 @@ QPushButton {
 
 QComboBox {
 	background-color: #CCCBC7;
+  selection-background-color: #57698C;
 	}
 
 QComboBox:On {
   padding-top: 3px;
   padding-left: 4px;
 	}
+
+QComboBox QAbstractItemView {
+  background-color: #E0DFDB;
 
 QLineEdit {
 	background-color: #E0DFDB;
@@ -81,6 +85,6 @@ QMenu::item {
 	}
 
 QMenu::item:selected { 
- background-color: #CCCBC7;
-	}
+background-color: red;
+ }
 
