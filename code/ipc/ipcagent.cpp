@@ -4,7 +4,7 @@ Code for the ipc agentr registered on DBus.  When registered MBMP
 will communicate to other processes.  This program and registering on
 dbus will be started in the constructor.
 
-Copyright (C) 2013-2015
+Copyright (C) 2013-2016
 by: Andrew J. Bibb
 License: MIT 
 

@@ -1,7 +1,7 @@
 /**************************** playerctl.cpp ****************************
 Main window which also handles all the controls.
 
-Copyright (C) 2014-2015
+Copyright (C) 2014-2016
 by: Andrew J. Bibb
 License: MIT 
 
