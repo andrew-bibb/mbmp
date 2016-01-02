@@ -1,8 +1,9 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>In Progress</b>
+<b>2 January 2016</b>
 <ul>
+<li>Album art can be downloaded for media files and audio CD's if it can be found.</li>
 <li>Playlist can display album art if it exists and can be found.</li>
 <li>Added details checkbox to playlist to display art and media details.</li>
 <li>Playlist tooltips are automatically turned off when playlist details are active.</li>
