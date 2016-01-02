@@ -14,4 +14,4 @@ A DBUS based interprocess communication (IPC) interface has also been implemente
 Update (September 2015)
 The interface is essentially complete.  There are still a few advanced items to implement (color balance, av sync, etc), but all the main parts are there and working.
 
-Future development effort will be aimed at improving the playlist or a separate media manager and eventually downloading metadata (tags and album art) from online sources. It is my intention to keep the media player as a media player so it is not clear at the moment how these features will be implemented.  Possibly as plugins, or possibly as stand alone programs that communicate with the player via the IPC.     
+Update (January 2016) Playlist has been heavily updated.  Future development effort will be aimed at improving the playlist or creating a separate media manager. 
