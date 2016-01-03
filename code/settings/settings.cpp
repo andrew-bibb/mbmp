@@ -64,7 +64,7 @@ Settings::Settings(QWidget *parent)
 	styles << tr("None");
 	QString str = settings->value("style").toString();
 	styles.replaceInStrings(".qss", "");
-	if (! styles.contains(str)) styles << str;
+	if (! str.isEmpty() && ! styles.contains(str)) styles << str;
 	styles.sort(Qt::CaseSensitive);
 	ui.comboBox_style->clear();
 	ui.comboBox_style->addItems(styles);
