@@ -88,7 +88,8 @@ QMenu::item {
 	}
 
 QMenu::item:selected { 
-	border: 2px solid #57698C;
+	border: 1px solid #57698C;
 	border-style: outset;
+	background-color: #F7F6F2;
 	}
 
