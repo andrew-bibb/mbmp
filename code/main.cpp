@@ -53,6 +53,9 @@ int main(int argc, char *argv[])
 	QCommandLineOption openGUI(QStringList() << "g" << "gui", QCoreApplication::translate("main.cpp", "Open the player in GUI mode (default is no GUI).") );
 	parser.addOption(openGUI);
 	
+	QCommandLineOption openShadeMode(QStringList() << "s" << "shademode", QCoreApplication::translate("main.cpp", "Start the player in shade mode (default is start in normal mode).") );
+	parser.addOption(openShadeMode);
+	
   parser.addHelpOption();  
   
   QCommandLineOption useIconTheme(QStringList() << "i" << "icon-theme",
@@ -64,7 +67,7 @@ int main(int argc, char *argv[])
 	QCommandLineOption logLevel(QStringList() << "l" << "loglevel", QCoreApplication::translate("main.cpp", "Set the log level from 0 to 4 (default is 1)."), QCoreApplication::translate("main.cpp", "loglevel"), "1" );
 	parser.addOption(logLevel);  
   
-  QCommandLineOption enableSubtitles(QStringList() << "s" << "subtitles", QCoreApplication::translate("main.cpp", "Enable display of subtitles if a subtitle stream is found (default is no subtitles).") );
+  QCommandLineOption enableSubtitles(QStringList() << "S" << "subtitles", QCoreApplication::translate("main.cpp", "Enable display of subtitles if a subtitle stream is found (default is no subtitles).") );
   parser.addOption(enableSubtitles);  
 	
   parser.addVersionOption();	  

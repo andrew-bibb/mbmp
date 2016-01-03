@@ -39,16 +39,16 @@ QLabel {
 
 QListWidget {
 	background-color: #E0DFDB;
-  }
+	}
 
 QListWidget::item:hover {
   background-color: #CCCBC7; 
-}
+	}
 
 QListWidget::item:selected {
   background-color: #57698C;
   border: 1px;
-}
+	}
 
 QPushButton {
 	background-color: #CCCBC7;
@@ -66,6 +66,7 @@ QComboBox:On {
 
 QComboBox QAbstractItemView {
   background-color: #E0DFDB;
+	}
 
 QLineEdit {
 	background-color: #E0DFDB;
@@ -85,6 +86,6 @@ QMenu::item {
 	}
 
 QMenu::item:selected { 
-background-color: red;
- }
+background-color: #57698C;
+	}
 

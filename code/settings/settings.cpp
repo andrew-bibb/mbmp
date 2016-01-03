@@ -79,6 +79,7 @@ Settings::Settings(QWidget *parent)
 	// start options
 	settings->beginGroup("StartOptions");
 	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
+	ui.checkBox_shademode->setChecked(settings->value("start_shademode").toBool() );
 	ui.checkBox_gui->setChecked(settings->value("start_gui").toBool() );
 	ui.checkBox_icontheme->setChecked(settings->value("use_icon_theme").toBool() );
 	if (ui.checkBox_icontheme->isChecked() ) ui.lineEdit_icontheme->setEnabled(true);
@@ -137,6 +138,7 @@ void Settings::writeSettings()
 
   settings->beginGroup("StartOptions");
   settings->setValue("start_fullscreen", ui.checkBox_fullscreen->isChecked() );
+  settings->setValue("start_shademode", ui.checkBox_shademode->isChecked() );
 	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );  
   settings->setValue("use_icon_theme", ui.checkBox_icontheme->isChecked() );
   settings->setValue("icon_theme_name", ui.lineEdit_icontheme->text()  );

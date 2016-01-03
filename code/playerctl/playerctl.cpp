@@ -93,15 +93,13 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		qApp->setStyleSheet(qss);
 	}
   
-  // show or hide GUI
+  // Show or hide GUI.  useState() governs if it is set
   ui.widget_control->setVisible(false);
-  if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
-  else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_gui").toBool() ) ui.widget_control->setVisible(true);
-  
-  // options to start fullscreen 
-	if (parser.isSet("fullscreen") ) this->showFullScreen();
-	else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->showFullScreen();
-	
+  if (! diag_settings->useState()) {
+		if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
+		else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_gui").toBool() ) ui.widget_control->setVisible(true);
+	}	// if useState();
+    	
 	// Setup the icon manager and give it a color
 	IconManager iconman(this);
 	iconman.setIconColor(QColor(diag_settings->getSetting("Preferences", "colorize_icons").toString()) );
@@ -492,12 +490,21 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	chtsht->setDisplayText(scman.getCheatSheet());
 	chtsht->setWindowModality(Qt::NonModal);	
 	
+	// Options to start fullscreen or shade, if both are set fullscreen takes precedence
+	// Settings ->useState takes precedence over both
+	if (! diag_settings->useState()) {
+		if (parser.isSet("fullscreen") ) this->toggleFullScreen();
+			else if (parser.isSet("shademode") ) this->toggleShadeMode();
+				else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->toggleFullScreen();
+					else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_shademode").toBool() ) this->toggleShadeMode();
+	}	// if useState()
+	
   // connect signals to slots 
   connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
   connect (ui.actionToggleStreamInfo, SIGNAL (triggered()), gstiface, SLOT(toggleStreamInfo()));
 	connect (ui.actionQuit, SIGNAL (triggered()), qApp, SLOT(quit()));
 	connect (ui.actionToggleGUI, SIGNAL (triggered()), this, SLOT(toggleGUI()));
-	connect (ui.actionToggleShade, SIGNAL (triggered()), this, SLOT(toggleShade()));
+	connect (ui.actionToggleShade, SIGNAL (triggered()), this, SLOT(toggleShadeMode()));
 	connect (ui.actionToggleFullscreen, SIGNAL (triggered()), this, SLOT(toggleFullScreen()));
 	connect (ui.actionShowCheatsheet, SIGNAL (triggered()), this, SLOT(toggleCheatsheet()));
 	connect (ui.actionShowSettingsDialog, SIGNAL (triggered()), this, SLOT(toggleSettingsDialog()));
@@ -904,17 +911,27 @@ void PlayerControl::toggleFullScreen()
 {
 	static bool playlistup = false;
 	static bool cheatsheetup = false;
+	static QSize savedsize;
+	static QPoint savedpoint;
 	
+	// If we're in shademode bring the video window back
+	if (! videowidget->isVisible() ) this->toggleShadeMode();
+	
+	// Now do the toggle
 	if (this->isFullScreen() ) {
 		if (playlistup) playlist->show();
 		if (cheatsheetup) chtsht->show();
 		this->showNormal();
+		this->resize(savedsize);
+		this->move(savedpoint);
 		this->activateWindow();
 		this->setCursor(ncurs);
 		}
 	else {
 		playlistup = playlist->isVisible();
 		cheatsheetup = chtsht->isVisible();
+		savedsize = this->size();
+		savedpoint = this->pos();
 		if (playlistup) playlist->hide();
 		if (cheatsheetup) chtsht->hide();
 		if (vis_menu->isTearOffMenuVisible() ) vis_menu->hideTearOffMenu();	
@@ -945,18 +962,25 @@ void PlayerControl::toggleGUI()
 
 //
 // Slot to toggle shademode on and off
-void PlayerControl::toggleShade()
+void PlayerControl::toggleShadeMode()
 {
 	static QSize savedsize;
+	static QPoint savedpoint;
 	
+	// If we're in fullscreen mode go to normal mode
+	if (this->isFullScreen() ) this->toggleFullScreen();
+	
+	// Now do the toggle
 	if (videowidget->isVisible() ) {
 		savedsize = this->size();
+		savedpoint = this->pos();
 		videowidget->setVisible(false);
 		this->resize(this->sizeHint().width(), ui.widget_control->height());
 	}
 	else {
 		videowidget->setVisible(true);
 		this->resize(savedsize);
+		this->move(savedpoint);
 	}
 		
 	return;

@@ -32,8 +32,8 @@ DEALINGS IN THE SOFTWARE.
 ///////////////////////////////// Program Values ///////////////////////
 //
 // Program Info (may be visible, but don't mark for tranalation) 
-#define VERSION "2016.01.01-2"
-#define RELEASE_DATE "22 November 2015"
+#define VERSION "2016.01.03-1"
+#define RELEASE_DATE "3 January 2016"
 #define COPYRIGHT_DATE "2013-2016"
 
 // Program Values:
