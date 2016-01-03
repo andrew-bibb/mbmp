@@ -97,16 +97,16 @@ cmd_movedown =      ctrl+down         # Move a playlist entry down one line     
 cmd_removeitem =    ctrl+-            # Remove a playlist entry                           y             e
 cmd_removeall =     ctrl+del          # Remove all playlist entries                       y             e
 cmd_addmedia =      ctrl+ins          # Add media to the playlist                     y   y         E   
-cmd_addfile =       ctrl+F            # Add a file (audio or video) to the playlist   w   y         e   e
-cmd_addaudio =      ctrl+A            # Add an audio file to the playlist             w   y         e   e
-cmd_addvideo =      ctrl+V            # Add a video file to the playlist              w   y         e   e
-cmd_addplaylist =   ctrl+P            # Add entries contained in a playlist (.m3u)    w   y         e   e
-cmd_addurl =        ctrl+U            # Add a URL to the playlist                     w   y         e   e
-cmd_saveplaylist =  ctrl+S            # Save the playlist to disk                     w   y             e
-cmd_togglewrap	=		ctrl+W						# Toggle the wrap action												w		y					e		e
-cmd_toggleconsume = ctrl+C						# Toggle the consume action											w		y					e		e
-cmd_togglerandom	= ctrl+R						#	Toggle the random action											w		y					e		e
-cmd_toggledetail  = ctrl+D						# Toggle the detail action													y							e
+cmd_addfile =       ctrl+F            # Add a file (audio or video) to the playlist   	  y         e   e
+cmd_addaudio =      ctrl+A            # Add an audio file to the playlist               	y         e   e
+cmd_addvideo =      ctrl+V            # Add a video file to the playlist                 	y         e   e
+cmd_addplaylist =   ctrl+P            # Add entries contained in a playlist (.m3u)       	y         e   e
+cmd_addurl =        ctrl+U            # Add a URL to the playlist                        	y         e   e
+cmd_saveplaylist =  ctrl+S            # Save the playlist to disk                         y             e
+cmd_togglewrap	=		ctrl+W						# Toggle the wrap action														y					e		e
+cmd_toggleconsume = ctrl+C						# Toggle the consume action													y					e		e
+cmd_togglerandom	= ctrl+R						#	Toggle the random action													y					e		e
+cmd_toggledetail  = ctrl+D						# Toggle the detail action													y					e		e
 
 #
 # These are streaminfo related actions

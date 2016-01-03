@@ -3,7 +3,7 @@ Main window which also handles all the controls.
 
 Copyright (C) 2014-2016
 by: Andrew J. Bibb
-License: MIT 
+License: MIT \
 
 Permission is hereby granted, free of charge, to any person obtaining a copy 
 of this software and associated documentation files (the "Software"),to deal 
@@ -583,6 +583,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	this->addAction(pl_Act08);
 	pl_Act08->setShortcuts(scman.getKeySequence("cmd_togglerandom") );
 	connect (pl_Act08, SIGNAL(triggered()), playlist, SLOT(toggleRandomMode()));	
+	
+	QAction* pl_Act09 = new QAction(this);
+	this->addAction(pl_Act09);
+	pl_Act09->setShortcuts(scman.getKeySequence("cmd_toggledetail") );
+	connect (pl_Act09, SIGNAL(triggered()), playlist, SLOT(toggleDetailMode()));	
 	
 	QAction* si_Act01 = new QAction(this);
 	this->addAction(si_Act01);
