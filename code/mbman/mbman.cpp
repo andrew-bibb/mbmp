@@ -47,9 +47,9 @@ MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(
   // APP defined in resource.h
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QString home = env.value("HOME"); 
-	artwork_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/artwork").arg(QString(APP).toLower()) );
+	artwork_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath()) + "/.local/share") + "/%1/artwork").arg(QString(APP).toLower()) );
 	if (! artwork_dir.exists()) artwork_dir.mkpath(artwork_dir.absolutePath() ); 
-	cdmeta_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath())) + "/.local/share/%1/cdmeta").arg(QString(APP).toLower()) );
+	cdmeta_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath()) + "/.local/share") + "/%1/cdmeta").arg(QString(APP).toLower()) );
 	if (! cdmeta_dir.exists()) cdmeta_dir.mkpath(cdmeta_dir.absolutePath() );	
 	
 	
