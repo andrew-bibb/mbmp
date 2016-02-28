@@ -23,8 +23,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 DEALINGS IN THE SOFTWARE.
 ***********************************************************************/ 
-# include "playerctl.h"
-
 # include <QtCore/QDebug>
 # include <QLocale>
 # include <QFile>
@@ -143,7 +141,12 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.progressBar_buffering->hide();	
 	
 	// set up an event filter 
-	qApp->installEventFilter(this);
+	QList<QWidget*> childlist = ui.widget_control->findChildren<QWidget*>();
+	childlist += playlist->findChildren<QWidget*>();
+	for (int i = 0; i < childlist.count(); ++i) {
+		childlist.at(i)->installEventFilter(this);
+	}	
+	ui.horizontalSlider_position->installEventFilter(this);
 	
 	// find the the optical drives, or at least the first five
 	for (int i = 0; i < 5; ++i) {
@@ -1501,20 +1504,23 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
 			return false;
 	}	// if
 	
-	// check tooltips.  Always allow playlistitem tooltips, sent from 
-	// qt_scrollarea_viewport.  I think this is the only qtt_scrollarea_viewport
-	// where tooltips might appear, but keep in mind I would not bet my life on it.
+	// Disable tooltips on control box Allow playlistitem tooltips, except disable
+	// if the checkBox_showInfo is checked
 	if (event->type() == QEvent::ToolTip) {
-    if (diag_settings->useDisableTT() ) {
-			if (watched->objectName().contains("qt_scrollarea_viewport"))
-				return false;
-			else	
+
+		if (watched->objectName().contains("qt_scrollarea_viewport") ) {
+			if (playlist->findChild<QCheckBox*>("checkBox_showinfo")->isChecked() )
 				return true;
-		}	// if
-    else
-      return false;
-  } // event is a tooltip
-	
+			else
+				return false;
+		}
+
+		if (diag_settings->useDisableTT() )
+			return true;
+		else	
+			return false;
+	} // event is a tooltip
+  
 	// not interested, pass it on
 	return false;
 }

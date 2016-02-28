@@ -167,7 +167,6 @@ class Playlist : public QDialog
 		void hideEvent(QHideEvent*);
 		void showEvent(QShowEvent*);
 		void contextMenuEvent(QContextMenuEvent*);	
-		bool eventFilter(QObject*, QEvent*);
 
   private:
   // members 

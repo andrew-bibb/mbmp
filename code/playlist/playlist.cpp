@@ -82,9 +82,6 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   geometry = QRect();
   ui.listWidget_playlist->clear();
   
-  // set up an event filter 
-	qApp->installEventFilter(this);
-  
   // Iconmanager with constructor only scope
   IconManager iconman(this);
   
@@ -854,24 +851,6 @@ void Playlist::contextMenuEvent(QContextMenuEvent* e)
 	playlist_menu->popup(e->globalPos());
 }	
 
-//
-// Event filter used to filter out tooltip events. Show tooltips unless
-// the ui.checkBox_details is checked. In that case all the tooltips are
-// shown in the details area.
-bool Playlist::eventFilter(QObject* watched, QEvent* event)
-{
-	(void) watched;
-	
-	if (event->type() == QEvent::ToolTip) {
-    if (ui.checkBox_showinfo->isChecked() )
-			return true;
-		else
-			return false;
-	}	// if tooltip	
-	
-  // default case
-  return false;
-}
 
 //////////////////////////// Private Functions ////////////////////////////
 //

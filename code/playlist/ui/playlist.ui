@@ -117,6 +117,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="checkBox_showinfo">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show additional details about the selected item including album art if available.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>&amp;Details</string>
          </property>
