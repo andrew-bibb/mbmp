@@ -146,7 +146,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	for (int i = 0; i < childlist.count(); ++i) {
 		childlist.at(i)->installEventFilter(this);
 	}	
-	ui.horizontalSlider_position->installEventFilter(this);
+	//ui.horizontalSlider_position->installEventFilter(this);
 	
 	// find the the optical drives, or at least the first five
 	for (int i = 0; i < 5; ++i) {
