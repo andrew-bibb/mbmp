@@ -392,12 +392,8 @@ void GST_Interface::playMedia(WId winId, QString uri, int track)
         else  mediatype = MBMP_GI::File;
 
     // Set the video overlay and allow it to handle navigation events
-    // NOTE: 2016.02.28 - disable hangling navigation events.  A change in 
-    // something has occured and with it enabled no key shortcuts work when
-    // it is playing. Setting to FALSE probably broke onscreen DVD navigation
-    // so I'm going to need to look at this.
     gst_video_overlay_set_window_handle(GST_VIDEO_OVERLAY(pipeline_playbin), winId);
-    gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), FALSE);                
+    gst_video_overlay_handle_events(GST_VIDEO_OVERLAY(pipeline_playbin), TRUE);                
 
     // Bring the pipeline to paused and see if we have a live stream (for buffering)
     ret = gst_element_set_state(pipeline_playbin, GST_STATE_PAUSED);
