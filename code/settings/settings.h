@@ -54,8 +54,8 @@ class Settings : public QDialog
     inline bool useDisableTT() {return ui.checkBox_disabletooltips->isChecked();}
     inline bool useDisableXSS() {return (ui.checkBox_disablexscreensaver->isEnabled() && ui.checkBox_disablexscreensaver->isChecked() );}
     inline bool useDisableInternet() {return ui.checkBox_disableinternet->isChecked();}
+    inline bool useYouTubeDL() {return ui.checkBox_useyoutubedl->isChecked();}
     
-  	void writeSettings();
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
   	void restoreElementGeometry(const QString&, QWidget*);
   	QStringList getPlaylist();
@@ -63,7 +63,10 @@ class Settings : public QDialog
   	void setNotificationsTrying(const QString&); 
   	void setNotificationsConnected(const QString&);
   	void setNotificationsFailed(); 	    
-  
+  	
+  public slots:
+  void writeSettings();
+  	
   private:
   // members 
     Ui::Settings ui;    

@@ -37,6 +37,11 @@ DEALINGS IN THE SOFTWARE.
 
 // constructor
 // Most of the interface is defined in the ui
+//
+// The UI dialog button box accept button is connected to the writeSettings
+// so slot so the settings on disk are always current to what is selected
+// and set using the UI
+//
 Settings::Settings(QWidget *parent)
     : QDialog(parent)
 {	
@@ -59,6 +64,7 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_disablexscreensaver->setChecked(settings->value("disable_xscreensaver").toBool() );
 	ui.lineEdit_colorize->setText(settings->value("colorize_icons").toString() );
 	ui.checkBox_disableinternet->setChecked(settings->value("disable_internet").toBool() );
+	ui.checkBox_useyoutubedl->setChecked(settings->value("use_youtube-dl").toBool() );
 	QDir res(":/stylesheets/stylesheets/");
 	QStringList styles = res.entryList(QDir::Files);
 	styles << tr("None");
@@ -110,10 +116,27 @@ Settings::Settings(QWidget *parent)
 	connect(bg01, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(openEditor(QAbstractButton*)));
 	connect(ui.toolButton_colorize, SIGNAL(clicked()), this, SLOT(callColorDialog()));
 	connect(ui.lineEdit_colorize, SIGNAL(textChanged(const QString&)), this, SLOT(iconColorChanged(const QString&)));
+	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(writeSettings()));
 	
 	// See if we can find XScreenSaver disable settings if we can't
-	QProcess::execute("xscreensaver-command -version") == 0 ? ui.checkBox_disablexscreensaver->setEnabled(true) : ui.checkBox_disablexscreensaver->setEnabled(false);		
+	if (QProcess::execute("xscreensaver-command -version") != 0) {
+		ui.checkBox_disablexscreensaver->setChecked(false);
+		ui.checkBox_disablexscreensaver->setEnabled(false);
+	}
+	else 
+		ui.checkBox_disablexscreensaver->setEnabled(true);	
 
+	// See if we can find youtube-dl and disable settings if we can't
+	if (QProcess::execute("youtube-dl --version") != 0) {
+		ui.checkBox_useyoutubedl->setChecked(false);
+		ui.checkBox_useyoutubedl->setEnabled(false);
+	}
+	else 
+		ui.checkBox_useyoutubedl->setEnabled(true);
+	
+	// We may have changed settings finding XScreensaver and youtube-dl so
+	// make sure everything is in sync.
+	this->writeSettings();
 		
 	return;  
 }  
@@ -130,6 +153,7 @@ void Settings::writeSettings()
   settings->setValue("colorize_icons", ui.lineEdit_colorize->text() );
   settings->setValue("style", ui.comboBox_style->currentText() );
   settings->setValue("disable_internet", ui.checkBox_disableinternet->isChecked() );
+  settings->setValue("use_youtube-dl", ui.checkBox_useyoutubedl->isChecked() );
   settings->endGroup();
   
   settings->beginGroup("Notifications");

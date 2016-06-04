@@ -807,6 +807,21 @@ void PlayerControl::playMedia(QAction* act)
 	else if (playlist->currentItemType() == MBMP_PL::DVD) {
 		gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
+	
+	// If we are playing a URL process it through youtube-dl if requested
+	else if (playlist->currentItemType() == MBMP_PL::Url) {
+		if (diag_settings->useYouTubeDL() ) {
+			QProcess p;
+			p.start(QString("youtube-dl -g -f best %1").arg(playlist->getCurrentUri()) );
+			if (p.waitForFinished(5000) )	// 5 second timeout
+				gstiface->playMedia(videowidget->winId(), p.readAll());
+			else {
+				this->processGstifaceMessages(MBMP_GI::Info, tr("Failed processing %1 through youtube-dl. Skipping URL").arg(playlist->getCurrentUri()) );
+				return;
+			}	// else
+		}	// if
+	}
+
 	else {
 		// Get the window ID to render the media on and the next item in 
 		// the playlist, then send both to gstiface to play the media
@@ -1003,7 +1018,7 @@ void PlayerControl::toggleCheatsheet()
 }
 
 //
-// Slot to toggle the cheatsheet up or down
+// Slot to toggle the settings dialog up or down
 void PlayerControl::toggleSettingsDialog()
 {
 	diag_settings->isVisible() ? diag_settings->hide() : diag_settings->show();
