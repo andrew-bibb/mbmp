@@ -871,11 +871,17 @@ void Playlist::processM3U(const QString& plfile)
   while (!in.atEnd()) {
 		QString line = in.readLine();
     if (line.startsWith("#EXTINF:", Qt::CaseSensitive)) {
-			QFileInfo itemtarget = QFileInfo(in.readLine());
-			if (itemtarget.isRelative()) 
-				new PlaylistItem(QString(pldir.canonicalPath() + "/" + itemtarget.filePath()), ui.listWidget_playlist, MBMP_PL::File);
-			else 
-				new PlaylistItem(itemtarget.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
+			line = in.readLine();
+			if (line.startsWith("ftp") || line.startsWith("http") ) {
+				new PlaylistItem(line, ui.listWidget_playlist, MBMP_PL::Url);
+			}	// if a URL
+			else {
+				QFileInfo itemtarget = QFileInfo(in.readLine());
+				if (itemtarget.isRelative()) 
+					new PlaylistItem(QString(pldir.canonicalPath() + "/" + itemtarget.filePath()), ui.listWidget_playlist, MBMP_PL::File);
+				else 
+					new PlaylistItem(itemtarget.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
+			}	// else a file
 		}	// if
 	}	// while
 	

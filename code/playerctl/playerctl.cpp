@@ -808,9 +808,10 @@ void PlayerControl::playMedia(QAction* act)
 		gstiface->playMedia(videowidget->winId(), "dvd://", playlist->getCurrentSeq());
 	}
 	
-	// If we are playing a URL process it through youtube-dl if requested
+	// If we are playing a URL process it through youtube-dl if requested and if the URL has a default port
+	// youtube-dl does not like URL's when the port is specified.
 	else if (playlist->currentItemType() == MBMP_PL::Url) {
-		if (diag_settings->useYouTubeDL() ) {
+		if (diag_settings->useYouTubeDL() && QUrl::fromUserInput(playlist->getCurrentUri()).port() == -1 ) {
 			QProcess p;
 			p.start(QString("youtube-dl -g -f best %1").arg(playlist->getCurrentUri()) );
 			if (p.waitForFinished(5000) )	// 5 second timeout
@@ -819,8 +820,12 @@ void PlayerControl::playMedia(QAction* act)
 				this->processGstifaceMessages(MBMP_GI::Info, tr("Failed processing %1 through youtube-dl. Skipping URL").arg(playlist->getCurrentUri()) );
 				return;
 			}	// else
-		}	// if
-	}
+		}	// if useYouTubeDL
+		
+		else {
+			gstiface->playMedia(videowidget->winId(), playlist->getCurrentUri());	
+		}	// else
+	}	// else if
 
 	else {
 		// Get the window ID to render the media on and the next item in 
