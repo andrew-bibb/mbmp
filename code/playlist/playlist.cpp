@@ -370,7 +370,7 @@ void Playlist::addFile(QAction* a)
 	
 	const QString audio = "*.mp3 *.mp4 *.m4a *.ogg *.oga *.flac";
 	const QString video = "*.mp4 *.mkv *.avi *.ogv *.webm *.vob";
-	const QString plext = "*.m3u";
+	const QString plext = "*.m3u *.pls";
 	
 	// select the files to be presented
 	QString startdir = QDir::homePath();
@@ -401,6 +401,8 @@ void Playlist::addFile(QAction* a)
 		for (int i = 0; i < sl_files.size(); ++i) {
 			if (sl_files.at(i).endsWith(".m3u", Qt::CaseInsensitive) )
 				this->processM3U(sl_files.at(i));
+			else if (sl_files.at(i).endsWith(".pls", Qt::CaseInsensitive) )
+				this->processPLS(sl_files.at(i));
 			else
 				new PlaylistItem(sl_files.at(i), ui.listWidget_playlist, MBMP_PL::File);
 		}	// for
@@ -868,15 +870,16 @@ void Playlist::processM3U(const QString& plfile)
 
 	// read the file and create playlist entries from the contents
   QTextStream in(&file);
+  QString line = QString();
   while (!in.atEnd()) {
-		QString line = in.readLine();
+		line = in.readLine();
     if (line.startsWith("#EXTINF:", Qt::CaseSensitive)) {
 			line = in.readLine();
 			if (line.startsWith("ftp") || line.startsWith("http") ) {
 				new PlaylistItem(line, ui.listWidget_playlist, MBMP_PL::Url);
 			}	// if a URL
 			else {
-				QFileInfo itemtarget = QFileInfo(in.readLine());
+				QFileInfo itemtarget = QFileInfo(line);
 				if (itemtarget.isRelative()) 
 					new PlaylistItem(QString(pldir.canonicalPath() + "/" + itemtarget.filePath()), ui.listWidget_playlist, MBMP_PL::File);
 				else 
@@ -888,6 +891,53 @@ void Playlist::processM3U(const QString& plfile)
 	file.close();
 	return;	
 }	
+
+//
+// Function to process a .pls (shoutcast playlist) file.  Called from addFile() when
+// a file ends with .pls
+void Playlist::processPLS(const QString& plfile)
+{
+	// Make a QDir out of the input string, if plfile contains relative
+	// paths we'll need this.
+	QFileInfo pldir = QFileInfo(plfile);
+	
+	// Open plfile for reading
+  QFile file(plfile);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) return;
+
+	// read the file and create playlist entries from the contents.  Use the
+	// stringlist incase the PLS file is not in order.
+  QTextStream in(&file);
+  QString line = QString();
+  QStringList sl = QStringList();
+  while (!in.atEnd()) {
+		line = in.readLine();
+    if (line.startsWith("File", Qt::CaseSensitive)) {
+			bool ok = false;
+			int idx = line.section('=', 0, 0).remove(0, 4).toInt(&ok, 10);
+			if (ok) sl.insert(idx - 1, line.section('=', 1, 1) );
+		}	// if
+	}	// while
+	
+	// create a playlist item for each element in the string list
+	if (sl.count() > 0) {
+		for (int i = 0; i < sl.count(); ++i) {
+			if (sl.at(i).startsWith("ftp") || sl.at(i).startsWith("http") ) {
+				new PlaylistItem(sl.at(i), ui.listWidget_playlist, MBMP_PL::Url);
+			}	// if a URL
+			else if (! sl.at(i).isEmpty() ) {
+				QFileInfo itemtarget = QFileInfo(sl.at(i));
+				if (itemtarget.isRelative()) 
+					new PlaylistItem(QString(pldir.canonicalPath() + "/" + itemtarget.filePath()), ui.listWidget_playlist, MBMP_PL::File);
+				else 
+					new PlaylistItem(itemtarget.canonicalFilePath(), ui.listWidget_playlist, MBMP_PL::File);
+			}	// else if a file
+		} // for
+	}	// if sl count > 0
+			  
+	file.close();
+	return;
+}
 
 //
 // Function to update the summary text. Called at the end of the add functions,

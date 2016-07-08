@@ -183,6 +183,7 @@ class Playlist : public QDialog
 
 	// functions
 		void processM3U(const QString&);
+		void processPLS(const QString&);
 		void updateSummary();
 		bool readCDMetaFile(const QString&);
 		void updateTracks();
