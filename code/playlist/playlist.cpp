@@ -85,6 +85,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // Iconmanager with constructor only scope
   IconManager iconman(this);
   
+  // Initialize musicbrainz manager
+  mbman = NULL;
+
   // Class to hold audio CD metadata about the current disk
   cdmetadata = new MetaData(static_cast<QObject*>(this) );
   
