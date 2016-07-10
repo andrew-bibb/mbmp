@@ -923,6 +923,7 @@ gint64 GST_Interface::queryStreamPosition()
 			guint num = 0;
 			GstTagList* tags = NULL;
 			gst_message_parse_tag (msg, &tags);
+			static QString oldtrack = QString();
 			
 			// Get tags and emit a message listing the tags we've got with their values
 			str = gst_tag_list_to_string(tags);
@@ -1028,7 +1029,15 @@ gint64 GST_Interface::queryStreamPosition()
 					
 				default:   
 					if (gst_tag_list_get_string (tags, GST_TAG_TITLE, &str)) {
-						if (str) emit signalMessage(MBMP_GI::NewTrack, QString(str) );
+						// For media files the entire taglist is sent everytime any
+						// tag (including bitrates) changes. Only issue NewTrack when
+						// there really is one. 
+						if (str) {
+							if (oldtrack != QString(str) ) {
+								oldtrack = QString(str);
+								emit signalMessage(MBMP_GI::NewTrack, QString(str) );
+							}	// if oldtrack != str
+						}	// if str
 					 g_free (str);
 					}
 					break;   // default media type case

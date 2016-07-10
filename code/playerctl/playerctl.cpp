@@ -1137,8 +1137,6 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				if (msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) {
 					this->setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() ); 
 				}
-				else if (gstiface->getState() != GST_STATE_PAUSED)
-					ipcagent->init();
 				
 				// let ipcagent know about state changes	
 				ipcagent->setProperty("state", gstiface->getState() );
@@ -1279,7 +1277,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 		break;	
 					
 		case MBMP_GI::TagCL:	// a TAG message indicating a new dvd chapter count
-			if (loglevel >= 3) {
+			if (loglevel >= 4) {
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
@@ -1289,27 +1287,25 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			break;
 		
 		case MBMP_GI::TagCC:	// a TAG message indicating a new dvd chapter
-			if (loglevel >= 3) {
+			if (loglevel >= 4) {
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if
 			playlist->setCurrentChapter(gstiface->getCurrentChapter() );
 			break;
 		
-		case MBMP_GI::NewTrack:	// a New Track signal was emitte
-			if (loglevel >= 3) {
-				msg = "New track signal emitted";
+		case MBMP_GI::NewTrack:	// a New Track signal was emitted 
+			if (loglevel >= 4) {
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if	
 			// Set the window title, notifications, and ipc data
-			if (msg.isEmpty() )
-				this->setWindowTitle(playlist->getWindowTitle());
-			else  {
+			if (msg.isEmpty() ) 
+			this->setWindowTitle(playlist->getWindowTitle());	
+			else   
 				this->setWindowTitle(msg);		
-			}
-			this->processMediaInfo(msg);
-			ipcagent->updatedTrackInfo();			
+			
+			this->processMediaInfo(msg);			
 			break;		
 		
 		case MBMP_GI::StreamStatus:	// stream status message
@@ -1584,10 +1580,13 @@ void PlayerControl::processMediaInfo(const QString& msg)
 				
 			// build the notification
 			notifyclient->init();
-			if (! msg.isEmpty() && playlist->currentItemType() )
+			if (! msg.isEmpty() )
 				notifyclient->setSummary(msg);
-			else if (playlist->getCurrentTitle().isEmpty() ) 
-				notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
+				
+			if (playlist->getCurrentTitle().isEmpty() ) {
+				if (msg.isEmpty() ) notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
+				else notifyclient->setSummary(msg);
+			}
 			else {
 				notifyclient->setSummary(playlist->getCurrentTitle() );
 				QString s;
@@ -1610,7 +1609,7 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	ipcagent->setProperty("artist", playlist->getCurrentArtist() );
 	ipcagent->setProperty("title", playlist->getCurrentTitle() );
 	ipcagent->setProperty("duration", playlist->getCurrentDuration() );
-	ipcagent->setProperty("track", msg);		
-	
+	ipcagent->setProperty("track", msg);	
+	ipcagent->updatedTrackInfo();	
 	return;
 }
