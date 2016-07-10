@@ -63,7 +63,7 @@ class IPC_Agent : public QObject, protected QDBusContext
 		Q_SCRIPTABLE inline void playPause() {emit controlPlaypause();}
 		Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
 		Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
-		Q_SCRIPTABLE inline void	toggleWrapMode() {emit controlToggleWrap();}
+		Q_SCRIPTABLE inline void toggleWrapMode() {emit controlToggleWrap();}
 		Q_SCRIPTABLE inline void toggleConsumeMode() {emit controlToggleConsume();}
 		Q_SCRIPTABLE inline void toggleRandomMode() {emit controlToggleRandom();}
 		
@@ -76,6 +76,7 @@ class IPC_Agent : public QObject, protected QDBusContext
 	  Q_SCRIPTABLE inline int getState() {return vmap.value("state").toInt();}
 	  Q_SCRIPTABLE inline bool isPlaying() {return (vmap.value("state").toInt() == GST_STATE_PLAYING) ? true : false;}
 	  Q_SCRIPTABLE inline bool isPaused() {return (vmap.value("state").toInt() == GST_STATE_PAUSED) ? true : false;}
+	  Q_SCRIPTABLE inline QString getTrack() {return vmap.value("track").toString();}
 		
 		Q_SCRIPTABLE inline QVariantMap getProperties() {return vmap;}
 		

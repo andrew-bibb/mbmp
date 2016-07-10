@@ -1131,12 +1131,11 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				if (b_logtofile) stream2 << msg << endl;				
 			}	// loglevel else
 			
-			// process information and set widgets depending onstate
+			// process information and set widgets depending on state
 			if (msg.contains(PLAYER_NAME, Qt::CaseSensitive) ) {
-				// process media info for notifications and ipc	
+				// initialize things based on player state	
 				if (msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) {
 					this->setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() ); 
-					this->processMediaInfo();
 				}
 				else if (gstiface->getState() != GST_STATE_PAUSED)
 					ipcagent->init();
@@ -1297,7 +1296,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			playlist->setCurrentChapter(gstiface->getCurrentChapter() );
 			break;
 		
-		case MBMP_GI::NewTrack:	// a New Track signal was emitted
+		case MBMP_GI::NewTrack:	// a New Track signal was emitte
 			if (loglevel >= 3) {
 				msg = "New track signal emitted";
 				stream1 << msg << endl;
@@ -1306,8 +1305,11 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			// Set the window title, notifications, and ipc data
 			if (msg.isEmpty() )
 				this->setWindowTitle(playlist->getWindowTitle());
-			else 
-				this->setWindowTitle(msg);						
+			else  {
+				this->setWindowTitle(msg);		
+			}
+			this->processMediaInfo(msg);
+			ipcagent->updatedTrackInfo();			
 			break;		
 		
 		case MBMP_GI::StreamStatus:	// stream status message
@@ -1566,10 +1568,12 @@ QString PlayerControl::readTextFile(const char* textfile)
 } 
 
 //
-// Function to process the media info (tags) and select various pieces 
-// for display, etc.  Called from various case statements in processGstifaceMessages
-void PlayerControl::processMediaInfo()
+// Function to process the media info (tags) from the playlist and
+// select various pieces for display, etc.
+// Called from processGstifaceMessages.  
+void PlayerControl::processMediaInfo(const QString& msg)
 {
+	// Don't show notifications if playing CD's or DVD's
 	if (! gstiface->currentIsDisk() ) {
 		if(diag_settings->useNotifications() ) {
 			// collect some data
@@ -1580,7 +1584,9 @@ void PlayerControl::processMediaInfo()
 				
 			// build the notification
 			notifyclient->init();
-			if (playlist->getCurrentTitle().isEmpty() ) 
+			if (! msg.isEmpty() && playlist->currentItemType() )
+				notifyclient->setSummary(msg);
+			else if (playlist->getCurrentTitle().isEmpty() ) 
 				notifyclient->setSummary(playlist->getCurrentUri().section("//", 1, 1));
 			else {
 				notifyclient->setSummary(playlist->getCurrentTitle() );
@@ -1596,14 +1602,15 @@ void PlayerControl::processMediaInfo()
 		}	// if useNotifications
 	}	// if media type we want notifications for
 	
-	// Pass information from playlist to ipcagent
+	// Pass information from playlist to ipcagent.  The track information
+	// is changed from processGstifaceMessages when a NewTrack signal is received. 
 	ipcagent->init();
 	ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
 	ipcagent->setProperty("uri", playlist->getCurrentUri() );
 	ipcagent->setProperty("artist", playlist->getCurrentArtist() );
 	ipcagent->setProperty("title", playlist->getCurrentTitle() );
-	ipcagent->setProperty("Duration", playlist->getCurrentDuration() );
-	ipcagent->updatedTrackInfo();	
+	ipcagent->setProperty("duration", playlist->getCurrentDuration() );
+	ipcagent->setProperty("track", msg);		
 	
 	return;
 }

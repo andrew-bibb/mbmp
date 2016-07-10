@@ -46,6 +46,9 @@
     <method name="isPaused">
       <arg type="b" direction="out"/>
     </method>
+    <method name="getTrack">
+      <arg type="s" direction="out"/>
+    </method>
     <method name="getProperties">
       <arg type="a{sv}" direction="out"/>
       <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="QVariantMap"/>
