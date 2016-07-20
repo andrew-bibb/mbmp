@@ -1,6 +1,14 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>17 July 2016</b>
+<ul>
+<li>Fixed malformed XDG paths</li>
+<li>Can parse URL's through youtube-dl if that program is installed.</li>
+<li>Can read Shoutcast (.pls) playlists.</li>
+<li>Fixed an uninitialized pointer which was causing occasional segfaults.</li>
+<li>The IPC now includes tracks and track changes in addition to titles.  Useful for streaming media.</li>
+</ul>
 <b>2 January 2016</b>
 <ul>
 <li>Album art can be downloaded for media files and audio CD's if it can be found.</li>
