@@ -1117,9 +1117,6 @@ void GST_Interface::keyNavEvent(GstNavigationCommand cmd)
   GstNavigation* nav = 0;           
   nav = GST_NAVIGATION (pipeline_playbin);  
   
-  // Return if we could not find a GstNavigation element in the pipeline
-  if (! nav) return;
-  
   // Inject the command into the stream
   gst_navigation_send_command(nav, cmd);
   

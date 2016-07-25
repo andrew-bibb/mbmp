@@ -57,9 +57,10 @@ void VideoWidget::mouseDoubleClickEvent(QMouseEvent* e)
 }
 
 //
-// GstNavigation does not seem to need mouse moves.  Eat them as well
+// GstNavigation does not seem to need mouse moves, but send it on anyway
 void VideoWidget::mouseMoveEvent(QMouseEvent* e)
 {
+	emit navsignal ("mouse-move", 0, e->x(), e->y() );
 	e->accept();
 }
 
@@ -70,6 +71,7 @@ void VideoWidget::mousePressEvent(QMouseEvent* e)
 {
 	if (e->button() == Qt::LeftButton) {
 		emit navsignal ("mouse-button-press", 1, e->x(), e->y() );
+		e->accept();
 	}
 	else e->ignore();
 }
@@ -82,6 +84,7 @@ void VideoWidget::mouseReleaseEvent(QMouseEvent* e)
 {
 	if (e->button() == Qt::LeftButton) {
 		emit navsignal ("mouse-button-release", 1, e->x(), e->y() );
+		e->accept();
 	}
 	else 	e->ignore();
 }
