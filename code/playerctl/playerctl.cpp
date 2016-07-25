@@ -761,7 +761,16 @@ void PlayerControl::initializeDVD()
 				"play this DVD in a different drive.").arg(ui.comboBox_dvd->currentText())
 				);
 			return;	
-	}	// switch			
+	}	// switch
+	
+	if (! action_sub->isChecked() ) {
+		QMessageBox::warning(this, tr("%1 - Warning").arg(APP),
+		tr("<center><b>Subtitles not enabled.</b></center>"                       
+		"<br>DVD on screen navigation will only show your selection if subtitles are enabled. Subtitles "				
+		"are currently not enabled so you will not be able to see your selections, although selections "		
+		"can still be made.")
+		 );
+	}	// if
 	
 	// if we are here checkDVD passed, disable the addmedia menu and
 	gstiface->playMedia(videowidget->winId(), "dvd://" );
