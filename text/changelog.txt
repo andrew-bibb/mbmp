@@ -1,7 +1,7 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>17 July 2016</b>
+<b>In Progress</b>
 <ul>
 <li>Fixed malformed XDG paths</li>
 <li>Can parse URL's through youtube-dl if that program is installed.</li>
