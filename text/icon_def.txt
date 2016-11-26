@@ -75,7 +75,7 @@
 #	application icon
 [icon]
 icon_name = mbmp
-resource = :/images/images/app/ipod_mount2.png
+resource = :/images/images/24x24/raw_art/mbmp.png
 colorize = yes
 fdo_name = multimedia-player
 

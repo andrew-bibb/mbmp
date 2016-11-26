@@ -16,6 +16,19 @@ documentation.CONFIG = no_check_exist
 documentation.extra = gzip --force --keep ./misc/manpage/mbmp.1
 INSTALLS += documentation
 
+# program icon
+LIST = 16 20 22 24 32 36 40 48 64 72 96 128 192 256 384 512
+for(a, LIST) {
+	icon$${a}.path = /usr/share/icons/hicolor/$${a}x$${a}/apps
+	icon$${a}.files = ./images/application/$${a}x$${a}/mbmp.png
+	INSTALLS += icon$${a}
+}
+exists(./images/application/scalable/mbmp.svg) {
+	iconsvg.path = /usr/share/icons/hicolor/scalable/apps
+	iconsvg.files = ./images/application/scalable/mbmp.svg
+	INSTALLS += iconsvg
+}
+
 # desktop file
 desktop.path = /usr/share/applications
 desktop.files = ./misc/desktop/mbmp.desktop
