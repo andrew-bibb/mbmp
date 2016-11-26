@@ -861,7 +861,6 @@ void PlayerControl::playMedia(QAction* act)
 		XSetScreenSaver(dpy, 0, 0, xss_prefer_blanking_return, xss_allow_exposures_return);
 		XFlush(dpy);
 	}	// if
-	free(dpy);
 					
 	return;
 }
@@ -900,7 +899,6 @@ void PlayerControl::stopPlaying()
 	qDebug() << "restoring:" << xss_timeout_return << xss_interval_return <<xss_prefer_blanking_return << xss_allow_exposures_return;
 	XSetScreenSaver(dpy, xss_timeout_return, xss_interval_return, xss_prefer_blanking_return, xss_allow_exposures_return);
 	XFlush(dpy);
-	free(dpy);
 	
 	return;
 }	

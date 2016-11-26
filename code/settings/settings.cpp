@@ -31,6 +31,8 @@ DEALINGS IN THE SOFTWARE.
 # include <QInputDialog>
 # include <QFile>
 # include <QColorDialog>
+# include <QProcessEnvironment>
+# include <QDirIterator>
 
 # include "./code/settings/settings.h"
 # include "./code/resource.h"
@@ -122,25 +124,22 @@ Settings::Settings(QWidget *parent)
 	// See if we can find XScreenSaver and enable or disable controls
 	// based on what we can find.  If XScreenSaver is running it controls
 	// blanking and powersaving.
-	if (QProcess::execute("xscreensaver-command -version") != 0) {
-		ui.checkBox_disablexscreensaver->setChecked(false);
-		ui.checkBox_disablexscreensaver->setEnabled(false);
-		ui.checkBox_disabledpms->setChecked(true);
-		ui.checkBox_disabledpms->setEnabled(true);
+	if (isProcessRunning("xscreensaver") ) {
+		ui.checkBox_disablexscreensaver->setEnabled(true);
+		ui.checkBox_disabledpms->setEnabled(false);
 	}
 	else {
-		ui.checkBox_disablexscreensaver->setEnabled(true);	
-		ui.checkBox_disabledpms->setChecked(false);
-		ui.checkBox_disabledpms->setEnabled(false);
+		ui.checkBox_disablexscreensaver->setEnabled(false);	
+		ui.checkBox_disabledpms->setEnabled(true);
 	}	// else
 
 	// See if we can find youtube-dl and disable settings if we can't
-	if (QProcess::execute("youtube-dl --version") != 0) {
-		ui.checkBox_useyoutubedl->setChecked(false);
+	if (isProgramAvailable("youtube-dl") ) {
+		ui.checkBox_useyoutubedl->setEnabled(true);
+	}
+	else {
 		ui.checkBox_useyoutubedl->setEnabled(false);
 	}
-	else 
-		ui.checkBox_useyoutubedl->setEnabled(true);
 	
 	// We may have changed settings finding XScreensaver and youtube-dl so
 	// make sure everything is in sync.
@@ -361,4 +360,40 @@ void Settings::iconColorChanged(const QString& col)
 	// can't change icons in QActions once they are set so just return
 	(void) col;
 	return;
+}
+
+//
+//  Slot to find if a specified process is running
+bool Settings::isProcessRunning(const QByteArray& str)
+{
+	QProcess prss;
+	prss.start("ps -e");
+	prss.waitForFinished();
+	QByteArray ba = prss.readAllStandardOutput();
+	
+	return ba.contains(QByteArray(" " + str + "\n"));
+}
+
+//
+// Slot to find if a specified program is available in the environment path
+bool Settings::isProgramAvailable(const QString& prog_name)
+{
+	// get search paths
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QStringList sl_dirs = env.value("PATH").split(':');
+	
+	// return false if there are no paths to search	
+	if (sl_dirs.size() < 1) return false;
+	
+	// iterate over the search paths 
+	for (int i = 0; i < sl_dirs.size(); ++i) { 
+		QDirIterator dit(QString(sl_dirs.at(i) ), QDirIterator::Subdirectories);
+		while (dit.hasNext()) {
+			QFileInfo fi(dit.next());
+			if (fi.completeBaseName() == prog_name) return true;
+		}	// while
+	}	// for
+
+	// no found, return false
+	return false;
 }

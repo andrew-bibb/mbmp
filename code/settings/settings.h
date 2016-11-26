@@ -36,6 +36,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QVariant>
 # include <QStringList>
 # include <QButtonGroup>
+# include <QByteArray>
 
 # include "ui_settings.h"
 
@@ -79,7 +80,8 @@ class Settings : public QDialog
 		void openEditor(QAbstractButton*);
 		void callColorDialog();
 		void iconColorChanged(const QString&);
-
+    bool isProcessRunning(const QByteArray&);
+    bool isProgramAvailable(const QString&);
 };
 
 #endif
