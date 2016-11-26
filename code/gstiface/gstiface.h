@@ -71,16 +71,16 @@ namespace MBMP_GI
     NoDVDPipe   = 0x33,   // not able to create a DVD pipe
     BadDVDRead  = 0x34,   // can't read the DVD 
     // media types
-    None			  = (1 << 0),   // not playing anything
+    NoStream			  = (1 << 0),   // not playing anything
     File        = (1 << 1),   // a local media file
     Url         = (1 << 2),   // a remote file
     ACD         = (1 << 3),   // an audio cd
     DVD         = (1 << 4),   // a dvd
   };
-} // namespace MBMP_GI
+}; // namespace MBMP_GI
 
 // Gstreamer playbin GstPlayFlags
-typedef enum {
+enum GstPlayFlags {
   GST_PLAY_FLAG_VIDEO         = (1 << 0),
   GST_PLAY_FLAG_AUDIO         = (1 << 1),
   GST_PLAY_FLAG_TEXT          = (1 << 2),
@@ -92,7 +92,7 @@ typedef enum {
   GST_PLAY_FLAG_BUFFERING     = (1 << 8),
   GST_PLAY_FLAG_DEINTERLACE   = (1 << 9),
   GST_PLAY_FLAG_SOFT_COLORBALANCE = (1 << 10)
-} GstPlayFlags;
+  };
 
 
 //  Table of contents structure
@@ -137,7 +137,7 @@ class GST_Interface : public QObject
     inline int getCurrentChapter() {return map_md_dvd.value("currentchapter").toInt();}
     inline QString getMBDiscID() {return map_md_cd.value(GST_TAG_CDDA_MUSICBRAINZ_DISCID).toString();}
     
-    inline bool currentIsNone() {return checkCurrent(MBMP_GI::None);}
+    inline bool currentIsNoStream() {return checkCurrent(MBMP_GI::NoStream);}
 		inline bool currentIsFile() {return checkCurrent(MBMP_GI::File);}
 		inline bool currentIsUrl() {return checkCurrent(MBMP_GI::Url);}
 		inline bool currentIsACD() {return checkCurrent(MBMP_GI::ACD);}

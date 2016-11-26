@@ -53,6 +53,7 @@ class Settings : public QDialog
     inline bool useNotifications() {return (ui.checkBox_notifydaemon->isEnabled() && ui.checkBox_notifydaemon->isChecked() );}
     inline bool useDisableTT() {return ui.checkBox_disabletooltips->isChecked();}
     inline bool useDisableXSS() {return (ui.checkBox_disablexscreensaver->isEnabled() && ui.checkBox_disablexscreensaver->isChecked() );}
+    inline bool useDisableDPMS() {return ui.checkBox_disabledpms->isChecked();}
     inline bool useDisableInternet() {return ui.checkBox_disableinternet->isChecked();}
     inline bool useYouTubeDL() {return ui.checkBox_useyoutubedl->isChecked();}
     

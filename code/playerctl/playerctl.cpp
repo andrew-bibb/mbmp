@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/playerctl/playerctl.h"	
 # include "./code/resource.h"
 
+
 PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent) 
 	: QDialog(parent)
 {
@@ -848,7 +849,20 @@ void PlayerControl::playMedia(QAction* act)
 	
 	// start the position timer
 	pos_timer->start(500);
-						
+	
+	// Turn of Display Power Message Signaling if requested
+	Display* dpy = XOpenDisplay(NULL);
+	DPMSInfo(dpy, &dpms_power_level, &dpms_state); 
+	qDebug() << "dpms: " << dpms_power_level << dpms_state;
+	XGetScreenSaver(dpy, &xss_timeout_return, &xss_interval_return, &xss_prefer_blanking_return, &xss_allow_exposures_return);
+	if (diag_settings->useDisableDPMS() ) {
+		qDebug() << "saving ss:" << xss_timeout_return << xss_interval_return <<xss_prefer_blanking_return << xss_allow_exposures_return;
+		DPMSDisable(dpy);
+		XSetScreenSaver(dpy, 0, 0, xss_prefer_blanking_return, xss_allow_exposures_return);
+		XFlush(dpy);
+	}	// if
+	free(dpy);
+					
 	return;
 }
 
@@ -877,6 +891,16 @@ void PlayerControl::stopPlaying()
 	this->setDurationWidgets(-1);
 	this->setWindowTitle(LONG_NAME);
 	this->pos_timer->stop();
+	
+		
+	// Restore Display Power Message Signaling
+	if (playlist->getCurrentRow() < 0) return;
+	Display* dpy = XOpenDisplay(NULL);
+	dpms_state == 0 ? DPMSDisable(dpy) : DPMSEnable(dpy);
+	qDebug() << "restoring:" << xss_timeout_return << xss_interval_return <<xss_prefer_blanking_return << xss_allow_exposures_return;
+	XSetScreenSaver(dpy, xss_timeout_return, xss_interval_return, xss_prefer_blanking_return, xss_allow_exposures_return);
+	XFlush(dpy);
+	free(dpy);
 	
 	return;
 }	
@@ -1405,6 +1429,9 @@ void PlayerControl::changeOptions(QAction* act)
 // Slot to tidy up the place at close.  Called when the QApplication::aboutToQuit() signal is emitted
 void PlayerControl::cleanUp()
 {
+	// stop playing
+	stopPlaying();
+	
   // write settings
   diag_settings->saveElementGeometry("playerctl", true, this->size(), this->pos() );
 	diag_settings->saveElementGeometry("playlist", playlist->isVisible(),  playlist->size(), playlist->pos() );	

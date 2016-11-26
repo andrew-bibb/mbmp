@@ -50,7 +50,7 @@ Settings::Settings(QWidget *parent)
   
   // data members
   editor_string = QString();
-  
+    
   // read the settings
   settings = new QSettings(ORG, APP, this);
   
@@ -62,6 +62,7 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_retainplaylist->setChecked(settings->value("retain_playlist").toBool() );
 	ui.checkBox_disabletooltips->setChecked(settings->value("disable_tooltips").toBool() );
 	ui.checkBox_disablexscreensaver->setChecked(settings->value("disable_xscreensaver").toBool() );
+	ui.checkBox_disabledpms->setChecked(settings->value("disable_dpms").toBool() );
 	ui.lineEdit_colorize->setText(settings->value("colorize_icons").toString() );
 	ui.checkBox_disableinternet->setChecked(settings->value("disable_internet").toBool() );
 	ui.checkBox_useyoutubedl->setChecked(settings->value("use_youtube-dl").toBool() );
@@ -118,13 +119,20 @@ Settings::Settings(QWidget *parent)
 	connect(ui.lineEdit_colorize, SIGNAL(textChanged(const QString&)), this, SLOT(iconColorChanged(const QString&)));
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(writeSettings()));
 	
-	// See if we can find XScreenSaver disable settings if we can't
+	// See if we can find XScreenSaver and enable or disable controls
+	// based on what we can find.  If XScreenSaver is running it controls
+	// blanking and powersaving.
 	if (QProcess::execute("xscreensaver-command -version") != 0) {
 		ui.checkBox_disablexscreensaver->setChecked(false);
 		ui.checkBox_disablexscreensaver->setEnabled(false);
+		ui.checkBox_disabledpms->setChecked(true);
+		ui.checkBox_disabledpms->setEnabled(true);
 	}
-	else 
+	else {
 		ui.checkBox_disablexscreensaver->setEnabled(true);	
+		ui.checkBox_disabledpms->setChecked(false);
+		ui.checkBox_disabledpms->setEnabled(false);
+	}	// else
 
 	// See if we can find youtube-dl and disable settings if we can't
 	if (QProcess::execute("youtube-dl --version") != 0) {
@@ -150,6 +158,7 @@ void Settings::writeSettings()
   settings->setValue("retain_playlist", ui.checkBox_retainplaylist->isChecked() );
   settings->setValue("disable_tooltips", ui.checkBox_disabletooltips->isChecked() );
   settings->setValue("disable_xscreensaver", ui.checkBox_disablexscreensaver->isChecked() );
+  settings->setValue("disable_dpms", ui.checkBox_disabledpms->isChecked() );
   settings->setValue("colorize_icons", ui.lineEdit_colorize->text() );
   settings->setValue("style", ui.comboBox_style->currentText() );
   settings->setValue("disable_internet", ui.checkBox_disableinternet->isChecked() );

@@ -1,5 +1,3 @@
-
-
 /**************************** gstiface.cpp *****************************
 
 Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
@@ -85,7 +83,7 @@ static gboolean busCallback(GstBus* bus, GstMessage* msg, gpointer data)
 GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 {
   // members
-  mediatype = MBMP_GI::None;  // the type of media playing
+  mediatype = MBMP_GI::NoStream;  // the type of media playing
   is_live = false;            // true if we are playing a live stream
   is_buffering = false;       // true if we are currently buffering
   vismap.clear();
@@ -821,7 +819,7 @@ gint64 GST_Interface::queryStreamPosition()
 					  opticaldrive.clear();
 					  map_md_cd.clear();
 					  map_md_dvd.clear();
-					  mediatype = MBMP_GI::None;  
+					  mediatype = MBMP_GI::NoStream;  
 					  is_live = false;
 					  is_buffering = false;
 					  dl_timer->stop();

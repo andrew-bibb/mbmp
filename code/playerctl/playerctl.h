@@ -50,6 +50,13 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/notify/notify.h"
 # include "./code/ipc/ipcagent.h"
 
+// To toggle DPMS.  Note that Xlib.h defines a macro Bool, and QT also defines
+// Bool in QMetaData. Need to undefine the X11 version - be careful using
+// X11 functions when a Bool is needed
+# include <X11/Xlib.h>
+# include <X11/extensions/dpms.h>
+# undef Bool
+
 class PlayerControl : public QDialog
 {
 	Q_OBJECT
@@ -126,6 +133,12 @@ class PlayerControl : public QDialog
 		QAction* action_sbuf;
 		QAction* action_dbuf;
 		int hiatus_resume;
+		CARD16 dpms_power_level;
+		BOOL dpms_state;
+		int xss_timeout_return;
+		int xss_interval_return;
+		int xss_prefer_blanking_return;
+		int xss_allow_exposures_return;
 		
   
   // functions
