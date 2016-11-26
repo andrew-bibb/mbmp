@@ -270,7 +270,7 @@
        <item row="7" column="0">
         <widget class="QCheckBox" name="checkBox_disabledpms">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked DPMS (Display Power Management Signaling) will be turned off while MBMP is running. This will disable screen blanking.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked DPMS (Display Power Management Signaling) and X11 screen blanking will be turned off while MBMP is playing media. This will disable screen blanking and any X11 screensaver.  This is the built in X11 screensaver, not the XScreenSaver program.&lt;/p&gt;&lt;p&gt;The XScreenSaver program should control DPMS and the X11 screensaver so when XScreenSaver is found this button is disabled. &lt;/p&gt;&lt;p/&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Disable DPMS</string>

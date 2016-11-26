@@ -8,6 +8,7 @@
 <li>Can read Shoutcast (.pls) playlists.</li>
 <li>Fixed an uninitialized pointer which was causing occasional segfaults.</li>
 <li>The IPC now includes tracks and track changes in addition to titles.  Useful for streaming media.</li>
+<li>Can disable DPMS and X11 screen blanking from preferences if there is no xscreensaver program found.</li>
 </ul>
 <b>2 January 2016</b>
 <ul>
