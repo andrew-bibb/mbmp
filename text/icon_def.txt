@@ -76,7 +76,6 @@
 [icon]
 icon_name = mbmp
 resource = :/images/images/24x24/raw_art/mbmp.png
-colorize = yes
 fdo_name = multimedia-player
 
 # playlist icons

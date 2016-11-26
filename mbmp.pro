@@ -29,9 +29,11 @@ exists(./images/application/scalable/mbmp.svg) {
 	INSTALLS += iconsvg
 }
 
+
 # desktop file
 desktop.path = /usr/share/applications
 desktop.files = ./misc/desktop/mbmp.desktop
+desktop.extra = gtk-update-icon-cache /usr/share/icons/hicolor
 INSTALLS += desktop
 
 #  Widgets needed for QT5, 
