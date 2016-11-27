@@ -1,4 +1,4 @@
-.TH	MBMP 1 "3 January 2016" "Version: 2016.01.06"
+.TH	MBMP 1 "27 Novermber 2016" "Version: 2016.11.27"
 .SH NAME
 MBMP - Media Player
 .SH SYNOPSIS
@@ -42,17 +42,23 @@ Start the player in shade mode (video window is hidden).
 \fB-v, --version\fP
 Displays version information.
 .TP
-\fB-S, --subtitles\fP
-Enable display of subtitles if a subtitle stream is found.  Default is no subtitles.
-.TP
 \fB-C, --CD <CD Drive>\fP
 Specify which optical drive is used to play Audio CD's.  Default is /dev/sr0.
 .TP
 \fB-D, --DVD <DVD Drive>\fP
 Specify which optical drive is used to play DVD's.  Default is /dev/sr0.
 .TP
+\fB-S, --subtitles\fP
+Enable display of subtitles if a subtitle stream is found.  Default is no subtitles.
+.TP
 \fB-V, --visualizer\fP
 Enable a visualizer when playing audio tracks.  Default is no visualizer. 
+.TP
+\fB--promote\fP
+"List of GStreamer elements (comma separated) to be promoted.")
+.TP
+\fB--blacklist\fP
+"List (comma separated) of GStreamer elements to be blacklisted.")
 .SH FILELIST
 The filelist is an optional list of media files you would like queue up into the playlist.  Each file should be separated from any
 other by whitespace.  There will be fewer errors if each file is listed between double quotes.  Example: "/path01/file01" "path02/file02"

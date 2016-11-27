@@ -79,9 +79,6 @@ int main(int argc, char *argv[])
 	QCommandLineOption openGUI(QStringList() << "g" << "gui", QCoreApplication::translate("main.cpp", "Open the player in GUI mode (default is no GUI).") );
 	parser.addOption(openGUI);
 	
-	QCommandLineOption openShadeMode(QStringList() << "s" << "shademode", QCoreApplication::translate("main.cpp", "Start the player in shade mode (default is start in normal mode).") );
-	parser.addOption(openShadeMode);
-	
   parser.addHelpOption();  
   
   QCommandLineOption useIconTheme(QStringList() << "i" << "icon-theme",
@@ -92,10 +89,10 @@ int main(int argc, char *argv[])
 	
 	QCommandLineOption logLevel(QStringList() << "l" << "loglevel", QCoreApplication::translate("main.cpp", "Set the log level from 0 to 4 (default is 1)."), QCoreApplication::translate("main.cpp", "loglevel"), "1" );
 	parser.addOption(logLevel);  
-  
-  QCommandLineOption enableSubtitles(QStringList() << "S" << "subtitles", QCoreApplication::translate("main.cpp", "Enable display of subtitles if a subtitle stream is found (default is no subtitles).") );
-  parser.addOption(enableSubtitles);  
-	
+
+ 	QCommandLineOption openShadeMode(QStringList() << "s" << "shademode", QCoreApplication::translate("main.cpp", "Start the player in shade mode (default is start in normal mode).") );
+	parser.addOption(openShadeMode);
+ 
   parser.addVersionOption();	  
     
   QCommandLineOption cdDevice(QStringList() << "C" << "CD", QCoreApplication::translate("main.cpp", "Specify the optical drive that will play the audio CD (default is /dev/sr0)."), QCoreApplication::translate("main.cpp", "CD"), "/dev/sr0");
@@ -103,7 +100,10 @@ int main(int argc, char *argv[])
   
   QCommandLineOption dvdDevice(QStringList() << "D" << "DVD", QCoreApplication::translate("main.cpp", "Specify the optical drive that will play the DVD (default is /dev/sr0)."), QCoreApplication::translate("main.cpp", "DVD"), "/dev/sr0");
   parser.addOption(dvdDevice);
-  
+ 
+ QCommandLineOption enableSubtitles(QStringList() << "S" << "subtitles", QCoreApplication::translate("main.cpp", "Enable display of subtitles if a subtitle stream is found (default is no subtitles).") );
+  parser.addOption(enableSubtitles);  
+	 
   QCommandLineOption enableVisualizer(QStringList() << "V" << "visualizer", QCoreApplication::translate("main.cpp", "Enable a visualizer when playing audio tracks (default is no visualizer).") );
   parser.addOption(enableVisualizer);  
 

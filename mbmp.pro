@@ -106,7 +106,7 @@ INCLUDEPATH += /usr/include/glib-2.0
 INCLUDEPATH += /usr/lib/glib-2.0/include
 INCLUDEPATH += /usr/lib/gstreamer-1.0
 
-# gstreamer libraries
+# external libraries
 CONFIG += link_pkgconfig
 PKGCONFIG += gstreamer-1.0
 PKGCONFIG += gstreamer-video-1.0
