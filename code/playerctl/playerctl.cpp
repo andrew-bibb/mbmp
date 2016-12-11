@@ -1167,8 +1167,9 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				}
 				
 				// let ipcagent know about state changes	
-				ipcagent->setProperty("state", gstiface->getState() );
-				ipcagent->updatedState();	
+////////// IPC FIXME ///////////
+//				ipcagent->setProperty("state", gstiface->getState() );
+//				ipcagent->updatedState();	
 			}	// if PLAYER_NAME								
 			
 			break;
@@ -1634,13 +1635,15 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	
 	// Pass information from playlist to ipcagent.  The track information
 	// is changed from processGstifaceMessages when a NewTrack signal is received. 
-	ipcagent->init();
-	ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
-	ipcagent->setProperty("uri", playlist->getCurrentUri() );
-	ipcagent->setProperty("artist", playlist->getCurrentArtist() );
-	ipcagent->setProperty("title", playlist->getCurrentTitle() );
-	ipcagent->setProperty("duration", playlist->getCurrentDuration() );
-	ipcagent->setProperty("track", msg);	
-	ipcagent->updatedTrackInfo();	
+
+//////////////// 	IPC FIXME /////////
+	//ipcagent->init();
+	//ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
+	//ipcagent->setProperty("uri", playlist->getCurrentUri() );
+	//ipcagent->setProperty("artist", playlist->getCurrentArtist() );
+	//ipcagent->setProperty("title", playlist->getCurrentTitle() );
+	//ipcagent->setProperty("duration", playlist->getCurrentDuration() );
+	//ipcagent->setProperty("track", msg);	
+	//ipcagent->updatedTrackInfo();	
 	return;
 }

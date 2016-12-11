@@ -1,4 +1,4 @@
-/**************************** ipcagent.h *****************************
+/**************************** ipcplayer.h *****************************
 
 Code for the ipc agentr registered on DBus.  When registered MBMP
 will communicate to other processes.  This program and registering on
@@ -28,8 +28,8 @@ DEALINGS IN THE SOFTWARE.
 ***********************************************************************/  
 
 
-# ifndef IPC_AGENT
-# define IPC_AGENT
+# ifndef IPC_PLAYER
+# define IPC_PLAYER
 
 # include <gst/gst.h>
 
@@ -39,30 +39,25 @@ DEALINGS IN THE SOFTWARE.
 # include <QMap>
 # include <QStringList>
 
-# define IPC_SERVICE "org.mpris.MediaPlayer2.mbmp"
-# define IPC_OBJECT "/org/mpris/MediaPlayer2"
-# define IPC_INTERFACE_AGENT "org.mpris.MediaPlayer2"
-# define IPC_INTERFACE_PLAYER "org.mpris.MediaPlayer2.Player"
+# include "./ipcagent.h"
 
-
-
-class IPC_Agent : public QObject, protected QDBusContext
+class IPC_Player : public QObject, protected QDBusContext
 {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_AGENT)
+  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_PLAYER)
     
   public:
-    IPC_Agent(QObject* parent = 0);
+    IPC_Player(QObject* parent = 0);
  
 		// functions
-		void stopAgent();
-		inline void init() {vmap.clear();}
-		inline void setProperty(const QString& key, QVariant val) {if (keywords.contains(key, Qt::CaseInsensitive)) vmap[key.simplified().toLower()] = val;} 
+//		void stopAgent();
+//		inline void init() {vmap.clear();}
+//		inline void setProperty(const QString& key, QVariant val) {if (keywords.contains(key, Qt::CaseInsensitive)) vmap[key.simplified().toLower()] = val;} 
   
 	public Q_SLOTS:
-		Q_SCRIPTABLE inline void Quit() {emit controlStop();} 
+		//Q_SCRIPTABLE inline void Quit() {emit controlStop();} 
 		//Q_SCRIPTABLE inline void Raise() {emit controlStop();} 
-		//Q_SCRIPTABLE inline void playPause() {emit controlPlaypause();}
+		Q_SCRIPTABLE inline void playPause() {emit controlPlaypause();}
 		//Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
 		//Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
 		//Q_SCRIPTABLE inline void toggleWrapMode() {emit controlToggleWrap();}
@@ -102,6 +97,5 @@ class IPC_Agent : public QObject, protected QDBusContext
 		QVariantMap vmap;	
 		QStringList keywords;
 };  
-
 
 #endif

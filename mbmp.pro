@@ -47,10 +47,6 @@ TEMPLATE = app
 target.path = /usr/bin/
 INSTALLS += target
 
-# dbus
-DBUS_ADAPTORS		+= ./code/ipc/org.monkey_business_enterprises.ipcagent.xml
-DBUS_INTERFACES	+= ./code/ipc/org.monkey_business_enterprises.ipcagent.xml
-
 #	header files
 HEADERS		+= ./code/resource.h
 HEADERS 	+= ./code/playerctl/playerctl.h
@@ -65,6 +61,11 @@ HEADERS		+= ./code/iconman/iconman.h
 HEADERS		+= ./code/notify/notify.h
 HEADERS		+= ./code/scman/scman.h
 HEADERS		+= ./code/ipc/ipcagent.h
+HEADERS		+= ./code/ipc/ipcplayer.h
+HEADERS		+= ./code/ipc/ipcagent_adaptor.h
+HEADERS		+= ./code/ipc/ipcagent_interface.h
+HEADERS		+= ./code/ipc/ipcplayer_adaptor.h
+HEADERS		+= ./code/ipc/ipcplayer_interface.h
 HEADERS		+= ./code/mbman/mbman.h
 
 #	forms
@@ -88,6 +89,11 @@ SOURCES += ./code/iconman/iconman.cpp
 SOURCES += ./code/notify/notify.cpp
 SOURCES += ./code/scman/scman.cpp
 SOURCES += ./code/ipc/ipcagent.cpp
+SOURCES += ./code/ipc/ipcplayer.cpp
+SOURCES += ./code/ipc/ipcagent_adaptor.cpp
+SOURCES += ./code/ipc/ipcagent_interface.cpp
+SOURCES += ./code/ipc/ipcplayer_adaptor.cpp
+SOURCES += ./code/ipc/ipcplayer_interface.cpp
 SOURCES += ./code/mbman/mbman.cpp
 
 #	resource files
