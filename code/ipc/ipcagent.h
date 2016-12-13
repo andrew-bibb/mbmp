@@ -1,6 +1,6 @@
 /**************************** ipcagent.h *****************************
 
-Code for the ipc agentr registered on DBus.  When registered MBMP
+Code for the ipc agent registered on DBus.  When registered MBMP
 will communicate to other processes.  This program and registering on
 dbus will be started in the constructor.
 
@@ -39,12 +39,12 @@ DEALINGS IN THE SOFTWARE.
 # include <QMap>
 # include <QStringList>
 
+# include "./code/resource.h"
+
 # define IPC_SERVICE "org.mpris.MediaPlayer2.mbmp"
 # define IPC_OBJECT "/org/mpris/MediaPlayer2"
 # define IPC_INTERFACE_AGENT "org.mpris.MediaPlayer2"
 # define IPC_INTERFACE_PLAYER "org.mpris.MediaPlayer2.Player"
-
-
 
 class IPC_Agent : public QObject, protected QDBusContext
 {
@@ -53,54 +53,50 @@ class IPC_Agent : public QObject, protected QDBusContext
     
   public:
     IPC_Agent(QObject* parent = 0);
- 
+		
+		// properties
+		Q_PROPERTY (bool CanQuit READ getCanQuit);
+		Q_PROPERTY (bool Fullscreen READ getFullscreen WRITE setFullscreen) ;
+		Q_PROPERTY (bool CanSetFullscreen READ getCanSetFullscreen);
+		Q_PROPERTY (bool CanRaise READ getCanRaise);
+		Q_PROPERTY (bool HasTrackList READ getHasTrackList);
+		Q_PROPERTY (QString Identity READ getIdentity);
+		Q_PROPERTY (QString DesktopEntry READ getDesktopEntry);
+		Q_PROPERTY (QStringList SupportedUriSchemes READ getSupportedUriSchemes);
+		Q_PROPERTY (QStringList SupportedMimeTypes READ getSupportedMimeTypes);
+		
 		// functions
 		void stopAgent();
-		inline void init() {vmap.clear();}
-		inline void setProperty(const QString& key, QVariant val) {if (keywords.contains(key, Qt::CaseInsensitive)) vmap[key.simplified().toLower()] = val;} 
+	  inline bool getCanQuit() const {return canquit;}
+	  inline bool getFullscreen() const {return fullscreen;}
+	  inline bool getCanSetFullscreen() const {return cansetfullscreen;}
+	  inline bool getCanRaise() const {return canraise;}
+	  inline bool getHasTrackList() const {return hastracklist;}
+	  inline QString getIdentity() const {return identity;}
+	  inline QString getDesktopEntry() const  {return desktopentry;}
+	  inline QStringList getSupportedUriSchemes() const {return supportedurischemes;}
+	  inline QStringList getSupportedMimeTypes() const {return supportedmimetypes;}
+	 
+	  inline void setFullscreen(bool b_fs) {fullscreen = b_fs;}
   
 	public Q_SLOTS:
 		Q_SCRIPTABLE inline void Quit() {emit controlStop();} 
-		//Q_SCRIPTABLE inline void Raise() {emit controlStop();} 
-		//Q_SCRIPTABLE inline void playPause() {emit controlPlaypause();}
-		//Q_SCRIPTABLE inline void playlistNext() {emit controlPlaylistNext();}
-		//Q_SCRIPTABLE inline void playlistBack() {emit controlPlaylistBack();}
-		//Q_SCRIPTABLE inline void toggleWrapMode() {emit controlToggleWrap();}
-		//Q_SCRIPTABLE inline void toggleConsumeMode() {emit controlToggleConsume();}
-		//Q_SCRIPTABLE inline void toggleRandomMode() {emit controlToggleRandom();}
-		
-		
-		//Q_SCRIPTABLE inline int getSequence() {return vmap.value("sequence").toInt();}
-		//Q_SCRIPTABLE inline QString getUri() {return vmap.value("uri").toString();}
-		//Q_SCRIPTABLE inline QString getArtist() {return vmap.value("artist").toString();}
-		//Q_SCRIPTABLE inline QString getTitle() {return vmap.value("title").toString();}
-		//Q_SCRIPTABLE inline int getDuration() {return vmap.value("duration").toInt();}
-	  //Q_SCRIPTABLE inline int getState() {return vmap.value("state").toInt();}
-	  //Q_SCRIPTABLE inline bool isPlaying() {return (vmap.value("state").toInt() == GST_STATE_PLAYING) ? true : false;}
-	  //Q_SCRIPTABLE inline bool isPaused() {return (vmap.value("state").toInt() == GST_STATE_PAUSED) ? true : false;}
-	  //Q_SCRIPTABLE inline QString getTrack() {return vmap.value("track").toString();}
-		
-		//Q_SCRIPTABLE inline QVariantMap getProperties() {return vmap;}
-		
-		//inline void updatedTrackInfo() {emit trackChanged(vmap);}
-		//inline void updatedState() {emit stateChanged(vmap.value("state").toInt() );}
+		Q_SCRIPTABLE inline void Raise() {}
 	
-	Q_SIGNALS:
-		//Q_SCRIPTABLE void trackChanged(QVariantMap);
-		//Q_SCRIPTABLE void stateChanged(int);
-		
+	Q_SIGNALS:		
 		void controlStop();
-		void controlPlaypause();
-		void controlPlaylistNext();
-		void controlPlaylistBack();
-		void controlToggleWrap();
-		void controlToggleConsume();
-		void controlToggleRandom();
 		
 	private:
 		// data members
-		QVariantMap vmap;	
-		QStringList keywords;
+		bool canquit;
+		bool fullscreen;
+		bool cansetfullscreen;
+		bool canraise;
+		bool hastracklist;
+		QString identity;
+		QString desktopentry;
+		QStringList supportedurischemes;
+		QStringList supportedmimetypes;
 };  
 
 

@@ -35,11 +35,55 @@ public:
 
     ~OrgMprisMediaPlayer2Interface();
 
+    Q_PROPERTY(bool CanQuit READ canQuit)
+    inline bool canQuit() const
+    { return qvariant_cast< bool >(property("CanQuit")); }
+
+    Q_PROPERTY(bool CanRaise READ canRaise)
+    inline bool canRaise() const
+    { return qvariant_cast< bool >(property("CanRaise")); }
+
+    Q_PROPERTY(bool CanSetFullscreen READ canSetFullscreen)
+    inline bool canSetFullscreen() const
+    { return qvariant_cast< bool >(property("CanSetFullscreen")); }
+
+    Q_PROPERTY(QString DesktopEntry READ desktopEntry)
+    inline QString desktopEntry() const
+    { return qvariant_cast< QString >(property("DesktopEntry")); }
+
+    Q_PROPERTY(bool Fullscreen READ fullscreen WRITE setFullscreen)
+    inline bool fullscreen() const
+    { return qvariant_cast< bool >(property("Fullscreen")); }
+    inline void setFullscreen(bool value)
+    { setProperty("Fullscreen", QVariant::fromValue(value)); }
+
+    Q_PROPERTY(bool HasTrackList READ hasTrackList)
+    inline bool hasTrackList() const
+    { return qvariant_cast< bool >(property("HasTrackList")); }
+
+    Q_PROPERTY(QString Identity READ identity)
+    inline QString identity() const
+    { return qvariant_cast< QString >(property("Identity")); }
+
+    Q_PROPERTY(QStringList SupportedMimeTypes READ supportedMimeTypes)
+    inline QStringList supportedMimeTypes() const
+    { return qvariant_cast< QStringList >(property("SupportedMimeTypes")); }
+
+    Q_PROPERTY(QStringList SupportedUriSchemes READ supportedUriSchemes)
+    inline QStringList supportedUriSchemes() const
+    { return qvariant_cast< QStringList >(property("SupportedUriSchemes")); }
+
 public Q_SLOTS: // METHODS
     inline QDBusPendingReply<> Quit()
     {
         QList<QVariant> argumentList;
         return asyncCallWithArgumentList(QStringLiteral("Quit"), argumentList);
+    }
+
+    inline QDBusPendingReply<> Raise()
+    {
+        QList<QVariant> argumentList;
+        return asyncCallWithArgumentList(QStringLiteral("Raise"), argumentList);
     }
 
 Q_SIGNALS: // SIGNALS

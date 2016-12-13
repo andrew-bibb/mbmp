@@ -33,9 +33,75 @@ MediaPlayer2Adaptor::~MediaPlayer2Adaptor()
     // destructor
 }
 
+bool MediaPlayer2Adaptor::canQuit() const
+{
+    // get the value of property CanQuit
+    return qvariant_cast< bool >(parent()->property("CanQuit"));
+}
+
+bool MediaPlayer2Adaptor::canRaise() const
+{
+    // get the value of property CanRaise
+    return qvariant_cast< bool >(parent()->property("CanRaise"));
+}
+
+bool MediaPlayer2Adaptor::canSetFullscreen() const
+{
+    // get the value of property CanSetFullscreen
+    return qvariant_cast< bool >(parent()->property("CanSetFullscreen"));
+}
+
+QString MediaPlayer2Adaptor::desktopEntry() const
+{
+    // get the value of property DesktopEntry
+    return qvariant_cast< QString >(parent()->property("DesktopEntry"));
+}
+
+bool MediaPlayer2Adaptor::fullscreen() const
+{
+    // get the value of property Fullscreen
+    return qvariant_cast< bool >(parent()->property("Fullscreen"));
+}
+
+void MediaPlayer2Adaptor::setFullscreen(bool value)
+{
+    // set the value of property Fullscreen
+    parent()->setProperty("Fullscreen", QVariant::fromValue(value));
+}
+
+bool MediaPlayer2Adaptor::hasTrackList() const
+{
+    // get the value of property HasTrackList
+    return qvariant_cast< bool >(parent()->property("HasTrackList"));
+}
+
+QString MediaPlayer2Adaptor::identity() const
+{
+    // get the value of property Identity
+    return qvariant_cast< QString >(parent()->property("Identity"));
+}
+
+QStringList MediaPlayer2Adaptor::supportedMimeTypes() const
+{
+    // get the value of property SupportedMimeTypes
+    return qvariant_cast< QStringList >(parent()->property("SupportedMimeTypes"));
+}
+
+QStringList MediaPlayer2Adaptor::supportedUriSchemes() const
+{
+    // get the value of property SupportedUriSchemes
+    return qvariant_cast< QStringList >(parent()->property("SupportedUriSchemes"));
+}
+
 void MediaPlayer2Adaptor::Quit()
 {
     // handle method call org.mpris.MediaPlayer2.Quit
     QMetaObject::invokeMethod(parent(), "Quit");
+}
+
+void MediaPlayer2Adaptor::Raise()
+{
+    // handle method call org.mpris.MediaPlayer2.Raise
+    QMetaObject::invokeMethod(parent(), "Raise");
 }
 

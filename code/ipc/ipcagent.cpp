@@ -42,6 +42,18 @@ DEALINGS IN THE SOFTWARE.
 //  constructor
 IPC_Agent::IPC_Agent(QObject* parent) : QObject(parent)
 {
+	// initialize agent properties
+	canquit = true;
+	fullscreen = true;
+	cansetfullscreen = true;
+	canraise = false;
+	hastracklist = false;
+	identity = LONG_NAME;
+	desktopentry = APP;
+	supportedurischemes << "file" << "http";
+	supportedmimetypes << "audio/*" << "video/*";
+
+
   //  Create adaptors 
   new MediaPlayer2Adaptor(this);
   new PlayerAdaptor(this);
@@ -68,10 +80,6 @@ IPC_Agent::IPC_Agent(QObject* parent) : QObject(parent)
 				QCoreApplication::instance()->exit(2);
 		}	// if registering object failed
 			
-		// data members
-		vmap.clear();
-		keywords.clear();
-		keywords << "sequence" << "uri" << "artist" << "title" << "duration" << "state" << "track";
 		
   return;
 }  

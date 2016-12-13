@@ -32,7 +32,17 @@ class MediaPlayer2Adaptor: public QDBusAbstractAdaptor
     Q_CLASSINFO("D-Bus Interface", "org.mpris.MediaPlayer2")
     Q_CLASSINFO("D-Bus Introspection", ""
 "  <interface name=\"org.mpris.MediaPlayer2\">\n"
+"    <property access=\"read\" type=\"b\" name=\"CanQuit\"/>\n"
+"    <property access=\"readwrite\" type=\"b\" name=\"Fullscreen\"/>\n"
+"    <property access=\"read\" type=\"b\" name=\"CanSetFullscreen\"/>\n"
+"    <property access=\"read\" type=\"b\" name=\"CanRaise\"/>\n"
+"    <property access=\"read\" type=\"b\" name=\"HasTrackList\"/>\n"
+"    <property access=\"read\" type=\"s\" name=\"Identity\"/>\n"
+"    <property access=\"read\" type=\"s\" name=\"DesktopEntry\"/>\n"
+"    <property access=\"read\" type=\"as\" name=\"SupportedUriSchemes\"/>\n"
+"    <property access=\"read\" type=\"as\" name=\"SupportedMimeTypes\"/>\n"
 "    <method name=\"Quit\"/>\n"
+"    <method name=\"Raise\"/>\n"
 "  </interface>\n"
         "")
 public:
@@ -40,8 +50,37 @@ public:
     virtual ~MediaPlayer2Adaptor();
 
 public: // PROPERTIES
+    Q_PROPERTY(bool CanQuit READ canQuit)
+    bool canQuit() const;
+
+    Q_PROPERTY(bool CanRaise READ canRaise)
+    bool canRaise() const;
+
+    Q_PROPERTY(bool CanSetFullscreen READ canSetFullscreen)
+    bool canSetFullscreen() const;
+
+    Q_PROPERTY(QString DesktopEntry READ desktopEntry)
+    QString desktopEntry() const;
+
+    Q_PROPERTY(bool Fullscreen READ fullscreen WRITE setFullscreen)
+    bool fullscreen() const;
+    void setFullscreen(bool value);
+
+    Q_PROPERTY(bool HasTrackList READ hasTrackList)
+    bool hasTrackList() const;
+
+    Q_PROPERTY(QString Identity READ identity)
+    QString identity() const;
+
+    Q_PROPERTY(QStringList SupportedMimeTypes READ supportedMimeTypes)
+    QStringList supportedMimeTypes() const;
+
+    Q_PROPERTY(QStringList SupportedUriSchemes READ supportedUriSchemes)
+    QStringList supportedUriSchemes() const;
+
 public Q_SLOTS: // METHODS
     void Quit();
+    void Raise();
 Q_SIGNALS: // SIGNALS
 };
 
