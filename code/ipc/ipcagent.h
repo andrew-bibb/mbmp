@@ -35,9 +35,9 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QObject>
 # include <QtDBus/QDBusContext>
-# include <QVariant>
-# include <QMap>
+# include <QString>
 # include <QStringList>
+# include <QVector>
 
 # include "./code/resource.h"
 
@@ -45,6 +45,21 @@ DEALINGS IN THE SOFTWARE.
 # define IPC_OBJECT "/org/mpris/MediaPlayer2"
 # define IPC_INTERFACE_AGENT "org.mpris.MediaPlayer2"
 # define IPC_INTERFACE_PLAYER "org.mpris.MediaPlayer2.Player"
+
+namespace MBMP_MPRIS 
+{
+  enum {
+    CanQuit       = 0x01,  
+    Fullscreen		= 0x02,
+    CanSetFull		= 0x03,
+    CanRaise			= 0x04,
+    HasTrackList	= 0x05,
+    Identity			= 0x06,
+    DesktopEntry	= 0x07,
+    UriSchemes		= 0x08,
+    MimeTypes			= 0x09,
+	};
+};
 
 class IPC_Agent : public QObject, protected QDBusContext
 {
@@ -67,6 +82,8 @@ class IPC_Agent : public QObject, protected QDBusContext
 		
 		// functions
 		void stopAgent();
+		
+		// get functions for memebers
 	  inline bool getCanQuit() const {return canquit;}
 	  inline bool getFullscreen() const {return fullscreen;}
 	  inline bool getCanSetFullscreen() const {return cansetfullscreen;}
@@ -76,15 +93,27 @@ class IPC_Agent : public QObject, protected QDBusContext
 	  inline QString getDesktopEntry() const  {return desktopentry;}
 	  inline QStringList getSupportedUriSchemes() const {return supportedurischemes;}
 	  inline QStringList getSupportedMimeTypes() const {return supportedmimetypes;}
-	 
-	  inline void setFullscreen(bool b_fs) {fullscreen = b_fs;}
+
+		// set functions for members (most can or will never be used)
+		inline void setCanQuit(bool b_cc) {canquit = b_cc; changeditems.append(MBMP_MPRIS::CanQuit); emit propertyChanged();}
+	  inline void setFullscreen(bool b_fs) {fullscreen = b_fs; changeditems.append(MBMP_MPRIS::Fullscreen); emit propertyChanged();}
+	  inline void setCanSetFullscreen(bool b_cfs) {cansetfullscreen = b_cfs; changeditems.append(MBMP_MPRIS::CanSetFull); emit propertyChanged();}
+	  inline void setRaise(bool b_r) {canraise = b_r; changeditems.append(MBMP_MPRIS::CanRaise); emit propertyChanged();}	
+	  inline void setHasTrackList(bool b_htl) {hastracklist = b_htl; changeditems.append(MBMP_MPRIS::HasTrackList); emit propertyChanged();}
+	  inline void setIdentity(QString s_id) {identity = s_id; changeditems.append(MBMP_MPRIS::Identity); emit propertyChanged();}
+	  inline void setDesktopEntry(QString s_de) {desktopentry = s_de; changeditems.append(MBMP_MPRIS::DesktopEntry); emit propertyChanged();}	 
+		inline void setSupportedUriSchemes(QStringList sl_u) {supportedurischemes = sl_u; changeditems.append(MBMP_MPRIS::UriSchemes); emit propertyChanged();}	
+		inline void setSupportedMimeSchemes(QStringList sl_m) {supportedmimetypes = sl_m; changeditems.append(MBMP_MPRIS::MimeTypes); emit propertyChanged();}			  		  
   
 	public Q_SLOTS:
 		Q_SCRIPTABLE inline void Quit() {emit controlStop();} 
-		Q_SCRIPTABLE inline void Raise() {}
+		Q_SCRIPTABLE inline void Raise() {}	// does nothing
+		
+		void sendPropertyChanged();
 	
 	Q_SIGNALS:		
 		void controlStop();
+		void propertyChanged();
 		
 	private:
 		// data members
@@ -97,6 +126,9 @@ class IPC_Agent : public QObject, protected QDBusContext
 		QString desktopentry;
 		QStringList supportedurischemes;
 		QStringList supportedmimetypes;
+		
+		QVector<int> changeditems; 
+
 };  
 
 

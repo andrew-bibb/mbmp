@@ -29,6 +29,10 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QtCore/QDebug>
 # include <QtDBus/QDBusConnection>
+# include <QtDBus/QDBusMessage>
+# include <QMap>
+# include <QList>
+# include <QVariant>
 
 # include "./ipcagent.h"
 # include "./ipcplayer.h"
@@ -52,7 +56,9 @@ IPC_Agent::IPC_Agent(QObject* parent) : QObject(parent)
 	desktopentry = APP;
 	supportedurischemes << "file" << "http";
 	supportedmimetypes << "audio/*" << "video/*";
-
+	
+	// data members
+	changeditems.clear();
 
   //  Create adaptors 
   new MediaPlayer2Adaptor(this);
@@ -79,7 +85,9 @@ IPC_Agent::IPC_Agent(QObject* parent) : QObject(parent)
 			# endif
 				QCoreApplication::instance()->exit(2);
 		}	// if registering object failed
-			
+	
+	// connect signals to slots
+	connect (this, SIGNAL(propertyChanged()), this, SLOT(sendPropertyChanged()));
 		
   return;
 }  
@@ -103,5 +111,64 @@ void IPC_Agent::stopAgent()
 	return;
 }
 
-    
+/////////////////////// Public Slots /////////////////////////////////////
+//
+// Slot to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
+// DBus signal.  Called from the local propertyChanged() QT signal
+void IPC_Agent::sendPropertyChanged()
+{
+	// changed properties
+	if (changeditems.size() <= 0) return;  
+
+	// create a map of all changed items. Use for loop because it is possible
+	// (but highly unlikely) that this slot could be called with more than 
+	// one property needing to be changed 
+  QMap<QString, QVariant> vmap;
+  for (int i = 0; i < changeditems.size(); ++i) {
+		switch (changeditems.at(i) ) {
+			case MBMP_MPRIS::CanQuit:
+				vmap["CanQuit"] = QVariant(canquit);
+				break;
+			case MBMP_MPRIS::Fullscreen:
+				vmap["Fullscreen"] = QVariant(fullscreen); 
+				break;
+			case MBMP_MPRIS::CanSetFull:
+				vmap["CanSetFullscreen"] = QVariant(cansetfullscreen);
+				break;
+			case MBMP_MPRIS::CanRaise:
+				vmap["CanRaise"] = QVariant(canraise);
+				break;
+			case MBMP_MPRIS::HasTrackList:
+				vmap["HasTrackList"] = QVariant(hastracklist);
+				break;
+			case MBMP_MPRIS::Identity:
+				vmap["Identity"] = QVariant(identity);
+				break;
+			case MBMP_MPRIS::DesktopEntry:
+				vmap["DesktopEntry"] = QVariant(desktopentry);
+				break;
+			case MBMP_MPRIS::UriSchemes:
+				vmap["SupportedUriSchemes"] = QVariant(supportedurischemes);
+				break;
+			case MBMP_MPRIS::MimeTypes:
+				vmap["SupportedMimeTypes"] = QVariant(supportedmimetypes);
+				break;
+			default:
+				break;
+		}	// switch				
+  }	// for
+  changeditems.clear();
+  
+  // create the message.  We never remove a property so we don't need
+  // to deal with that - send an empty qstringlist
+  QList<QVariant> vlist;
+  vlist << QVariant(IPC_OBJECT) << vmap << QStringList();
+  QDBusMessage msg = QDBusMessage::createSignal(IPC_OBJECT, "org.freedesktop.Dbus.Properties", "PropertiesChanged");  
+  msg.setArguments(vlist);																																														
+  qDebug() << "MESSAGE:" << msg;
+  
+	QDBusConnection::sessionBus().send(msg);
+	
+	return;
+}
 
