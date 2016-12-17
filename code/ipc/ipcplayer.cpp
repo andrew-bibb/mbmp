@@ -1,8 +1,8 @@
 /**************************** ipcplayer.cpp ***************************
 
-Code for the ipc agentr registered on DBus.  When registered MBMP
-will communicate to other processes.  This program and registering on
-dbus will be started in the constructor.
+Code for the MPRISv2.2 player interface on DBus.  When registered MBMP
+will communicate to other processes.  This program this program is 
+intitialized and controled from the ipcagetnt.cpp class.
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -39,6 +39,9 @@ DEALINGS IN THE SOFTWARE.
 //  constructor
 IPC_Player::IPC_Player(QObject* parent) : QObject(parent)
 {
+	
+	// data members
+	changeditems.clear();	
 	
 }
     

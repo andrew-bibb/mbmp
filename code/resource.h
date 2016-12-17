@@ -49,5 +49,36 @@ DEALINGS IN THE SOFTWARE.
 // Program Values - Misc. (not user visible)
 #define INTERNAL_THEME "MBMP_Icon_Theme"
 
+namespace MBMP_MPRIS 
+{
+  enum {
+    CanQuit       = 0x01,  
+    Fullscreen		= 0x02,
+    CanSetFull		= 0x03,
+    CanRaise			= 0x04,
+    HasTrackList	= 0x05,
+    Identity			= 0x06,
+    DesktopEntry	= 0x07,
+    UriSchemes		= 0x08,
+    MimeTypes			= 0x09,
+    
+		PlaybackStatus= 0x21,
+		LoopStatus		= 0x22,
+		PlaybackRate	= 0x23,
+		Shuffle				= 0x24,
+		Metadata			= 0x25,
+		Volume				= 0x26,
+		Position			= 0x27,
+		MinRate				= 0x28,
+		MaxRate				= 0x29,
+		CanGoNext			= 0x2a,		
+		CanGoPrevious	= 0x2b,	
+		CanPlay				= 0x2c,	
+		CanPause			= 0x2d,	
+		CanSeek				= 0x2e,	
+		CanControl		= 0x2f,	    
+	};
+};
+
 #endif
 

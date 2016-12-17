@@ -33,9 +33,117 @@ PlayerAdaptor::~PlayerAdaptor()
     // destructor
 }
 
-void PlayerAdaptor::playPause()
+bool PlayerAdaptor::canControl() const
 {
-    // handle method call org.mpris.MediaPlayer2.Player.playPause
-    QMetaObject::invokeMethod(parent(), "playPause");
+    // get the value of property CanControl
+    return qvariant_cast< bool >(parent()->property("CanControl"));
+}
+
+bool PlayerAdaptor::canGoNext() const
+{
+    // get the value of property CanGoNext
+    return qvariant_cast< bool >(parent()->property("CanGoNext"));
+}
+
+bool PlayerAdaptor::canGoPrevious() const
+{
+    // get the value of property CanGoPrevious
+    return qvariant_cast< bool >(parent()->property("CanGoPrevious"));
+}
+
+bool PlayerAdaptor::canPause() const
+{
+    // get the value of property CanPause
+    return qvariant_cast< bool >(parent()->property("CanPause"));
+}
+
+bool PlayerAdaptor::canPlay() const
+{
+    // get the value of property CanPlay
+    return qvariant_cast< bool >(parent()->property("CanPlay"));
+}
+
+bool PlayerAdaptor::canSeek() const
+{
+    // get the value of property CanSeek
+    return qvariant_cast< bool >(parent()->property("CanSeek"));
+}
+
+QString PlayerAdaptor::loopStatus() const
+{
+    // get the value of property LoopStatus
+    return qvariant_cast< QString >(parent()->property("LoopStatus"));
+}
+
+void PlayerAdaptor::setLoopStatus(const QString &value)
+{
+    // set the value of property LoopStatus
+    parent()->setProperty("LoopStatus", QVariant::fromValue(value));
+}
+
+double PlayerAdaptor::maximumRate() const
+{
+    // get the value of property MaximumRate
+    return qvariant_cast< double >(parent()->property("MaximumRate"));
+}
+
+QMap<QString,QVariant> PlayerAdaptor::metadata() const
+{
+    // get the value of property Metadata
+    return qvariant_cast< QMap<QString,QVariant> >(parent()->property("Metadata"));
+}
+
+double PlayerAdaptor::minimumRate() const
+{
+    // get the value of property MinimumRate
+    return qvariant_cast< double >(parent()->property("MinimumRate"));
+}
+
+QString PlayerAdaptor::playbackStatus() const
+{
+    // get the value of property PlaybackStatus
+    return qvariant_cast< QString >(parent()->property("PlaybackStatus"));
+}
+
+qlonglong PlayerAdaptor::position() const
+{
+    // get the value of property Position
+    return qvariant_cast< qlonglong >(parent()->property("Position"));
+}
+
+double PlayerAdaptor::rate() const
+{
+    // get the value of property Rate
+    return qvariant_cast< double >(parent()->property("Rate"));
+}
+
+void PlayerAdaptor::setRate(double value)
+{
+    // set the value of property Rate
+    parent()->setProperty("Rate", QVariant::fromValue(value));
+}
+
+bool PlayerAdaptor::shuffle() const
+{
+    // get the value of property Shuffle
+    return qvariant_cast< bool >(parent()->property("Shuffle"));
+}
+
+void PlayerAdaptor::setShuffle(bool value)
+{
+    // set the value of property Shuffle
+    parent()->setProperty("Shuffle", QVariant::fromValue(value));
+}
+
+double PlayerAdaptor::volume() const
+{
+    // get the value of property Volume
+    return qvariant_cast< double >(parent()->property("Volume"));
+}
+
+void PlayerAdaptor::setVolume(double value)
+{
+    // set the value of property Volume
+    parent()->setProperty("Volume", QVariant::fromValue(value));
 }
 

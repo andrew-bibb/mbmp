@@ -1,8 +1,8 @@
 /**************************** ipcagent.h *****************************
 
-Code for the ipc agent registered on DBus.  When registered MBMP
+Code for the MPRISv2.2 interface on DBus.  When registered MBMP
 will communicate to other processes.  This program and registering on
-dbus will be started in the constructor.
+dbus will be started from the playerctl constructor.
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -31,8 +31,6 @@ DEALINGS IN THE SOFTWARE.
 # ifndef IPC_AGENT
 # define IPC_AGENT
 
-# include <gst/gst.h>
-
 # include <QObject>
 # include <QtDBus/QDBusContext>
 # include <QString>
@@ -40,26 +38,11 @@ DEALINGS IN THE SOFTWARE.
 # include <QVector>
 
 # include "./code/resource.h"
+# include "./ipcplayer.h"
 
 # define IPC_SERVICE "org.mpris.MediaPlayer2.mbmp"
 # define IPC_OBJECT "/org/mpris/MediaPlayer2"
 # define IPC_INTERFACE_AGENT "org.mpris.MediaPlayer2"
-# define IPC_INTERFACE_PLAYER "org.mpris.MediaPlayer2.Player"
-
-namespace MBMP_MPRIS 
-{
-  enum {
-    CanQuit       = 0x01,  
-    Fullscreen		= 0x02,
-    CanSetFull		= 0x03,
-    CanRaise			= 0x04,
-    HasTrackList	= 0x05,
-    Identity			= 0x06,
-    DesktopEntry	= 0x07,
-    UriSchemes		= 0x08,
-    MimeTypes			= 0x09,
-	};
-};
 
 class IPC_Agent : public QObject, protected QDBusContext
 {
@@ -127,8 +110,8 @@ class IPC_Agent : public QObject, protected QDBusContext
 		QStringList supportedurischemes;
 		QStringList supportedmimetypes;
 		
-		QVector<int> changeditems; 
-
+		QVector<int> changeditems;
+		IPC_Player* ipcplayer; 
 };  
 
 
