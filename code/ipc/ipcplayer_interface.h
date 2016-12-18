@@ -105,9 +105,14 @@ public:
 
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
+    void Seeked(qlonglong in0);
 };
 
-
-typedef ::OrgMprisMediaPlayer2PlayerInterface Player;
-
+namespace org {
+  namespace mpris {
+    namespace MediaPlayer2 {
+      typedef ::OrgMprisMediaPlayer2PlayerInterface Player;
+    }
+  }
+}
 #endif

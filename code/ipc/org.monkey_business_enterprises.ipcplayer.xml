@@ -18,5 +18,8 @@
     <property name="CanPause" type="b" access="read"/>
     <property name="CanSeek" type="b" access="read"/>
     <property name="CanControl" type="b" access="read"/>
+    <signal name="Seeked">
+      <arg type="x" direction="out"/>
+    </signal>
   </interface>
 </node>

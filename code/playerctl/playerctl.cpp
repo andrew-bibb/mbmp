@@ -67,6 +67,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	hiatus_resume = -1;
 	notifyclient = NULL;
 	ipcagent = new IPC_Agent(this);
+	ipcplayer = new IPC_Player(this);
 	pos_timer = new QTimer(this);
 	
 	// Create the notifyclient, make four tries; first immediately in constructor, then

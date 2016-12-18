@@ -49,6 +49,9 @@ class PlayerAdaptor: public QDBusAbstractAdaptor
 "    <property access=\"read\" type=\"b\" name=\"CanPause\"/>\n"
 "    <property access=\"read\" type=\"b\" name=\"CanSeek\"/>\n"
 "    <property access=\"read\" type=\"b\" name=\"CanControl\"/>\n"
+"    <signal name=\"Seeked\">\n"
+"      <arg direction=\"out\" type=\"x\"/>\n"
+"    </signal>\n"
 "  </interface>\n"
         "")
 public:
@@ -107,6 +110,7 @@ public: // PROPERTIES
 
 public Q_SLOTS: // METHODS
 Q_SIGNALS: // SIGNALS
+    void Seeked(qlonglong in0);
 };
 
 #endif

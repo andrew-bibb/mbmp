@@ -49,6 +49,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/scrollbox/scrollbox.h"
 # include "./code/notify/notify.h"
 # include "./code/ipc/ipcagent.h"
+# include "./code/ipc/ipcplayer.h"
 
 // To toggle DPMS.  Note that Xlib.h defines a macro Bool, and QT also defines
 // Bool in QMetaData. Need to undefine the X11 version - be careful using
@@ -111,6 +112,7 @@ class PlayerControl : public QDialog
     ScrollBox* chtsht;
     NotifyClient* notifyclient;
     IPC_Agent* ipcagent;
+    IPC_Player* ipcplayer;
     QTimer* pos_timer;
     bool b_logtofile;
     short displaymode;

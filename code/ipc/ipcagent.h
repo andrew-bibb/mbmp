@@ -38,7 +38,6 @@ DEALINGS IN THE SOFTWARE.
 # include <QVector>
 
 # include "./code/resource.h"
-# include "./ipcplayer.h"
 
 # define IPC_SERVICE "org.mpris.MediaPlayer2.mbmp"
 # define IPC_OBJECT "/org/mpris/MediaPlayer2"
@@ -111,7 +110,6 @@ class IPC_Agent : public QObject, protected QDBusContext
 		QStringList supportedmimetypes;
 		
 		QVector<int> changeditems;
-		IPC_Player* ipcplayer; 
 };  
 
 
