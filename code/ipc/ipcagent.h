@@ -47,6 +47,15 @@ class IPC_Agent : public QObject, protected QDBusContext
 {
   Q_OBJECT
   Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE)
+  
+  Q_PROPERTY(int sequence READ getSequence)
+  Q_PROPERTY(QString uri READ getUri)
+  Q_PROPERTY(QString artist READ getArtist)
+  Q_PROPERTY(QString title READ getTitle)
+  Q_PROPERTY(QString track READ getTrack)
+  Q_PROPERTY(int duration READ getDuration)
+  Q_PROPERTY(int state READ getState)
+  
     
   public:
     IPC_Agent(QObject* parent = 0);
@@ -72,11 +81,11 @@ class IPC_Agent : public QObject, protected QDBusContext
 		Q_SCRIPTABLE inline QString getUri() {return vmap.value("uri").toString();}
 		Q_SCRIPTABLE inline QString getArtist() {return vmap.value("artist").toString();}
 		Q_SCRIPTABLE inline QString getTitle() {return vmap.value("title").toString();}
+		Q_SCRIPTABLE inline QString getTrack() {return vmap.value("track").toString();}
 		Q_SCRIPTABLE inline int getDuration() {return vmap.value("duration").toInt();}
 	  Q_SCRIPTABLE inline int getState() {return vmap.value("state").toInt();}
 	  Q_SCRIPTABLE inline bool isPlaying() {return (vmap.value("state").toInt() == GST_STATE_PLAYING) ? true : false;}
 	  Q_SCRIPTABLE inline bool isPaused() {return (vmap.value("state").toInt() == GST_STATE_PAUSED) ? true : false;}
-	  Q_SCRIPTABLE inline QString getTrack() {return vmap.value("track").toString();}
 		
 		Q_SCRIPTABLE inline QVariantMap getProperties() {return vmap;}
 		
