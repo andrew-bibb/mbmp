@@ -1,4 +1,4 @@
-/**************************** ipcagent.h *****************************
+/************************** mediaplayer2.h *****************************
 
 Code for the MPRISv2.2 interface on DBus.  When registered MBMP
 will communicate to other processes.  This program and registering on
@@ -28,8 +28,8 @@ DEALINGS IN THE SOFTWARE.
 ***********************************************************************/  
 
 
-# ifndef IPC_AGENT
-# define IPC_AGENT
+# ifndef IPC_MEDIAPLAYER2
+# define IPC_MEDIAPLAYER2
 
 # include <QObject>
 # include <QtDBus/QDBusContext>
@@ -38,18 +38,16 @@ DEALINGS IN THE SOFTWARE.
 # include <QVector>
 
 # include "./code/resource.h"
+# include "./mpris2.h"
+# include "./DBusAbstractAdaptor.h"
 
-# define IPC_SERVICE "org.mpris.MediaPlayer2.mbmp"
-# define IPC_OBJECT "/org/mpris/MediaPlayer2"
-# define IPC_INTERFACE_AGENT "org.mpris.MediaPlayer2"
-
-class IPC_Agent : public QObject, protected QDBusContext
+class MediaPlayer2 : public DBusAbstractAdaptor
 {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_AGENT)
+  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_MEDIAPLAYER2)
     
   public:
-    IPC_Agent(QObject* parent = 0);
+    MediaPlayer2(QObject* parent = 0);
 		
 		// properties
 		Q_PROPERTY (bool CanQuit READ getCanQuit);
@@ -61,9 +59,6 @@ class IPC_Agent : public QObject, protected QDBusContext
 		Q_PROPERTY (QString DesktopEntry READ getDesktopEntry);
 		Q_PROPERTY (QStringList SupportedUriSchemes READ getSupportedUriSchemes);
 		Q_PROPERTY (QStringList SupportedMimeTypes READ getSupportedMimeTypes);
-		
-		// functions
-		void stopAgent();
 		
 		// get functions for memebers
 	  inline bool getCanQuit() const {return canquit;}
@@ -88,7 +83,8 @@ class IPC_Agent : public QObject, protected QDBusContext
 		inline void setSupportedMimeSchemes(QStringList sl_m) {supportedmimetypes = sl_m; changeditems.append(MBMP_MPRIS::MimeTypes); emit propertyChanged();}			  		  
   
 	public Q_SLOTS:
-		Q_SCRIPTABLE inline void Quit() {emit controlStop();} 
+		//Q_SCRIPTABLE inline void Quit() {Q_SCRIPTABLE inline void Quit() {emit controlStop();} ;} 
+		Q_SCRIPTABLE void Quit(); 
 		Q_SCRIPTABLE inline void Raise() {}	// does nothing
 		
 		void sendPropertyChanged();
@@ -111,6 +107,5 @@ class IPC_Agent : public QObject, protected QDBusContext
 		
 		QVector<int> changeditems;
 };  
-
 
 #endif

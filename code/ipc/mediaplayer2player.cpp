@@ -1,4 +1,4 @@
-/**************************** ipcplayer.cpp ***************************
+/********************* mediaplayer2player.cpp ***************************
 
 Code for the MPRISv2.2 player interface on DBus.  When registered MBMP
 will communicate to other processes.  This program this program is 
@@ -29,16 +29,15 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QtCore/QDebug>
 # include <QtDBus/QDBusConnection>
+# include <QtDBus/QDBusMessage>
 
-# include "./ipcagent.h"
-# include "./ipcplayer.h"
+# include "./mediaplayer2player.h"
 
-# include "./ipcplayer_adaptor.h"
-# include "./ipcplayer_interface.h"
-# include "./ipcagent_adaptor.h"
+//# include "./ipcplayer_adaptor.h"
+//# include "./ipcplayer_interface.h"
 
 //  constructor
-IPC_Player::IPC_Player(QObject* parent) : QObject(parent)
+MediaPlayer2Player::MediaPlayer2Player(QObject* parent) : DBusAbstractAdaptor(parent)
 {
 
 	// initialize player properties
@@ -61,30 +60,6 @@ IPC_Player::IPC_Player(QObject* parent) : QObject(parent)
 	// data members
 	changeditems.clear();	
 	
-  //  Create adaptors
-  new PlayerAdaptor(this);
-  
-  	 ////Try to register a service on the system bus
-	//if (! QDBusConnection::sessionBus().registerService(IPC_SERVICE)) {
-		//#if QT_VERSION >= 0x050400 
-			//qCritical("Failed to register service %s on the session bus - there may be another instance running.", qUtf8Printable(IPC_SERVICE) );
-		//# else	
-			//qCritical("Failed to register service %s on the session bus - there may be another instance running.", qPrintable(IPC_SERVICE) );
-		//# endif
-		//QCoreApplication::instance()->exit(1);
-	//}	// if registering service failed
-	
-	// try to register an object on the system bus
-		if (! QDBusConnection::sessionBus().registerObject(IPC_OBJECT, this)) {
-			qDebug() << tr("Failed to register agent object on the session bus.");
-			#if QT_VERSION >= 0x050400 
-				qCritical("Failed to register object %s on the session bus.", qUtf8Printable(IPC_OBJECT) );
-			# else	
-				qCritical("Failed to register object %s on the session bus.", qPrintable(IPC_OBJECT) );
-			# endif
-				QCoreApplication::instance()->exit(2);
-		}	// if registering object failed
-
 
 	// connect signals to slots
 	connect (this, SIGNAL(propertyChanged()), this, SLOT(sendPropertyChanged()));
@@ -96,7 +71,7 @@ IPC_Player::IPC_Player(QObject* parent) : QObject(parent)
 //
 // Slot to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
 // DBus signal.  Called from the local propertyChanged() QT signal
-void IPC_Player::sendPropertyChanged()
+void MediaPlayer2Player::sendPropertyChanged()
 {
 	qDebug() << "inside property changed, size = " << changeditems.size();
 	
@@ -157,7 +132,7 @@ void IPC_Player::sendPropertyChanged()
   // create the message.  We never remove a property so we don't need
   // to deal with that - send an empty qstringlist
   QList<QVariant> vlist;
-  vlist << QVariant(IPC_INTERFACE_PLAYER) << vmap << QStringList();
+  vlist << QVariant(IPC_INTERFACE_MEDIAPLAYER2PLAYER) << vmap << QStringList();
   QDBusMessage msg = QDBusMessage::createSignal(IPC_OBJECT, "org.freedesktop.Dbus.Properties", "PropertiesChanged");  
   msg.setArguments(vlist);																																														
 	QDBusConnection::sessionBus().send(msg);

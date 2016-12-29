@@ -66,8 +66,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	videowidget = new VideoWidget(this);
 	hiatus_resume = -1;
 	notifyclient = NULL;
-	ipcagent = new IPC_Agent(this);
-	ipcplayer = new IPC_Player(this);
+	mpris2 = new Mpris2(this);
+	mediaplayer2 = new MediaPlayer2(this);
+	mediaplayer2player = new MediaPlayer2Player(this);
 	pos_timer = new QTimer(this);
 	
 	// Create the notifyclient, make four tries; first immediately in constructor, then
@@ -539,7 +540,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
 	
-	connect(ipcagent, SIGNAL(controlStop()), qApp, SLOT(quit()));
+	connect(mediaplayer2, SIGNAL(controlStop()), qApp, SLOT(quit()));
 	//connect(ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
 	//connect(ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
 	//connect(ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
@@ -1439,7 +1440,7 @@ void PlayerControl::cleanUp()
 	logfile.close();
 	
 	// stop the ipc agent
-	ipcagent->stopAgent();
+	//ipcagent->stopAgent();
 	
   return;
 }

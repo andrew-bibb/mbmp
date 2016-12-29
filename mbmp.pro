@@ -60,12 +60,14 @@ HEADERS		+= ./code/settings/settings.h
 HEADERS		+= ./code/iconman/iconman.h
 HEADERS		+= ./code/notify/notify.h
 HEADERS		+= ./code/scman/scman.h
-HEADERS		+= ./code/ipc/ipcagent.h
-HEADERS		+= ./code/ipc/ipcplayer.h
-HEADERS		+= ./code/ipc/ipcagent_adaptor.h
-HEADERS		+= ./code/ipc/ipcagent_interface.h
-HEADERS		+= ./code/ipc/ipcplayer_adaptor.h
-HEADERS		+= ./code/ipc/ipcplayer_interface.h
+HEADERS		+= ./code/ipc/mpris2.h
+HEADERS		+= ./code/ipc/mediaplayer2.h
+HEADERS		+= ./code/ipc/mediaplayer2player.h
+HEADERS		+= ./code/ipc/mediaplayer2_adaptor.h
+HEADERS		+= ./code/ipc/mediaplayer2_interface.h
+HEADERS		+= ./code/ipc/mediaplayer2player_adaptor.h
+HEADERS		+= ./code/ipc/mediaplayer2player_interface.h
+HEADERS		+= ./code/ipc/DBusAbstractAdaptor.h
 HEADERS		+= ./code/mbman/mbman.h
 
 #	forms
@@ -88,12 +90,14 @@ SOURCES += ./code/settings/settings.cpp
 SOURCES += ./code/iconman/iconman.cpp
 SOURCES += ./code/notify/notify.cpp
 SOURCES += ./code/scman/scman.cpp
-SOURCES += ./code/ipc/ipcagent.cpp
-SOURCES += ./code/ipc/ipcplayer.cpp
-SOURCES += ./code/ipc/ipcagent_adaptor.cpp
-SOURCES += ./code/ipc/ipcagent_interface.cpp
-SOURCES += ./code/ipc/ipcplayer_adaptor.cpp
-SOURCES += ./code/ipc/ipcplayer_interface.cpp
+SOURCES += ./code/ipc/mpris2.cpp
+SOURCES += ./code/ipc/mediaplayer2.cpp
+SOURCES += ./code/ipc/mediaplayer2player.cpp
+SOURCES += ./code/ipc/mediaplayer2_adaptor.cpp
+SOURCES += ./code/ipc/mediaplayer2_interface.cpp
+SOURCES += ./code/ipc/mediaplayer2player_adaptor.cpp
+SOURCES += ./code/ipc/mediaplayer2player_interface.cpp
+SOURCES	+= ./code/ipc/DBusAbstractAdaptor.cpp
 SOURCES += ./code/mbman/mbman.cpp
 
 #	resource files

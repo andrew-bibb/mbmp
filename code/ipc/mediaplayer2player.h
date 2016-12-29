@@ -1,4 +1,4 @@
-/**************************** ipcplayer.h *****************************
+/******************* medaiaplayer2player.h *****************************
 
 Code for the MPRISv2.2 player interface on DBus.  When registered MBMP
 will communicate to other processes.  This program this program is 
@@ -28,8 +28,8 @@ DEALINGS IN THE SOFTWARE.
 ***********************************************************************/  
 
 
-# ifndef IPC_PLAYER
-# define IPC_PLAYER
+# ifndef IPC_MEDIAPLAYER2PLAYER
+# define IPC_MEDIAPLAYER2PLAYER
 
 # include <gst/gst.h>
 
@@ -41,17 +41,16 @@ DEALINGS IN THE SOFTWARE.
 # include <QVector>
 
 # include "./code/resource.h"
+# include "./mpris2.h"
+# include "./DBusAbstractAdaptor.h"
 
-# define IPC_INTERFACE_PLAYER "org.mpris.MediaPlayer2.Player"
-
-
-class IPC_Player : public QObject, protected QDBusContext
+class MediaPlayer2Player : public DBusAbstractAdaptor
 {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_PLAYER)
+  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_MEDIAPLAYER2PLAYER)
     
   public:
-    IPC_Player(QObject* parent = 0);
+    MediaPlayer2Player(QObject* parent = 0);
     
     Q_PROPERTY (QString PlaybackStatus READ getPlaybackStatus);		
 		Q_PROPERTY (QString LoopStatus	READ getLoopStatus WRITE setLoopStatus);
