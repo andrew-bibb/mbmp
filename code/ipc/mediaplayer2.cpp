@@ -1,9 +1,7 @@
 /************************** mediaplayer2.cpp ***************************
 
-Code for the MPRISv2.2 interface on DBus.  When registered MBMP
-will communicate to other processes.  This program and registering on
-dbus will be started from the playerctl constructor.
-
+Code for the MediaPlayer2 interface on DBus.  When registered MBMP
+will communicate to other processes.  
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -42,11 +40,11 @@ DEALINGS IN THE SOFTWARE.
 //# include "./ipcagent_interface.h"
 
 //  constructor
-MediaPlayer2::MediaPlayer2(QObject* parent) : QDBusAbstractAdaptor(parent)
+MediaPlayer2::MediaPlayer2(Mpris2* parent) : QDBusAbstractAdaptor(parent)
 {
 	// initialize agent properties
 	canquit = true;
-	fullscreen = true;
+	fullscreen = false;
 	cansetfullscreen = true;
 	canraise = false;
 	hastracklist = false;
@@ -58,17 +56,22 @@ MediaPlayer2::MediaPlayer2(QObject* parent) : QDBusAbstractAdaptor(parent)
 	// data members
 	changeditems.clear();
 	
-	// signals and slots
-	connect (this, SIGNAL(propertyChanged()), this, SLOT(sendPropertyChanged()));
-	
   return;
 }  
     
 
-/////////////////////// Public Slots /////////////////////////////////////
+
+////////////////////////////////// Public Slots ////////////////////////
+void MediaPlayer2::Quit()
+{
+	static_cast<Mpris2*>(this->parent())->emitControlStop();
+}
+
+
+/////////////////////// Private Functions ///////////////////////////////
 //
-// Slot to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
-// DBus signal.  Called from the local propertyChanged() QT signal
+// Function to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
+// DBus signal.  Called from the local inline setxxx functions
 void MediaPlayer2::sendPropertyChanged()
 {
 	// changed properties
@@ -85,7 +88,6 @@ void MediaPlayer2::sendPropertyChanged()
 				break;
 			case MBMP_MPRIS::Fullscreen:
 				vmap["Fullscreen"] = QVariant(fullscreen); 
-				qDebug() << "fullscreen changed";
 				break;
 			case MBMP_MPRIS::CanSetFull:
 				vmap["CanSetFullscreen"] = QVariant(cansetfullscreen);
@@ -123,13 +125,5 @@ void MediaPlayer2::sendPropertyChanged()
 	QDBusConnection::sessionBus().send(msg);
 	
 	return;
-}
-
-void MediaPlayer2::Quit()
-{
-	qDebug() << "Calling quit";
-	emit controlStop(); 
-	
-}
-	
+}	
 

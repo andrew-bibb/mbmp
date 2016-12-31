@@ -1,8 +1,7 @@
 /************************** mediaplayer2.h *****************************
 
-Code for the MPRISv2.2 interface on DBus.  When registered MBMP
-will communicate to other processes.  This program and registering on
-dbus will be started from the playerctl constructor.
+Code for the MediaPlayer2 interface on DBus.  When registered MBMP
+will communicate to other processes. 
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -41,14 +40,13 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/resource.h"
 # include "./mpris2.h"
 
-
 class MediaPlayer2 : public QDBusAbstractAdaptor
 {
   Q_OBJECT
   Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_MEDIAPLAYER2)
     
   public:
-    MediaPlayer2(QObject*);
+    MediaPlayer2(Mpris2*);
 		
 		// properties
 		Q_PROPERTY (bool CanQuit READ getCanQuit);
@@ -71,27 +69,23 @@ class MediaPlayer2 : public QDBusAbstractAdaptor
 	  inline QString getDesktopEntry() const  {return desktopentry;}
 	  inline QStringList getSupportedUriSchemes() const {return supportedurischemes;}
 	  inline QStringList getSupportedMimeTypes() const {return supportedmimetypes;}
+	  
+		// set functions for members.  most can or will never be used, they are here because we are supposed to emit a propertyChanged()
+		// signal over dbus if one does change,   
+		inline void setCanQuit(bool b_cc) {canquit = b_cc; changeditems.append(MBMP_MPRIS::CanQuit); sendPropertyChanged();}
+	  inline void setFullscreen(bool b_fs) {fullscreen = b_fs; changeditems.append(MBMP_MPRIS::Fullscreen); sendPropertyChanged();}
+	  inline void setCanSetFullscreen(bool b_cfs) {cansetfullscreen = b_cfs; changeditems.append(MBMP_MPRIS::CanSetFull); sendPropertyChanged();}
+	  inline void setRaise(bool b_r) {canraise = b_r; changeditems.append(MBMP_MPRIS::CanRaise); sendPropertyChanged();}	
+	  inline void setHasTrackList(bool b_htl) {hastracklist = b_htl; changeditems.append(MBMP_MPRIS::HasTrackList); sendPropertyChanged();}
+	  inline void setIdentity(QString s_id) {identity = s_id; changeditems.append(MBMP_MPRIS::Identity); sendPropertyChanged();}
+	  inline void setDesktopEntry(QString s_de) {desktopentry = s_de; changeditems.append(MBMP_MPRIS::DesktopEntry); sendPropertyChanged();}	 
+		inline void setSupportedUriSchemes(QStringList sl_u) {supportedurischemes = sl_u; changeditems.append(MBMP_MPRIS::UriSchemes); sendPropertyChanged();}	
+		inline void setSupportedMimeSchemes(QStringList sl_m) {supportedmimetypes = sl_m; changeditems.append(MBMP_MPRIS::MimeTypes); sendPropertyChanged();}			  		  
+			  
 
 	public Q_SLOTS:
 		Q_SCRIPTABLE void Quit(); 
 		Q_SCRIPTABLE inline void Raise() {}	// does nothing
-		void sendPropertyChanged();
-
-		// set functions for members.  most can or will never be used, they are here because we are supposed to emit a propertyChanged()
-		// signal over dbus if one does change,   
-		inline void setCanQuit(bool b_cc) {canquit = b_cc; changeditems.append(MBMP_MPRIS::CanQuit); emit propertyChanged();}
-	  inline void setFullscreen(bool b_fs) {fullscreen = b_fs; changeditems.append(MBMP_MPRIS::Fullscreen); emit propertyChanged();}
-	  inline void setCanSetFullscreen(bool b_cfs) {cansetfullscreen = b_cfs; changeditems.append(MBMP_MPRIS::CanSetFull); emit propertyChanged();}
-	  inline void setRaise(bool b_r) {canraise = b_r; changeditems.append(MBMP_MPRIS::CanRaise); emit propertyChanged();}	
-	  inline void setHasTrackList(bool b_htl) {hastracklist = b_htl; changeditems.append(MBMP_MPRIS::HasTrackList); emit propertyChanged();}
-	  inline void setIdentity(QString s_id) {identity = s_id; changeditems.append(MBMP_MPRIS::Identity); emit propertyChanged();}
-	  inline void setDesktopEntry(QString s_de) {desktopentry = s_de; changeditems.append(MBMP_MPRIS::DesktopEntry); emit propertyChanged();}	 
-		inline void setSupportedUriSchemes(QStringList sl_u) {supportedurischemes = sl_u; changeditems.append(MBMP_MPRIS::UriSchemes); emit propertyChanged();}	
-		inline void setSupportedMimeSchemes(QStringList sl_m) {supportedmimetypes = sl_m; changeditems.append(MBMP_MPRIS::MimeTypes); emit propertyChanged();}			  		  
-	
-	Q_SIGNALS:		
-		void controlStop();
-		void propertyChanged();
 		
 	private:
 		// data members
@@ -106,6 +100,9 @@ class MediaPlayer2 : public QDBusAbstractAdaptor
 		QStringList supportedmimetypes;
 		
 		QVector<int> changeditems;
+		
+		// functions
+		void sendPropertyChanged();		
 };  
 
 #endif

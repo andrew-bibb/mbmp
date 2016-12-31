@@ -524,7 +524,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionAddMedia, SIGNAL (triggered()), playlist, SLOT(addMedia()));
 	connect (ui.actionToggleMute, SIGNAL (triggered()), gstiface, SLOT(toggleMute())); 
 	connect (volume_group, SIGNAL(triggered(QAction*)), this, SLOT(changeVolumeDialStep(QAction*)));
-	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));	
+	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));
+	connect (mpris2, SIGNAL(volumeChanged(int)), this, SLOT(changeVolume(int)));	
 	connect (ui.actionVisualizer, SIGNAL(triggered()), this, SLOT(popupVisualizerMenu()));
 	connect (ui.actionOptions, SIGNAL(triggered()), this, SLOT(popupOptionsMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
@@ -538,7 +539,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
 	
-	//connect(mpris2->mediaplayer2, SIGNAL(controlStop()), qApp, SLOT(quit()));
+	connect(mpris2, SIGNAL(controlStop()), qApp, SLOT(quit()));
 	//connect(ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
 	//connect(ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
 	//connect(ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
@@ -708,10 +709,10 @@ void PlayerControl::changeVolume(int vol)
 	//	100%		1.0				10
 	//	300%		3.0				30  This is the maximum we want to go
 	
-	double d_vol = 0.0;
-	d_vol = (static_cast<double>(vol) / 10.0);
+	gstiface->changeVolume(static_cast<double>(vol) / 10.0);
 	
-	gstiface->changeVolume(d_vol);
+	// let mpris2 know
+	mpris2->setVolume(static_cast<double>(vol) / 30.0);
 	
 	return;
 }

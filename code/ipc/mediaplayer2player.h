@@ -1,8 +1,7 @@
 /******************* medaiaplayer2player.h *****************************
 
-Code for the MPRISv2.2 player interface on DBus.  When registered MBMP
-will communicate to other processes.  This program this program is 
-intitialized and controled from the ipcagetnt.cpp class.
+Code for the MediaPlayer2.Player interface on DBus.  When registered MBMP
+will communicate to other processes.  
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -51,7 +50,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
   Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_MEDIAPLAYER2PLAYER)
     
   public:
-    MediaPlayer2Player(QObject* parent = 0);
+    MediaPlayer2Player(Mpris2*);
     
     Q_PROPERTY (QString PlaybackStatus READ getPlaybackStatus);		
 		Q_PROPERTY (QString LoopStatus	READ getLoopStatus WRITE setLoopStatus);
@@ -86,29 +85,26 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		inline bool getCanSeek() const {return canseek;}
 		inline bool getCanControl() const {return cancontrol;}
 
-		// set functions for members (most can or will never be used)
-		inline void setPlaybackStatus(QString s_ps) {playbackstatus = s_ps; changeditems.append(MBMP_MPRIS::PlaybackStatus); emit propertyChanged();}
-		inline void setLoopStatus(QString s_ls) {loopstatus = "HI ANDY"; changeditems.append(MBMP_MPRIS::LoopStatus); emit propertyChanged();}
-		inline void setPlaybackRate(double d_r) {playbackrate = d_r; changeditems.append(MBMP_MPRIS::PlaybackRate); emit propertyChanged();}
-		inline void setShuffle(bool b_s) {shuffle = b_s; changeditems.append(MBMP_MPRIS::Shuffle); emit propertyChanged();}
-		inline void setMetadata(QMap<QString,QVariant>(map)) {metadata = map;changeditems.append(MBMP_MPRIS::Metadata); emit propertyChanged();}
-		inline void setVolume(double d_v) {volume = d_v; changeditems.append(MBMP_MPRIS::Volume); emit propertyChanged();}
+		// set functions for members.  most can or will never be used, they are here because we are supposed to emit a propertyChanged()
+		// signal over dbus if one does change, 
+		void setPlaybackStatus(const QString&);
+		void setLoopStatus(const QString&);
+		inline void setPlaybackRate(double d_r) {(void) d_r;}	// We can't change playback rate
+		void setShuffle(const bool&);
+		inline void setMetadata(QMap<QString,QVariant>(map)) {metadata = map;changeditems.append(MBMP_MPRIS::Metadata); sendPropertyChanged();}
+		void setVolume(const double&);
 		inline void setPosition(qlonglong pos) {position = pos;}
-		inline void setMinimumRate(double d_mi) {volume = d_mi; changeditems.append(MBMP_MPRIS::MinRate); emit propertyChanged();}
-		inline void setMaximumRate(double d_mx) {volume = d_mx; changeditems.append(MBMP_MPRIS::MaxRate); emit propertyChanged();}
-		inline void setCanGoNext(bool b_cgn) {cangonext = b_cgn; changeditems.append(MBMP_MPRIS::CanGoNext); emit propertyChanged();}		
-		inline void setCanGoPrevious(bool b_cgp) {cangonext = b_cgp; changeditems.append(MBMP_MPRIS::CanGoPrevious); emit propertyChanged();}	
-		inline void setCanPlay(bool b_cpl) {canplay = b_cpl; changeditems.append(MBMP_MPRIS::CanPlay); emit propertyChanged();}	
-		inline void setCanPause(bool b_cpu) {canpause = b_cpu; changeditems.append(MBMP_MPRIS::CanPause); emit propertyChanged();}	
-		inline void setCanSeek(bool b_s) {canseek = b_s; changeditems.append(MBMP_MPRIS::CanSeek); emit propertyChanged();}	
+		inline void setMinimumRate(double d_mi) {volume = d_mi; changeditems.append(MBMP_MPRIS::MinRate); sendPropertyChanged();}
+		inline void setMaximumRate(double d_mx) {volume = d_mx; changeditems.append(MBMP_MPRIS::MaxRate); sendPropertyChanged();}
+		inline void setCanGoNext(bool b_cgn) {cangonext = b_cgn; changeditems.append(MBMP_MPRIS::CanGoNext); sendPropertyChanged();}		
+		inline void setCanGoPrevious(bool b_cgp) {cangonext = b_cgp; changeditems.append(MBMP_MPRIS::CanGoPrevious); sendPropertyChanged();}	
+		inline void setCanPlay(bool b_cpl) {canplay = b_cpl; changeditems.append(MBMP_MPRIS::CanPlay); sendPropertyChanged();}	
+		inline void setCanPause(bool b_cpu) {canpause = b_cpu; changeditems.append(MBMP_MPRIS::CanPause); sendPropertyChanged();}	
+		inline void setCanSeek(bool b_s) {canseek = b_s; changeditems.append(MBMP_MPRIS::CanSeek); sendPropertyChanged();}	
 		inline void setCanControl(bool b_ctl) {cancontrol = b_ctl;}	
-				
-	public Q_SLOTS:
-		void sendPropertyChanged();
-	
+
 	Q_SIGNALS:
 		Q_SCRIPTABLE void Seeked(qlonglong);
-		void propertyChanged();
 		
 	private:
 		// data members
@@ -129,6 +125,9 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		bool cancontrol;
 		
 		QVector<int> changeditems;
+		
+		// functions
+		void sendPropertyChanged();
 };  
 
 #endif

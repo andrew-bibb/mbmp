@@ -1,8 +1,11 @@
 /************************** mpris2.cpp ***************************
 
-Code for the MPRISv2.2 interface on DBus.  When this object is registered 
-MBMP will communicate to other processes.  
-
+Code for the MPRISv2.2 interface on DBus. Controls the interfaces registered
+on /org/mpris/MediaPlayer2.  It is kind of a hack because QT does not
+really support creating multiple interfaces on one object.  Some of the
+broad outline for this layout came from the Amarok project, although I've
+geatly modified the internal workings.
+  
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -63,9 +66,12 @@ Mpris2::Mpris2(QObject* parent) : QObject(parent)
   return;
 }  
 
-void Mpris2::propertyChanged()
+/////////////////////// Public Functions //////////////////////////////
+//
+// Function to send along a change of volumne 
+void Mpris2::setVolume(const double& d_v)
 {
-	qDebug() << "property changed from mediaplayer2";
-	
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setVolume(d_v);
 }
+
     

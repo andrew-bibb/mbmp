@@ -1,8 +1,7 @@
 /********************* mediaplayer2player.cpp ***************************
 
-Code for the MPRISv2.2 player interface on DBus.  When registered MBMP
-will communicate to other processes.  This program this program is 
-intitialized and controled from the ipcagetnt.cpp class.
+Code for the MediaPlayer2.Player interface on DBus.  When registered MBMP
+will communicate to other processes.  
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -33,17 +32,14 @@ DEALINGS IN THE SOFTWARE.
 
 # include "./mediaplayer2player.h"
 
-//# include "./ipcplayer_adaptor.h"
-//# include "./ipcplayer_interface.h"
-
 //  constructor
-MediaPlayer2Player::MediaPlayer2Player(QObject* parent) : QDBusAbstractAdaptor(parent)
+MediaPlayer2Player::MediaPlayer2Player(Mpris2* parent) : QDBusAbstractAdaptor(parent)
 {
 
 	// initialize player properties
-	playbackstatus = QString();
-	loopstatus = QString();
-	playbackrate = 0.0;
+	playbackstatus = QString("Stopped");
+	loopstatus = QString("None");
+	playbackrate = 1.0;
 	shuffle = false;
 	metadata.clear();
 	volume = 0.0;
@@ -55,26 +51,89 @@ MediaPlayer2Player::MediaPlayer2Player(QObject* parent) : QDBusAbstractAdaptor(p
 	canplay = false;
 	canpause = false;
 	canseek = false;
-	cancontrol = false;
+	cancontrol = true;
 	
 	// data members
 	changeditems.clear();	
 	
-
-	// connect signals to slots
-	connect (this, SIGNAL(propertyChanged()), this, SLOT(sendPropertyChanged()));
-	
 }
-    
-
-/////////////////////// Public Slots /////////////////////////////////////
+ 
+/////////////////////// Public Functions //////////////////////////////
 //
-// Slot to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
-// DBus signal.  Called from the local propertyChanged() QT signal
+// Function to set the Playback status. 
+void MediaPlayer2Player::setPlaybackStatus(const QString& s_ps)
+{
+	const QStringList valid{"Playing", "Paused", "Stopped"};
+	
+	// return if no change
+	if (playbackstatus == s_ps) return;
+	;
+	// return if not valid
+	if (! valid.contains(s_ps, Qt::CaseSensitive) ) return;
+	
+	// changed and valid
+	playbackstatus = s_ps;
+	changeditems.append(MBMP_MPRIS::PlaybackStatus);
+	sendPropertyChanged();
+}
+
+//
+// Function to set the Loop status. 
+void MediaPlayer2Player::setLoopStatus(const QString& s_ls)
+{
+	const QStringList valid{"None", "Track", "Playlist"};
+	
+	// return if no change
+	if (loopstatus == s_ls) return;
+	;
+	// return if not valid
+	if (! valid.contains(s_ls, Qt::CaseSensitive) ) return;
+	
+	// changed and valid
+	loopstatus = s_ls;
+	changeditems.append(MBMP_MPRIS::LoopStatus);
+	sendPropertyChanged();
+}
+
+//
+// Function to set the Shuffle property. 
+void MediaPlayer2Player::setShuffle(const bool& b_s)
+{
+	// return if no change
+	if (shuffle == b_s) return;
+	
+	// changed and valid
+	shuffle = b_s;
+	changeditems.append(MBMP_MPRIS::Shuffle);
+	sendPropertyChanged();
+}
+
+//
+// Function to set the Shuffle property. 
+void MediaPlayer2Player::setVolume(const double& d_v)
+{
+	// return if no change
+	if (volume == d_v) return;
+	
+	// volume changed
+	if (d_v < 0.0 ) volume = 0.0;
+		else if (d_v > 1.0) volume = 1.0;
+			else volume = d_v;	
+	
+	// let mpris2 things know we've changed
+	changeditems.append(MBMP_MPRIS::Volume);
+	sendPropertyChanged();
+
+	// let MBMP know we've changed (change could have been via the mpris2 dbus interface)
+	static_cast<Mpris2*>(this->parent())->emitVolumeChanged(static_cast<int>(d_v * 30.0) );
+}
+
+/////////////////////// Private Functions //////////////////////////////
+//
+// Function to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
+// DBus signal.  Called from the local inline setxxx functions
 void MediaPlayer2Player::sendPropertyChanged()
 {
-	qDebug() << "inside property changed, size = " << changeditems.size();
-	
 	// changed properties
 	if (changeditems.size() <= 0) return;  
 

@@ -1,7 +1,10 @@
-/***************************** mpris2.cpp *****************************
+/***************************** mpris2.h ********************************
 
-Code for the MPRISv2.2 interface on DBus.  When this object is registered 
-MBMP will communicate to other processes.  
+Code for the MPRISv2.2 interface on DBus. Controls the interfaces registered
+on /org/mpris/MediaPlayer2.  It is kind of a hack because QT does not
+really support creating multiple interfaces on one object.  Some of the
+broad outline for this layout came from the Amarok project, although I've
+geatly modified the internal workings. 
 
 Copyright (C) 2013-2016
 by: Andrew J. Bibb
@@ -34,7 +37,6 @@ DEALINGS IN THE SOFTWARE.
 # include <QtDBus/QtDBus>
 # include <QtDBus/QDBusAbstractAdaptor>
 
-
 # define IPC_SERVICE "org.mpris.MediaPlayer2.mbmp"
 # define IPC_OBJECT "/org/mpris/MediaPlayer2"
 # define IPC_INTERFACE_MEDIAPLAYER2 "org.mpris.MediaPlayer2"
@@ -43,15 +45,26 @@ DEALINGS IN THE SOFTWARE.
 class Mpris2 : public QObject
 {
   Q_OBJECT
-  Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_MEDIAPLAYER2)
     
-  public:
-    Mpris2 (QObject* parent = 0);
-    QDBusAbstractAdaptor* mediaplayer2;
-    QDBusAbstractAdaptor* mediaplayer2player;
-    
+	public:
+		Mpris2 (QObject* parent = 0);
+		inline void emitControlStop() {emit controlStop();}
+		inline void emitVolumeChanged(int vol) {emit volumeChanged(vol);}
+		
+		// members
+		QDBusAbstractAdaptor* mediaplayer2;
+		QDBusAbstractAdaptor* mediaplayer2player;
+  
   public Q_SLOTS:
-   void propertyChanged(); 
+		// information we need to send to the mpris adaptors, mainly so they can
+		// issue a propertyChanged signal
+		void setVolume(const double&);
+   
+  Q_SIGNALS:		
+		// signals we need to issue back to the player from the adaptors
+		// issue using the public inline functions above
+		void controlStop(); 
+		void volumeChanged(int);
 };		
 
 #endif
