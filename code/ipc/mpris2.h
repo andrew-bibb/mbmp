@@ -30,7 +30,10 @@ DEALINGS IN THE SOFTWARE.
 # ifndef IPC_MPRIS2
 # define IPC_MPRIS2
 
-# include <QObject>
+# include <QtCore/QObject>
+# include <QtDBus/QtDBus>
+# include <QtDBus/QDBusAbstractAdaptor>
+
 
 # define IPC_SERVICE "org.mpris.MediaPlayer2.mbmp"
 # define IPC_OBJECT "/org/mpris/MediaPlayer2"
@@ -44,6 +47,11 @@ class Mpris2 : public QObject
     
   public:
     Mpris2 (QObject* parent = 0);
+    QDBusAbstractAdaptor* mediaplayer2;
+    QDBusAbstractAdaptor* mediaplayer2player;
+    
+  public Q_SLOTS:
+   void propertyChanged(); 
 };		
 
 #endif

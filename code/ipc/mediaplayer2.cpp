@@ -42,7 +42,7 @@ DEALINGS IN THE SOFTWARE.
 //# include "./ipcagent_interface.h"
 
 //  constructor
-MediaPlayer2::MediaPlayer2(QObject* parent) : DBusAbstractAdaptor(parent)
+MediaPlayer2::MediaPlayer2(QObject* parent) : QDBusAbstractAdaptor(parent)
 {
 	// initialize agent properties
 	canquit = true;
@@ -57,8 +57,8 @@ MediaPlayer2::MediaPlayer2(QObject* parent) : DBusAbstractAdaptor(parent)
 	
 	// data members
 	changeditems.clear();
-
-	// connect signals to slots
+	
+	// signals and slots
 	connect (this, SIGNAL(propertyChanged()), this, SLOT(sendPropertyChanged()));
 	
   return;
@@ -85,6 +85,7 @@ void MediaPlayer2::sendPropertyChanged()
 				break;
 			case MBMP_MPRIS::Fullscreen:
 				vmap["Fullscreen"] = QVariant(fullscreen); 
+				qDebug() << "fullscreen changed";
 				break;
 			case MBMP_MPRIS::CanSetFull:
 				vmap["CanSetFullscreen"] = QVariant(cansetfullscreen);

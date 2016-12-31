@@ -49,8 +49,6 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/scrollbox/scrollbox.h"
 # include "./code/notify/notify.h"
 # include "./code/ipc/mpris2.h"
-# include "./code/ipc/mediaplayer2.h"
-# include "./code/ipc/mediaplayer2player.h"
 
 // To toggle DPMS.  Note that Xlib.h defines a macro Bool, and QT also defines
 // Bool in QMetaData. Need to undefine the X11 version - be careful using
@@ -113,8 +111,6 @@ class PlayerControl : public QDialog
     ScrollBox* chtsht;
     NotifyClient* notifyclient;
     Mpris2* mpris2;
-    MediaPlayer2* mediaplayer2;
-    MediaPlayer2Player* mediaplayer2player;
     QTimer* pos_timer;
     bool b_logtofile;
     short displaymode;

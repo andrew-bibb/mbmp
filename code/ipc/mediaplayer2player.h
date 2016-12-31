@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QObject>
 # include <QtDBus/QDBusContext>
+# include <QtDBus/QDBusAbstractAdaptor>
 # include <QVariant>
 # include <QMap>
 # include <QString>
@@ -42,9 +43,9 @@ DEALINGS IN THE SOFTWARE.
 
 # include "./code/resource.h"
 # include "./mpris2.h"
-# include "./DBusAbstractAdaptor.h"
 
-class MediaPlayer2Player : public DBusAbstractAdaptor
+
+class MediaPlayer2Player : public QDBusAbstractAdaptor
 {
   Q_OBJECT
   Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_MEDIAPLAYER2PLAYER)

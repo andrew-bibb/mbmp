@@ -52,13 +52,20 @@ Mpris2::Mpris2(QObject* parent) : QObject(parent)
 	}	// if registering service failed
 
   //  Create adaptors
-  DBusAbstractAdaptor* adaptor = new MediaPlayer2(this);
-  adaptor->setDBusPath( "/org/mpris/MediaPlayer2" );
-  adaptor = new MediaPlayer2Player(this);
-  adaptor->setDBusPath( "/org/mpris/MediaPlayer2" );
+  mediaplayer2  = new MediaPlayer2(this);
+  //adaptor->setDBusPath( "/org/mpris/MediaPlayer2" );
+  //connect (adaptor, SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+  mediaplayer2player = new MediaPlayer2Player(this);
+  //adaptor->setDBusPath( "/org/mpris/MediaPlayer2" );
 	QDBusConnection::sessionBus().registerObject(IPC_OBJECT, this, QDBusConnection::ExportAdaptors );
 	
 	
   return;
 }  
+
+void Mpris2::propertyChanged()
+{
+	qDebug() << "property changed from mediaplayer2";
+	
+}
     

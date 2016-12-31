@@ -33,21 +33,22 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QObject>
 # include <QtDBus/QDBusContext>
+# include <QtDBus/QDBusAbstractAdaptor>
 # include <QString>
 # include <QStringList>
 # include <QVector>
 
 # include "./code/resource.h"
 # include "./mpris2.h"
-# include "./DBusAbstractAdaptor.h"
 
-class MediaPlayer2 : public DBusAbstractAdaptor
+
+class MediaPlayer2 : public QDBusAbstractAdaptor
 {
   Q_OBJECT
   Q_CLASSINFO("D-Bus Interface", IPC_INTERFACE_MEDIAPLAYER2)
     
   public:
-    MediaPlayer2(QObject* parent = 0);
+    MediaPlayer2(QObject*);
 		
 		// properties
 		Q_PROPERTY (bool CanQuit READ getCanQuit);
@@ -71,7 +72,13 @@ class MediaPlayer2 : public DBusAbstractAdaptor
 	  inline QStringList getSupportedUriSchemes() const {return supportedurischemes;}
 	  inline QStringList getSupportedMimeTypes() const {return supportedmimetypes;}
 
-		// set functions for members (most can or will never be used)
+	public Q_SLOTS:
+		Q_SCRIPTABLE void Quit(); 
+		Q_SCRIPTABLE inline void Raise() {}	// does nothing
+		void sendPropertyChanged();
+
+		// set functions for members.  most can or will never be used, they are here because we are supposed to emit a propertyChanged()
+		// signal over dbus if one does change,   
 		inline void setCanQuit(bool b_cc) {canquit = b_cc; changeditems.append(MBMP_MPRIS::CanQuit); emit propertyChanged();}
 	  inline void setFullscreen(bool b_fs) {fullscreen = b_fs; changeditems.append(MBMP_MPRIS::Fullscreen); emit propertyChanged();}
 	  inline void setCanSetFullscreen(bool b_cfs) {cansetfullscreen = b_cfs; changeditems.append(MBMP_MPRIS::CanSetFull); emit propertyChanged();}
@@ -81,13 +88,6 @@ class MediaPlayer2 : public DBusAbstractAdaptor
 	  inline void setDesktopEntry(QString s_de) {desktopentry = s_de; changeditems.append(MBMP_MPRIS::DesktopEntry); emit propertyChanged();}	 
 		inline void setSupportedUriSchemes(QStringList sl_u) {supportedurischemes = sl_u; changeditems.append(MBMP_MPRIS::UriSchemes); emit propertyChanged();}	
 		inline void setSupportedMimeSchemes(QStringList sl_m) {supportedmimetypes = sl_m; changeditems.append(MBMP_MPRIS::MimeTypes); emit propertyChanged();}			  		  
-  
-	public Q_SLOTS:
-		//Q_SCRIPTABLE inline void Quit() {Q_SCRIPTABLE inline void Quit() {emit controlStop();} ;} 
-		Q_SCRIPTABLE void Quit(); 
-		Q_SCRIPTABLE inline void Raise() {}	// does nothing
-		
-		void sendPropertyChanged();
 	
 	Q_SIGNALS:		
 		void controlStop();

@@ -37,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 //# include "./ipcplayer_interface.h"
 
 //  constructor
-MediaPlayer2Player::MediaPlayer2Player(QObject* parent) : DBusAbstractAdaptor(parent)
+MediaPlayer2Player::MediaPlayer2Player(QObject* parent) : QDBusAbstractAdaptor(parent)
 {
 
 	// initialize player properties
