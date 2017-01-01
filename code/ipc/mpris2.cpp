@@ -68,9 +68,20 @@ Mpris2::Mpris2(QObject* parent) : QObject(parent)
 
 /////////////////////// Public Functions //////////////////////////////
 //
-// Function to send along a change of volumne 
+// Function to send along a change of volume.  Called from playerctl
+// when the UI volume control is changed
 void Mpris2::setVolume(const double& d_v)
 {
+	// Gstreamer volume ranges are doubles in the range of 0.0 to 10.0
+	// 0.0 = mute, 1.0 = 100%, so 10.0 must be really loud.  The volume
+	// scale is linear, and the default is 1.0  Our dial uses integers
+	// and is set up on a range of 0-30, with 10 being 100%. Mpris2 is 
+	// based on doubles range from 0.0 to 1.0,  The conversions:
+	//	Vol%		GStreamer MBMP	mpris2
+	//	  0%		0.0				0			0.00
+	//	100%		1.0				10		0.33
+	//	300%		3.0				30  	1.00 	This is the maximum we want to go
+	
 	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setVolume(d_v);
 }
 

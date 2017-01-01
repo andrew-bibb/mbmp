@@ -51,10 +51,14 @@ class Mpris2 : public QObject
 		inline void emitControlStop() {emit controlStop();}
 		inline void emitVolumeChanged(int vol) {emit volumeChanged(vol);}
 		
-		// members
+	private:
 		QDBusAbstractAdaptor* mediaplayer2;
 		QDBusAbstractAdaptor* mediaplayer2player;
   
+  // slots and signals here are to relay informtion in and out of the 
+  // adaptors.  A slot or signal in an adaptor will be published in
+  // the adaptor and that is not usually correct.  These slots and signals
+  // are connected to and from plain functions in the adaptor code
   public Q_SLOTS:
 		// information we need to send to the mpris adaptors, mainly so they can
 		// issue a propertyChanged signal

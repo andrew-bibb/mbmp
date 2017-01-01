@@ -525,7 +525,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionToggleMute, SIGNAL (triggered()), gstiface, SLOT(toggleMute())); 
 	connect (volume_group, SIGNAL(triggered(QAction*)), this, SLOT(changeVolumeDialStep(QAction*)));
 	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));
-	connect (mpris2, SIGNAL(volumeChanged(int)), this, SLOT(changeVolume(int)));	
+	connect (mpris2, SIGNAL(volumeChanged(int)), ui.dial_volume, SLOT(setValue(int)));	
 	connect (ui.actionVisualizer, SIGNAL(triggered()), this, SLOT(popupVisualizerMenu()));
 	connect (ui.actionOptions, SIGNAL(triggered()), this, SLOT(popupOptionsMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
@@ -703,11 +703,12 @@ void PlayerControl::changeVolume(int vol)
 	// Gstreamer volume ranges are doubles in the range of 0.0 to 10.0
 	// 0.0 = mute, 1.0 = 100%, so 10.0 must be really loud.  The volume
 	// scale is linear, and the default is 1.0  Our dial uses integers
-	// and is set up on a range of 0-30, with 10 being 100%. The conversions:
-	//	Vol%		GStreamer MBMP
-	//	  0%		0.0				0
-	//	100%		1.0				10
-	//	300%		3.0				30  This is the maximum we want to go
+	// and is set up on a range of 0-30, with 10 being 100%. Mpris2 is 
+	// based on doubles range from 0.0 to 1.0,  The conversions:
+	//	Vol%		GStreamer MBMP	mpris2
+	//	  0%		0.0				0			0.00
+	//	100%		1.0				10		0.33
+	//	300%		3.0				30  	1.00 	This is the maximum we want to go	
 	
 	gstiface->changeVolume(static_cast<double>(vol) / 10.0);
 	

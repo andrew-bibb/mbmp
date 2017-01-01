@@ -125,7 +125,7 @@ void MediaPlayer2Player::setVolume(const double& d_v)
 	sendPropertyChanged();
 
 	// let MBMP know we've changed (change could have been via the mpris2 dbus interface)
-	static_cast<Mpris2*>(this->parent())->emitVolumeChanged(static_cast<int>(d_v * 30.0) );
+	static_cast<Mpris2*>(this->parent())->emitVolumeChanged(static_cast<int>(d_v * 30.0 + 0.5) );
 }
 
 /////////////////////// Private Functions //////////////////////////////
