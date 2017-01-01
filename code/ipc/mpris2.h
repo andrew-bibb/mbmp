@@ -50,6 +50,7 @@ class Mpris2 : public QObject
 		Mpris2 (QObject* parent = 0);
 		inline void emitControlStop() {emit controlStop();}
 		inline void emitLoopStatusChanged(bool b_ls) {emit loopStatusChanged(b_ls);}
+		inline void emitShuffleChanged(bool b_s) {emit shuffleChanged(b_s);}
 		inline void emitVolumeChanged(int vol) {emit volumeChanged(vol);}
 		
 	private:
@@ -65,6 +66,7 @@ class Mpris2 : public QObject
 		// issue a propertyChanged signal
 		void setState(const int&);
 		void setLoopStatus(const bool&);
+		void setShuffle(const bool&);
 		void setVolume(const double&);
    
   Q_SIGNALS:		
@@ -72,6 +74,7 @@ class Mpris2 : public QObject
 		// issue using the public inline functions above
 		void controlStop(); 
 		void loopStatusChanged(bool);
+		void shuffleChanged(bool);
 		void volumeChanged(int);
 };		
 

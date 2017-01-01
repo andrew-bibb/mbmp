@@ -118,6 +118,9 @@ void MediaPlayer2Player::setShuffle(const bool& b_s)
 	shuffle = b_s;
 	changeditems.append(MBMP_MPRIS::Shuffle);
 	sendPropertyChanged();
+	
+	// let MBMP know we've changed (change could have been via the mpris2 dbus interface)
+	static_cast<Mpris2*>(this->parent())->emitShuffleChanged(b_s);
 }
 
 //

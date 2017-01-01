@@ -143,6 +143,7 @@ class Playlist : public QDialog
 		inline void setWrapMode(bool b_wm) {ui.checkBox_wrap->setChecked(b_wm);}
 		inline void toggleConsumeMode() {ui.checkBox_wrap->setChecked(false); ui.checkBox_consume->toggle();}
 		inline void toggleRandomMode() {ui.checkBox_random->toggle();}
+		inline void setRandomMode(bool b_rm) {ui.checkBox_random->setChecked(b_rm);}
 		inline void toggleDetailMode() {ui.checkBox_showinfo->toggle();}
 	
 		inline QString getCurrentUri() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri() : QString();}
@@ -192,6 +193,7 @@ class Playlist : public QDialog
 		
 	Q_SIGNALS:	
 		void wrapModeChanged(const bool&);	
+		void randomModeChanged(const bool&);
 };
 
 #endif

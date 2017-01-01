@@ -75,7 +75,7 @@ void Mpris2::setState(const int& i_s)
 }
 
 //
-// Function to send along a change in wrap mode known as loopstatus in mpris2
+// Function to send along a change in wrap mode known as LoopStatus in mpris2
 // Called from a playerctl signal which receives a signal from playlist
 void Mpris2::setLoopStatus(const bool& b_ls)
 {
@@ -85,6 +85,16 @@ void Mpris2::setLoopStatus(const bool& b_ls)
 	return;
 }
 
+//
+// Function to send along a change in random mode known as Shuffle in mpris2
+// Called from a playerctl signal which receives a signal from playlist
+void Mpris2::setShuffle(const bool& b_s)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setShuffle(b_s);
+	
+	return;
+}	
+	
 //
 // Function to send along a change of volume.  Called from playerctl
 // when the UI volume control is changed

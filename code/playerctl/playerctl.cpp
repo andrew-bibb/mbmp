@@ -539,14 +539,15 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
 	
-	connect(mpris2, SIGNAL(controlStop()), qApp, SLOT(quit()));
-	//connect(ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
-	//connect(ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
-	//connect(ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
-	connect(playlist, SIGNAL(wrapModeChanged(bool)), mpris2, SLOT(setLoopStatus(bool)));
-	connect(mpris2, SIGNAL(loopStatusChanged(bool)), playlist, SLOT(setWrapMode(bool)));
-	//connect(ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
-	//connect(ipcagent, SIGNAL(controlToggleRandom()), playlist, SLOT(toggleRandomMode()));
+	connect (mpris2, SIGNAL(controlStop()), qApp, SLOT(quit()));
+	//connect (ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
+	//connect (ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
+	//connect (ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
+	connect (playlist, SIGNAL(wrapModeChanged(bool)), mpris2, SLOT(setLoopStatus(bool)));
+	connect (mpris2, SIGNAL(loopStatusChanged(bool)), playlist, SLOT(setWrapMode(bool)));
+	//connect (ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
+	connect (playlist, SIGNAL(randomModeChanged(bool)), mpris2, SLOT(setShuffle(bool)));
+	connect (mpris2, SIGNAL(shuffleChanged(bool)), playlist, SLOT(setRandomMode(bool)));
 	
 	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);

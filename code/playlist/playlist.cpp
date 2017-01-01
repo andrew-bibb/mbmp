@@ -232,6 +232,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionToggleDetail, SIGNAL(triggered()), this, SLOT(toggleDetailMode()));
   connect (ui.listWidget_playlist, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
   connect (ui.checkBox_wrap, SIGNAL(toggled(bool)), this, SIGNAL(wrapModeChanged(bool)));
+  connect (ui.checkBox_random, SIGNAL(toggled(bool)), this, SIGNAL(randomModeChanged(bool)));
   
 	settings->deleteLater();
  
