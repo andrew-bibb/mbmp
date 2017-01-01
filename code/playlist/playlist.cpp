@@ -81,6 +81,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // initialize class members
   geometry = QRect();
   ui.listWidget_playlist->clear();
+  arturl.clear();
   
   // Iconmanager with constructor only scope
   IconManager iconman(this);
@@ -664,6 +665,7 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 	
 	ui.label_iteminfo->clear();
 	ui.label_artwork->clear();
+	arturl.clear();
 	QStringList searchtags;
 	searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString("musicbrainz-albumid");
 	searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM);
@@ -1144,6 +1146,7 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 	
 	namefilters.clear();
 	entlist.clear();
+	arturl.clear();
 	
 	// Look for any image in the media directory first, if a directory was provided
 	if (dir.exists() ) {
@@ -1151,8 +1154,10 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 			namefilters << QString("*%1").arg(ext.at(i));
 		}
 		entlist = dir.entryList(namefilters, QDir::Files, QDir::NoSort);
-		if (entlist.count() > 0)
+		if (entlist.count() > 0) {
+			arturl = QUrl::fromLocalFile(dir.absoluteFilePath(entlist.at(0)) );
 			return QPixmap(dir.absoluteFilePath(entlist.at(0)) );
+		}
 	}	// if dir exists
 	
 	// Not image in media directory, look in artwork_dir			
@@ -1163,6 +1168,7 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 		}
 		entlist = artwork_dir.entryList(namefilters, QDir::Files, QDir::NoSort);
 		if (entlist.count() > 0) {
+			arturl = QUrl::fromLocalFile(artwork_dir.absoluteFilePath(entlist.at(0)) );
 			return QPixmap(artwork_dir.absoluteFilePath(entlist.at(0)) );
 		}	// if found cover
 	}	// for searchtags

@@ -1637,15 +1637,18 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	
 	// Pass information from playlist to ipcagent.  The track information
 	// is changed from processGstifaceMessages when a NewTrack signal is received. 
+	QVariantMap vmap;
+	vmap["mpris::trackid"] = QVariant::fromValue(QDBusObjectPath(QString("/org/mbmp/Track/%1").arg(playlist->getCurrentRow())) );	
+	vmap["mpris:length"] = QVariant::fromValue(static_cast<qint64>(playlist->getCurrentDuration()) );
+	vmap["mpris:artUrl"] = QVariant::fromValue(playlist->getArtURL());
+	vmap["xesam:artist"] = QVariant::fromValue(playlist->getCurrentArtist());
+	if (playlist->getCurrentTitle().isEmpty() )
+		vmap["xesam:title"] = QVariant::fromValue(msg);
+	else
+		vmap["xesam:title"] = QVariant::fromValue(playlist->getCurrentTitle());
+	vmap["xesam:url"] = QVariant::fromValue(playlist->getCurrentUri());
+	vmap["xesam:trackNumber"] = QVariant::fromValue(playlist->getCurrentSeq());
+	mpris2->setMetadata(vmap);
 
-//////////////// 	IPC FIXME /////////
-	//ipcagent->init();
-	//ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
-	//ipcagent->setProperty("uri", playlist->getCurrentUri() );
-	//ipcagent->setProperty("artist", playlist->getCurrentArtist() );
-	//ipcagent->setProperty("title", playlist->getCurrentTitle() );
-	//ipcagent->setProperty("duration", playlist->getCurrentDuration() );
-	//ipcagent->setProperty("track", msg);	
-	//ipcagent->updatedTrackInfo();	
 	return;
 }

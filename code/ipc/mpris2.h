@@ -67,6 +67,7 @@ class Mpris2 : public QObject
 		void setState(const int&);
 		void setLoopStatus(const bool&);
 		void setShuffle(const bool&);
+		void setMetadata(const QVariantMap&);
 		void setVolume(const double&);
    
   Q_SIGNALS:		

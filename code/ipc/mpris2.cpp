@@ -93,7 +93,17 @@ void Mpris2::setShuffle(const bool& b_s)
 	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setShuffle(b_s);
 	
 	return;
-}	
+}
+
+//
+// Function to send along track metadata.  Called from playerctl in the
+// processMediaInfo function.
+void Mpris2::setMetadata(const QVariantMap& vmap)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setMetadata(vmap);
+	
+	return;
+}
 	
 //
 // Function to send along a change of volume.  Called from playerctl

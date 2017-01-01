@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QListWidgetItem>
 # include <QDir>
 # include <QPixmap>
+# include <QUrl>
 
 # include "ui_playlist.h"
 # include "./code/playlist/playlistitem.h"
@@ -152,10 +153,10 @@ class Playlist : public QDialog
 		inline QString getCurrentArtist() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getArtist() : QString();}
 		inline qint32 getCurrentDuration() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration() : -1;}
 		inline int getCurrentRow() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentRow() : -1;}		
+		inline QString getArtURL() {return arturl.url(QUrl::None);}
 		
 		inline int currentItemType() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentItem()->type() : MBMP_PL::None;}
 		inline bool currentIsPlayable() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable() : false;}
-	
 		void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
 		
 	public:
@@ -182,6 +183,7 @@ class Playlist : public QDialog
     QDir cdmeta_dir;
 	  MetaData* cdmetadata;
 	  MusicBrainzManager* mbman; 
+	  QUrl arturl;
 	  
 	// functions
 		void processM3U(const QString&);
