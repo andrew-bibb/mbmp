@@ -89,7 +89,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		// signal over dbus if one does change, 
 		void setPlaybackStatus(const QString&);
 		void setLoopStatus(const QString&);
-		inline void setPlaybackRate(double d_r) {(void) d_r;}	// We can't change playback rate
+		inline void setPlaybackRate(double d_r) {(void) d_r;}	// We don't allow changing the playback rate
 		void setShuffle(const bool&);
 		inline void setMetadata(QMap<QString,QVariant>(map)) {metadata = map;changeditems.append(MBMP_MPRIS::Metadata); sendPropertyChanged();}
 		void setVolume(const double&);

@@ -543,7 +543,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	//connect(ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
 	//connect(ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
 	//connect(ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
-	//connect(ipcagent, SIGNAL(controlToggleWrap()), playlist, SLOT(toggleWrapMode()));
+	connect(playlist, SIGNAL(wrapModeChanged(bool)), mpris2, SLOT(setLoopStatus(bool)));
+	connect(mpris2, SIGNAL(loopStatusChanged(bool)), playlist, SLOT(setWrapMode(bool)));
 	//connect(ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
 	//connect(ipcagent, SIGNAL(controlToggleRandom()), playlist, SLOT(toggleRandomMode()));
 	
@@ -1168,10 +1169,8 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 					this->setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() ); 
 				}
 				
-				// let ipcagent know about state changes	
-////////// IPC FIXME ///////////
-//				ipcagent->setProperty("state", gstiface->getState() );
-//				ipcagent->updatedState();	
+				// let mpris2 know about state changes	
+				mpris2->setState(gstiface->getState() );
 			}	// if PLAYER_NAME								
 			
 			break;

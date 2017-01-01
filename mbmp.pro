@@ -63,11 +63,6 @@ HEADERS		+= ./code/scman/scman.h
 HEADERS		+= ./code/ipc/mpris2.h
 HEADERS		+= ./code/ipc/mediaplayer2.h
 HEADERS		+= ./code/ipc/mediaplayer2player.h
-HEADERS		+= ./code/ipc/mediaplayer2_adaptor.h
-HEADERS		+= ./code/ipc/mediaplayer2_interface.h
-HEADERS		+= ./code/ipc/mediaplayer2player_adaptor.h
-HEADERS		+= ./code/ipc/mediaplayer2player_interface.h
-HEADERS		+= ./code/ipc/DBusAbstractAdaptor.h
 HEADERS		+= ./code/mbman/mbman.h
 
 #	forms
@@ -93,11 +88,6 @@ SOURCES += ./code/scman/scman.cpp
 SOURCES += ./code/ipc/mpris2.cpp
 SOURCES += ./code/ipc/mediaplayer2.cpp
 SOURCES += ./code/ipc/mediaplayer2player.cpp
-SOURCES += ./code/ipc/mediaplayer2_adaptor.cpp
-SOURCES += ./code/ipc/mediaplayer2_interface.cpp
-SOURCES += ./code/ipc/mediaplayer2player_adaptor.cpp
-SOURCES += ./code/ipc/mediaplayer2player_interface.cpp
-SOURCES	+= ./code/ipc/DBusAbstractAdaptor.cpp
 SOURCES += ./code/mbman/mbman.cpp
 
 #	resource files

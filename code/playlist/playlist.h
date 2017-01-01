@@ -140,6 +140,7 @@ class Playlist : public QDialog
 		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
 		inline void setCurrentRow(const int& row) {ui.listWidget_playlist->setCurrentRow(row);}
 		inline void toggleWrapMode() {ui.checkBox_consume->setChecked(false); ui.checkBox_wrap->toggle();}
+		inline void setWrapMode(bool b_wm) {ui.checkBox_wrap->setChecked(b_wm);}
 		inline void toggleConsumeMode() {ui.checkBox_wrap->setChecked(false); ui.checkBox_consume->toggle();}
 		inline void toggleRandomMode() {ui.checkBox_random->toggle();}
 		inline void toggleDetailMode() {ui.checkBox_showinfo->toggle();}
@@ -179,8 +180,8 @@ class Playlist : public QDialog
 		QDir artwork_dir;
     QDir cdmeta_dir;
 	  MetaData* cdmetadata;
-	  MusicBrainzManager* mbman;     
-
+	  MusicBrainzManager* mbman; 
+	  
 	// functions
 		void processM3U(const QString&);
 		void processPLS(const QString&);
@@ -188,6 +189,9 @@ class Playlist : public QDialog
 		bool readCDMetaFile(const QString&);
 		void updateTracks();
 		QPixmap getLocalAlbumArt(const QStringList&, const QDir& = QDir("NONE"));
+		
+	Q_SIGNALS:	
+		void wrapModeChanged(const bool&);	
 };
 
 #endif

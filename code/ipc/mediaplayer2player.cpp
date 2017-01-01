@@ -61,13 +61,14 @@ MediaPlayer2Player::MediaPlayer2Player(Mpris2* parent) : QDBusAbstractAdaptor(pa
 /////////////////////// Public Functions //////////////////////////////
 //
 // Function to set the Playback status. 
+// dbus read only
 void MediaPlayer2Player::setPlaybackStatus(const QString& s_ps)
 {
 	const QStringList valid{"Playing", "Paused", "Stopped"};
 	
 	// return if no change
 	if (playbackstatus == s_ps) return;
-	;
+	
 	// return if not valid
 	if (! valid.contains(s_ps, Qt::CaseSensitive) ) return;
 	
@@ -79,24 +80,35 @@ void MediaPlayer2Player::setPlaybackStatus(const QString& s_ps)
 
 //
 // Function to set the Loop status. 
+// dbus read/write
 void MediaPlayer2Player::setLoopStatus(const QString& s_ls)
 {
 	const QStringList valid{"None", "Track", "Playlist"};
 	
 	// return if no change
 	if (loopstatus == s_ls) return;
-	;
+	
 	// return if not valid
 	if (! valid.contains(s_ls, Qt::CaseSensitive) ) return;
+	
+	// MBMP does not support Track repeat, return if set (via dbus interface)
+	if (s_ls == "Track") return;
 	
 	// changed and valid
 	loopstatus = s_ls;
 	changeditems.append(MBMP_MPRIS::LoopStatus);
 	sendPropertyChanged();
+	
+	// let MBMP know we've changed (change could have been via the mpris2 dbus interface)
+	if (s_ls == "Playlist")
+		static_cast<Mpris2*>(this->parent())->emitLoopStatusChanged(true);
+	else
+		static_cast<Mpris2*>(this->parent())->emitLoopStatusChanged(false);
 }
 
 //
 // Function to set the Shuffle property. 
+// dbus read/write
 void MediaPlayer2Player::setShuffle(const bool& b_s)
 {
 	// return if no change
@@ -110,6 +122,7 @@ void MediaPlayer2Player::setShuffle(const bool& b_s)
 
 //
 // Function to set the Shuffle property. 
+// dbus read/write
 void MediaPlayer2Player::setVolume(const double& d_v)
 {
 	// return if no change
