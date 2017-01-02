@@ -91,7 +91,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		void setLoopStatus(const QString&);
 		inline void setPlaybackRate(double d_r) {(void) d_r;}	// We don't allow changing the playback rate
 		void setShuffle(const bool&);
-		inline void setMetadata(QMap<QString,QVariant>(map)) {metadata = map;changeditems.append(MBMP_MPRIS::Metadata); sendPropertyChanged();}
+		inline void setMetadata(QMap<QString,QVariant>(map)) {metadata = map; changeditems.append(MBMP_MPRIS::Metadata); sendPropertyChanged();}
 		void setVolume(const double&);
 		inline void setPosition(qlonglong pos) {position = pos;}
 		inline void setMinimumRate(double d_mi) {volume = d_mi; changeditems.append(MBMP_MPRIS::MinRate); sendPropertyChanged();}
