@@ -69,6 +69,7 @@ class Mpris2 : public QObject
 		void setShuffle(const bool&);
 		void setMetadata(const QVariantMap&);
 		void setVolume(const double&);
+		void setPosition(const qint64&);
    
   Q_SIGNALS:		
 		// signals we need to issue back to the player from the adaptors

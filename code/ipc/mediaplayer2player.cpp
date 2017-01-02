@@ -124,6 +124,19 @@ void MediaPlayer2Player::setShuffle(const bool& b_s)
 }
 
 //
+// Function to set the Metadata property
+// dbus read only
+void MediaPlayer2Player::setMetadata(const QVariantMap& vmap)
+{
+	// new data
+	metadata = vmap;
+	changeditems.append(MBMP_MPRIS::Metadata);
+	sendPropertyChanged();
+	
+	return;
+}
+	
+//
 // Function to set the Shuffle property. 
 // dbus read/write
 void MediaPlayer2Player::setVolume(const double& d_v)
@@ -136,7 +149,7 @@ void MediaPlayer2Player::setVolume(const double& d_v)
 		else if (d_v > 1.0) volume = 1.0;
 			else volume = d_v;	
 	
-	// let mpris2 things know we've changed
+	// volume changed
 	changeditems.append(MBMP_MPRIS::Volume);
 	sendPropertyChanged();
 

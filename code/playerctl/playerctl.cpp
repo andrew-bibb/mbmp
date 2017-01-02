@@ -676,19 +676,26 @@ void PlayerControl::setPositionWidgets()
 	// return if we are not playing
 	if (gstiface->getState() != GST_STATE_PLAYING) return;
 	
-	// variables
-	int position = gstiface->queryStreamPosition() / (1000 * 1000 * 1000);
+	// variables 
+	// gst stream position in nanoseconds
+	// nano * 1000 = micro
+	// micro * 1000 = milli
+	// mili * 1000 = full seconds
+	qint64 position = gstiface->queryStreamPosition();
 	
 	// position is zero or positive
 	if (position >= 0 ) {
 		QTime t(0,0,0);
-		t = t.addSecs(position);
+		int pos = position / (1000 * 1000 * 1000);
+		t = t.addSecs(pos);
 		ui.label_position->setText(t.toString("HH:mm:ss") );
-		ui.horizontalSlider_position->setSliderPosition(position);	
+		ui.horizontalSlider_position->setSliderPosition(pos);	
+		mpris2->setPosition(position);
 	}
 	// position is negative
 	else {
 		ui.label_position->setText("00:00:00");
+		mpris2->setPosition(0);
 	}
 	
 	// deactive xscreensaver, do this each time we process a new position (about twice a second)
@@ -1647,44 +1654,55 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	vmap["mpris::trackid"] = QVariant::fromValue(QDBusObjectPath(QString("/org/mbmp/Track/%1").arg(playlist->getCurrentRow())) );	
 	if (playlist->getCurrentDuration() >= 0)
 		vmap["mpris:length"] = QVariant::fromValue(static_cast<qint64>(playlist->getCurrentDuration()) );
+	
 	if (! playlist->getArtURL().isEmpty() )
 		vmap["mpris:artUrl"] = QVariant::fromValue(playlist->getArtURL());
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM).isEmpty() )
 		vmap["xesam:album"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_ALBUM));
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST).isEmpty() )
 		vmap["xesam:albumArtist"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST)));		
+	
 	if (! playlist->getCurrentArtist().isEmpty() )
 		vmap["xesam:artist"] = QVariant::fromValue(playlist->getCurrentArtist());
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_LYRICS).isEmpty() )
 		vmap["xesam:asText"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_LYRICS));
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE).isEmpty() ) {
 		double bpm = (playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE)).toDouble(&ok);
 		if (ok) {
 			vmap["xesam:audioBPM"] = QVariant::fromValue(static_cast<int>(bpm));
 		}	// if ok
 	} // if bpm tag exists
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_COMMENT).isEmpty() )
 		vmap["xesam:comment"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMMENT)));	
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_COMPOSER).isEmpty() )
 		vmap["xesam:composer"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMPOSER)));			
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER).isEmpty() ) {
 		uint vn = (playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER)).toUInt(&ok);
 		if (ok) {
 			vmap["xesam:discNumber"] = QVariant::fromValue(vn);
 		}	// if ok
 	}	// if volume number tag exists
+	
 	if (! playlist->getCurrentTagAsString(GST_TAG_GENRE).isEmpty() )
 		vmap["xesam:genre"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_GENRE)));	
-	
 	
 	if (! playlist->getCurrentTitle().isEmpty() )
 		vmap["xesam:title"] = QVariant::fromValue(playlist->getCurrentTitle());
 	else	
 		vmap["xesam:title"] = QVariant::fromValue(msg);
-	if (! playlist->getCurrentUri().isEmpty() )
-		vmap["xesam:url"] = QVariant::fromValue(playlist->getCurrentUri());
+
 	if (playlist->getCurrentSeq() >= 0)
 		vmap["xesam:trackNumber"] = QVariant::fromValue(playlist->getCurrentSeq() );
+	
+	if (! playlist->getCurrentUri().isEmpty() )
+		vmap["xesam:url"] = QVariant::fromValue(playlist->getCurrentUri());
 	
 	mpris2->setMetadata(vmap);
 

@@ -125,4 +125,13 @@ void Mpris2::setVolume(const double& d_v)
 	return;
 }
 
+// Function to send along the stream position.  GStreamer returns
+// position in nanoseonds.  Convert to microseconds
+void Mpris2::setPosition(const qint64& nano)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setPosition(static_cast<qlonglong>(nano / 1000) );
+	
+	return;
+}
+
     
