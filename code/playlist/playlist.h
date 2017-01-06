@@ -61,7 +61,7 @@ namespace MBMP_PL
     File = (QListWidgetItem::UserType) + 11,	// Playlist file 
     Url  = (QListWidgetItem::UserType) + 12,	// Playlist url
     ACD  = (QListWidgetItem::UserType) + 101,	// Playlist Audio CD
-    DVD  = (QListWidgetItem::UserType) + 102	// Playlist DVD	
+    DVD  = (QListWidgetItem::UserType) + 102,	// Playlist DVD	
   };
 } // namespace MBMP_PL
 
@@ -153,11 +153,15 @@ class Playlist : public QDialog
 		inline QString getCurrentArtist() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getArtist() : QString();}
 		inline qint32 getCurrentDuration() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration() : -1;}
 		inline int getCurrentRow() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentRow() : -1;}		
+		inline int getPlaylistSize() {return ui.listWidget_playlist->count();}
 		inline QString getArtURL() {return arturl.url(QUrl::None);}
 		inline QString getCurrentTagAsString(const QString& tag) {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTagAsString(tag) : QString();}
+		inline bool canGoNext() {return cangonext;}
+		inline bool	canGoPrevious() {return cangoprevious;}
 		
 		inline int currentItemType() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentItem()->type() : MBMP_PL::None;}
 		inline bool currentIsPlayable() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable() : false;}
+		inline bool currentIsSeekable() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isSeekable() : false;}
 		void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
 		
 	public:
@@ -185,6 +189,8 @@ class Playlist : public QDialog
 	  MetaData* cdmetadata;
 	  MusicBrainzManager* mbman; 
 	  QUrl arturl;
+	  bool cangonext;
+	  bool cangoprevious;
 	  
 	// functions
 		void processM3U(const QString&);

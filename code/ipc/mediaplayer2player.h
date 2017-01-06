@@ -94,13 +94,13 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		void setMetadata(const QVariantMap&); 
 		void setVolume(const double&);
 		inline void setPosition(qlonglong pos) {position = pos;}	// propertyChanged not emitted when this changes
-		inline void setMinimumRate(double d_mi) {volume = d_mi; changeditems.append(MBMP_MPRIS::MinRate); sendPropertyChanged();}
-		inline void setMaximumRate(double d_mx) {volume = d_mx; changeditems.append(MBMP_MPRIS::MaxRate); sendPropertyChanged();}
-		inline void setCanGoNext(bool b_cgn) {cangonext = b_cgn; changeditems.append(MBMP_MPRIS::CanGoNext); sendPropertyChanged();}		
-		inline void setCanGoPrevious(bool b_cgp) {cangonext = b_cgp; changeditems.append(MBMP_MPRIS::CanGoPrevious); sendPropertyChanged();}	
-		inline void setCanPlay(bool b_cpl) {canplay = b_cpl; changeditems.append(MBMP_MPRIS::CanPlay); sendPropertyChanged();}	
-		inline void setCanPause(bool b_cpu) {canpause = b_cpu; changeditems.append(MBMP_MPRIS::CanPause); sendPropertyChanged();}	
-		inline void setCanSeek(bool b_s) {canseek = b_s; changeditems.append(MBMP_MPRIS::CanSeek); sendPropertyChanged();}	
+		inline void setMinimumRate(double d_mi) {(void) d_mi;}	// We don't allow changing the minimum rate
+		inline void setMaximumRate(double d_mx) {(void) d_mx;}	// We don't allow changing the maximum rate
+		void setCanGoNext(const bool& b_cgn); 		
+		void setCanGoPrevious(const bool& b_cgp); 
+		void setCanPlay(const bool& b_cpl);	
+		void setCanPause(const bool& b_cpu);	
+		void setCanSeek(const bool& b_s);	
 		inline void setCanControl(bool b_ctl) {cancontrol = b_ctl;}	
 
 	Q_SIGNALS:

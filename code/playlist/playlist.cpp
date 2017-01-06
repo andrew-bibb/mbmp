@@ -661,8 +661,26 @@ void Playlist::albumArtRetrieved()
 void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 {
 	(void) old;
+	
+	// return now if no current item
+	cangonext = false;
+	cangoprevious = false;	
 	if (cur == NULL) return;
 	
+	// save the movement properties of current item
+	if (ui.checkBox_wrap->isChecked() ) {
+		cangonext = true;
+		cangoprevious = true;
+	}// if wrap checked
+	else {
+		int pl_row = this->getCurrentRow();
+		int pl_size = this->getPlaylistSize();
+		if (pl_size <= 1) {cangonext = false; cangoprevious = false;}			
+		else if (pl_size - pl_row == 1) {cangonext = false; cangoprevious = true;}
+			else if (pl_row == 0) {cangonext = true; cangoprevious = false;}
+				else {cangonext = true; cangoprevious = true;}
+	}	// else wrap not checked
+		
 	ui.label_iteminfo->clear();
 	ui.label_artwork->clear();
 	arturl.clear();
@@ -708,7 +726,6 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 		if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
 	}
 		
-	
 	return;	
 }
 

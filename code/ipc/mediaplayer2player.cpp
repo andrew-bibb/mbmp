@@ -46,8 +46,8 @@ MediaPlayer2Player::MediaPlayer2Player(Mpris2* parent) : QDBusAbstractAdaptor(pa
 	position = 0.0;
 	minimumrate = 1.0;
 	maximumrate = 1.0;
-	cangonext = false;
-	cangoprevious = false;
+	cangonext = true;
+	cangoprevious = true;
 	canplay = false;
 	canpause = false;
 	canseek = false;
@@ -155,6 +155,76 @@ void MediaPlayer2Player::setVolume(const double& d_v)
 
 	// let MBMP know we've changed (change could have been via the mpris2 dbus interface)
 	static_cast<Mpris2*>(this->parent())->emitVolumeChanged(static_cast<int>(d_v * 30.0 + 0.5) );
+}
+
+//
+// Function to set the CanGoNext property
+// Dbus read only
+void MediaPlayer2Player::setCanGoNext(const bool& b_cgn)
+{
+	if (cangonext == b_cgn) return;
+	
+	cangonext = b_cgn;
+	changeditems.append(MBMP_MPRIS::CanGoNext);
+	sendPropertyChanged();
+	
+	return;
+}
+
+//
+// Function to set the CanGoPrevious property
+// Dbus read only
+void MediaPlayer2Player::setCanGoPrevious(const bool& b_cgp)
+{
+	if (cangoprevious == b_cgp) return;
+	
+	cangoprevious = b_cgp;
+	changeditems.append(MBMP_MPRIS::CanGoPrevious);
+	sendPropertyChanged();
+	
+	return;
+}
+
+//
+// Function to set the CanPlay property
+// Dbus read only
+void MediaPlayer2Player::setCanPlay(const bool& b_cpl)
+{
+	if (canplay == b_cpl) return;
+	
+	canplay = b_cpl;
+	changeditems.append(MBMP_MPRIS::CanPlay);
+	sendPropertyChanged();
+	
+	return;
+}
+
+//
+// Function to set the CanPause property
+// Dbus read only
+void MediaPlayer2Player::setCanPause(const bool& b_cpu)
+{
+	if (canpause == b_cpu) return;
+	
+	canpause = b_cpu;
+	changeditems.append(MBMP_MPRIS::CanPause);
+	sendPropertyChanged();
+	
+	return;
+}
+
+//
+// Function to set the CanSeek property
+// Dbus read only
+void MediaPlayer2Player::setCanSeek(const bool& b_s)
+{
+	if (canseek == b_s) return;
+	
+	canseek = b_s;
+	changeditems.append(MBMP_MPRIS::CanSeek);
+	sendPropertyChanged();
+	
+	return;
 }
 
 /////////////////////// Private Functions //////////////////////////////

@@ -1705,6 +1705,13 @@ void PlayerControl::processMediaInfo(const QString& msg)
 		vmap["xesam:url"] = QVariant::fromValue(playlist->getCurrentUri());
 	
 	mpris2->setMetadata(vmap);
+	
+	// update mpris2 on previous, next, play, pause and seekable status
+	mpris2->setCanGoNext(playlist->canGoNext());
+	mpris2->setCanGoPrevious(playlist->canGoPrevious());
+	mpris2->setCanPlay(playlist->currentIsPlayable());
+	mpris2->setCanPause(playlist->currentIsPlayable());
+	mpris2->setCanSeek(playlist->currentIsSeekable());
 
 	return;
 }

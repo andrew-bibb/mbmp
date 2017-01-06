@@ -125,6 +125,7 @@ void Mpris2::setVolume(const double& d_v)
 	return;
 }
 
+//
 // Function to send along the stream position.  GStreamer returns
 // position in nanoseonds.  Convert to microseconds
 void Mpris2::setPosition(const qint64& nano)
@@ -133,5 +134,50 @@ void Mpris2::setPosition(const qint64& nano)
 	
 	return;
 }
+
+// The next 4 setCan functions are not really used.  All are set
+// at the same time in the newTrack() function
+// Function to send along the bool to the CanGoNext property
+void Mpris2::setCanGoNext(const bool& b_cgn)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setCanGoNext(b_cgn);
+	
+	return;
+}	
+
+// Function to send along the bool to the CanGoPrevious property
+void Mpris2::setCanGoPrevious(const bool& b_cgp)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setCanGoPrevious(b_cgp);
+	
+	return;
+}	
+
+// Function to send along the bool to the CanPlay property
+void Mpris2::setCanPlay(const bool& b_cpl)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setCanPlay(b_cpl);
+	
+	return;
+}	
+
+// Function to send along the bool to the CanPause property
+void Mpris2::setCanPause(const bool& b_cps)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setCanPause(b_cps);
+	
+	return;
+}	
+
+// Function to send along the bool to the CanSeek property
+void Mpris2::setCanSeek(const bool& b_s)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setCanSeek(b_s);
+	
+	return;
+}	
+
+		
+	
 
     
