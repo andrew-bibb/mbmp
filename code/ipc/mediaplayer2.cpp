@@ -64,7 +64,7 @@ MediaPlayer2::MediaPlayer2(Mpris2* parent) : QDBusAbstractAdaptor(parent)
 ////////////////////////////////// Public Slots ////////////////////////
 void MediaPlayer2::Quit()
 {
-	static_cast<Mpris2*>(this->parent())->emitControlStop();
+	static_cast<Mpris2*>(this->parent())->emitApplicationStop();
 }
 
 

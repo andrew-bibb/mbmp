@@ -48,10 +48,16 @@ class Mpris2 : public QObject
     
 	public:
 		Mpris2 (QObject* parent = 0);
-		inline void emitControlStop() {emit controlStop();}
+		inline void emitApplicationStop() {emit applicationStop();}
 		inline void emitLoopStatusChanged(bool b_ls) {emit loopStatusChanged(b_ls);}
 		inline void emitShuffleChanged(bool b_s) {emit shuffleChanged(b_s);}
 		inline void emitVolumeChanged(int vol) {emit volumeChanged(vol);}
+		inline void emitPlaylistNext() {emit playlistNext();}
+		inline void emitPlaylistBack() {emit playlistBack();}
+		inline void emitControlPause() {emit controlPause();}
+		inline void emitControlPlayPause() {emit controlPlayPause();}
+		inline void emitControlStop() {emit controlStop();}
+		inline void emitControlPlay() {emit controlPlay();}
 		
 	private:
 		QDBusAbstractAdaptor* mediaplayer2;
@@ -79,10 +85,16 @@ class Mpris2 : public QObject
   Q_SIGNALS:		
 		// signals we need to issue back to the player from the adaptors
 		// issue using the public inline functions above
-		void controlStop(); 
+		void applicationStop(); 
 		void loopStatusChanged(bool);
 		void shuffleChanged(bool);
 		void volumeChanged(int);
+		void playlistNext();
+		void playlistBack();
+		void controlPause();
+		void controlPlayPause();
+		void controlStop();
+		void controlPlay();
 };		
 
 #endif

@@ -539,10 +539,13 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
 	
-	connect (mpris2, SIGNAL(controlStop()), qApp, SLOT(quit()));
-	//connect (ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
-	//connect (ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
-	//connect (ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
+	connect (mpris2, SIGNAL(applicationStop()), qApp, SLOT(quit()));
+	connect (mpris2, SIGNAL(controlStop()), ui.actionPlayerStop, SLOT(trigger()));
+	connect (mpris2, SIGNAL(controlPlay()), this, SLOT(playMedia()));
+	connect (mpris2, SIGNAL(controlPlayPause()), ui.actionPlayPause, SLOT(trigger()));
+	connect (mpris2, SIGNAL(controlPause()), this, SLOT(mpris2Pause()));
+	connect (mpris2, SIGNAL(playlistNext()), ui.actionPlaylistNext, SLOT(trigger()));
+	connect (mpris2, SIGNAL(playlistBack()), ui.actionPlaylistBack, SLOT(trigger()));
 	connect (playlist, SIGNAL(wrapModeChanged(bool)), mpris2, SLOT(setLoopStatus(bool)));
 	connect (mpris2, SIGNAL(loopStatusChanged(bool)), playlist, SLOT(setWrapMode(bool)));
 	//connect (ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
@@ -664,7 +667,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 
 ////////////////////////////// Public Functions ////////////////////////////
 //
-// Function to set the stream position.  This will set both the text
+// Function to set the stream position widgets. This will set both the text
 // label and the slider. Called from this->pos_timer. Position
 // is the stream position in seconds.
 //
@@ -958,6 +961,7 @@ void PlayerControl::dvdNavigationCommand(QAction* act)
 	return;
 }
 
+//
 // Slot to toggle pause and play on the media
 void PlayerControl::playPause()
 {
@@ -968,7 +972,20 @@ void PlayerControl::playPause()
 		if (gstiface->getState() == GST_STATE_PLAYING) seek_group->setEnabled(false);
 		gstiface->playPause();
 	}
+	
+	return;	
+}
+
+//
+// Slot to pause the playback.  Only used from the mpris2 interface, which
+// means it will probably never be used.  
+void PlayerControl::mpris2Pause()
+{
+	if (gstiface->getState() == GST_STATE_PLAYING) {
+			ui.actionPlayPause->trigger();
+	}	
 		
+	return;
 }
 
 //

@@ -46,8 +46,8 @@ MediaPlayer2Player::MediaPlayer2Player(Mpris2* parent) : QDBusAbstractAdaptor(pa
 	position = 0.0;
 	minimumrate = 1.0;
 	maximumrate = 1.0;
-	cangonext = true;
-	cangoprevious = true;
+	cangonext = false;
+	cangoprevious = false;
 	canplay = false;
 	canpause = false;
 	canseek = false;
@@ -223,6 +223,69 @@ void MediaPlayer2Player::setCanSeek(const bool& b_s)
 	canseek = b_s;
 	changeditems.append(MBMP_MPRIS::CanSeek);
 	sendPropertyChanged();
+	
+	return;
+}
+
+/////////////////////// Public Slots///// //////////////////////////////
+//
+// Slots will be visible in the dbus interface
+
+//
+// Slot to issue a Next command
+void MediaPlayer2Player::Next()
+{
+	if (cangonext) 
+		static_cast<Mpris2*>(this->parent())->emitPlaylistNext();
+		
+	return;
+}
+
+//
+// Slot to issue a Previous command
+void MediaPlayer2Player::Previous()
+{
+	if (cangoprevious)
+		static_cast<Mpris2*>(this->parent())->emitPlaylistBack();
+	
+	return;
+}
+
+//
+// Slot to issue a Pause command
+void MediaPlayer2Player::Pause()
+{
+	if (canpause)
+		static_cast<Mpris2*>(this->parent())->emitControlPause();
+	
+	return;
+}
+
+//
+// Slot to issue a Play/Pause (toggle) command
+void MediaPlayer2Player::PlayPause()
+{
+		static_cast<Mpris2*>(this->parent())->emitControlPlayPause();
+	
+	return;
+}
+
+//
+// Slot to issue a stop command
+void MediaPlayer2Player::Stop()
+{
+	if (canpause)
+		static_cast<Mpris2*>(this->parent())->emitControlStop();
+	
+	return;
+}
+
+//
+// Slot to issue a play command
+void MediaPlayer2Player::Play()
+{
+	if (canplay)
+		static_cast<Mpris2*>(this->parent())->emitControlPlay();
 	
 	return;
 }

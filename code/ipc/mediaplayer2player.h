@@ -66,7 +66,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		Q_PROPERTY (bool CanPlay READ getCanPlay);		
 		Q_PROPERTY (bool CanPause READ getCanPause);		
 		Q_PROPERTY (bool CanSeek READ getCanSeek);		
-		Q_PROPERTY (bool CanControl READ getCanControl);		
+		Q_PROPERTY (bool CanControl READ getCanControl);			
 		
 	// get functions for memebers
 		inline QString getPlaybackStatus() const {return playbackstatus;}
@@ -101,7 +101,17 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		void setCanPlay(const bool& b_cpl);	
 		void setCanPause(const bool& b_cpu);	
 		void setCanSeek(const bool& b_s);	
-		inline void setCanControl(bool b_ctl) {cancontrol = b_ctl;}	
+		inline void setCanControl(bool b_ctl) {(void) b_ctl;}	// We don't allow changing the CanControl property
+
+	// public slots (Q_SCRIPTABLE not actually needed) are published on the dbus interface
+	public Q_SLOTS:
+		Q_SCRIPTABLE void Next();
+		Q_SCRIPTABLE void Previous();
+		Q_SCRIPTABLE void Pause();
+		Q_SCRIPTABLE void PlayPause();
+		Q_SCRIPTABLE void Stop();
+		Q_SCRIPTABLE void Play();
+		
 
 	Q_SIGNALS:
 		Q_SCRIPTABLE void Seeked(qlonglong);
