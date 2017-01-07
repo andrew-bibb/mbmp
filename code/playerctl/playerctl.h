@@ -89,6 +89,7 @@ class PlayerControl : public QDialog
 		
 	private slots:
 		void processGstifaceMessages(int, QString);
+		void processMpris2Info();
 		void changeVolumeDialStep(QAction*);
 		void popupVisualizerMenu();
 		void popupOptionsMenu();

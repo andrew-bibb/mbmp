@@ -82,6 +82,8 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   geometry = QRect();
   ui.listWidget_playlist->clear();
   arturl.clear();
+  cangoprevious = false;
+  cangonext = false;
   
   // Iconmanager with constructor only scope
   IconManager iconman(this);
@@ -661,6 +663,9 @@ void Playlist::albumArtRetrieved()
 void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 {
 	(void) old;
+	
+	// let the rest of the world know about the change
+	emit currentChanged();
 	
 	// return now if no current item
 	cangonext = false;
