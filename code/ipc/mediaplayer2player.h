@@ -115,6 +115,13 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		Q_SCRIPTABLE void Seek(qlonglong);
 		Q_SCRIPTABLE void SetToPosition(QDBusObjectPath, qlonglong);
 		
+		// These are not part of the mpris2 specification.  They are to replace
+		// functions I consider useful and which I lost when I converted from
+		// my own IPC to the standard Mpris2 IPC.
+		Q_SCRIPTABLE QString getTitle();
+		Q_SCRIPTABLE QString getArtist();
+		Q_SCRIPTABLE int getDuration();
+		
 
 	Q_SIGNALS:
 		Q_SCRIPTABLE void Seeked(qlonglong);

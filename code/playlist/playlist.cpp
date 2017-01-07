@@ -664,9 +664,6 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 {
 	(void) old;
 	
-	// let the rest of the world know about the change
-	emit currentChanged();
-	
 	// return now if no current item
 	cangonext = false;
 	cangoprevious = false;	

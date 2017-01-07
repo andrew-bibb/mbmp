@@ -203,7 +203,6 @@ class Playlist : public QDialog
 	Q_SIGNALS:	
 		void wrapModeChanged(const bool&);	
 		void randomModeChanged(const bool&);
-		void currentChanged();
 };
 
 #endif

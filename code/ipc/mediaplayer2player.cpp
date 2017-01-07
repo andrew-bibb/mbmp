@@ -318,6 +318,32 @@ void MediaPlayer2Player::SetToPosition(QDBusObjectPath obj, qlonglong pos)
 	return;
 }
 
+// These are not part of the mpris2 specification.  They are to replace
+// functions I consider useful and which I lost when I converted from
+// my own IPC to the standard Mpris2 IPC.
+
+//
+// Slot to return the current artist
+QString MediaPlayer2Player::getArtist()
+{
+	return metadata.contains("xesam:title") ? metadata["xesam:title"].value<QString>() : QString();
+}
+
+//
+// Slot to return the current title
+QString MediaPlayer2Player::getTitle()
+{
+	return metadata.contains("xesam:artist") ? metadata["xesam:artist"].value<QString>() : QString();
+}
+
+//
+// Slot to return the current duration in seconds
+int MediaPlayer2Player::getDuration()
+{
+	return metadata.contains("mpris:length") ? static_cast<int>(metadata["mpris:length"].value<qlonglong>() / (1000 * 1000)) : 0;
+}
+
+
 /////////////////////// Private Functions //////////////////////////////
 //
 // Function to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
