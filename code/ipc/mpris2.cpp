@@ -177,6 +177,13 @@ void Mpris2::setCanSeek(const bool& b_s)
 	return;
 }	
 
+// Function to send along a new seeked position
+void Mpris2::seeked(const qlonglong& pos)
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->emitSeeked(pos);
+	
+	return;
+}	
 		
 	
 

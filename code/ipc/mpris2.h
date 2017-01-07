@@ -82,6 +82,7 @@ class Mpris2 : public QObject
 		void setCanPlay(const bool&);
 		void setCanPause(const bool&);
 		void setCanSeek(const bool&);
+		void seeked(const qlonglong&);
    
   Q_SIGNALS:		
 		// signals we need to issue back to the player from the adaptors

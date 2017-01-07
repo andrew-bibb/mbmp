@@ -935,6 +935,9 @@ void PlayerControl::seekToPosition(QAction* act)
 	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();	
 	gstiface->seekToPosition(pos);
 	
+	// let mpris2 know about it
+	mpris2->seeked(static_cast<qlonglong>(pos * 1000 * 1000));
+	
 	return;
 }
 
@@ -949,6 +952,9 @@ void PlayerControl::mpris2Seek(qlonglong offset)
 	if (pos < 0 ) pos = 0;
 	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();
 	gstiface->seekToPosition(pos);
+	
+	// let mpris2 know about it (even though we came here from mpris2)
+	mpris2->seeked(static_cast<qlonglong>(pos * 1000 * 1000));
 	
 	return;
 }

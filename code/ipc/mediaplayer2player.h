@@ -102,6 +102,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		void setCanPause(const bool& b_cpu);	
 		void setCanSeek(const bool& b_s);	
 		inline void setCanControl(bool b_ctl) {(void) b_ctl;}	// We don't allow changing the CanControl property
+		inline void emitSeeked(const qlonglong& pos) {emit Seeked(pos);} 
 
 	// public slots (Q_SCRIPTABLE not actually needed) are published on the dbus interface
 	public Q_SLOTS:
