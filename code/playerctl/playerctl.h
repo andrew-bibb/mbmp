@@ -74,6 +74,7 @@ class PlayerControl : public QDialog
 		void dvdNavigationCommand(QAction*);
 		void playPause();
 		void mpris2Pause();
+		void mpris2Seek(qlonglong);
 		void toggleFullScreen();
 		void togglePlaylist();
 		void toggleGUI();

@@ -544,6 +544,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (mpris2, SIGNAL(controlPlay()), this, SLOT(playMedia()));
 	connect (mpris2, SIGNAL(controlPlayPause()), ui.actionPlayPause, SLOT(trigger()));
 	connect (mpris2, SIGNAL(controlPause()), this, SLOT(mpris2Pause()));
+	connect (mpris2, SIGNAL(controlSeek(qlonglong)), this, SLOT(mpris2Seek(qlonglong)));
 	connect (mpris2, SIGNAL(playlistNext()), ui.actionPlaylistNext, SLOT(trigger()));
 	connect (mpris2, SIGNAL(playlistBack()), ui.actionPlaylistBack, SLOT(trigger()));
 	connect (playlist, SIGNAL(wrapModeChanged(bool)), mpris2, SLOT(setLoopStatus(bool)));
@@ -931,8 +932,22 @@ void PlayerControl::seekToPosition(QAction* act)
 	if (act != 0) ui.horizontalSlider_position->setSliderPosition(pos);
 			
 	if (pos < 0 ) pos = 0;
-	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();
+	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();	
+	gstiface->seekToPosition(pos);
 	
+	return;
+}
+
+//
+// Slot to change the slider position, called from mpris2 seek
+void PlayerControl::mpris2Seek(qlonglong offset)
+{
+	// offset is microseconds, convert to seconds for slider
+	int pos = ui.horizontalSlider_position->sliderPosition() + static_cast<int>(offset / (1000 * 1000));
+	
+	// move and change stream
+	if (pos < 0 ) pos = 0;
+	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();
 	gstiface->seekToPosition(pos);
 	
 	return;
@@ -1668,9 +1683,9 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	// specification is nothing but a steaming smelly pile of Obama. 
 	bool ok = false;
 	QVariantMap vmap;
-	vmap["mpris::trackid"] = QVariant::fromValue(QDBusObjectPath(QString("/org/mbmp/Track/%1").arg(playlist->getCurrentRow())) );	
+	vmap["mpris:trackid"] = QVariant::fromValue(QDBusObjectPath(QString("/org/mbmp/Track/%1").arg(playlist->getCurrentRow())) );	
 	if (playlist->getCurrentDuration() >= 0)
-		vmap["mpris:length"] = QVariant::fromValue(static_cast<qint64>(playlist->getCurrentDuration()) );
+		vmap["mpris:length"] = QVariant::fromValue(static_cast<qlonglong>(playlist->getCurrentDuration()) );
 	
 	if (! playlist->getArtURL().isEmpty() )
 		vmap["mpris:artUrl"] = QVariant::fromValue(playlist->getArtURL());

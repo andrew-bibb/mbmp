@@ -58,6 +58,7 @@ class Mpris2 : public QObject
 		inline void emitControlPlayPause() {emit controlPlayPause();}
 		inline void emitControlStop() {emit controlStop();}
 		inline void emitControlPlay() {emit controlPlay();}
+		inline void emitControlSeek(qlonglong offset) {emit controlSeek(offset);}
 		
 	private:
 		QDBusAbstractAdaptor* mediaplayer2;
@@ -75,7 +76,7 @@ class Mpris2 : public QObject
 		void setShuffle(const bool&);
 		void setMetadata(const QVariantMap&);
 		void setVolume(const double&);
-		void setPosition(const qint64&);
+		void setPosition(const qlonglong&);
 		void setCanGoNext(const bool&);
 		void setCanGoPrevious(const bool&);
 		void setCanPlay(const bool&);
@@ -95,6 +96,7 @@ class Mpris2 : public QObject
 		void controlPlayPause();
 		void controlStop();
 		void controlPlay();
+		void controlSeek(qlonglong);
 };		
 
 #endif

@@ -290,6 +290,34 @@ void MediaPlayer2Player::Play()
 	return;
 }
 
+//
+// Slot to issue a seek foward or backward command
+// offset is the amount foward (+) or backward (-) to 
+// seek in microseconds
+void MediaPlayer2Player::Seek(qlonglong offset)
+{
+	if (canseek)
+		static_cast<Mpris2*>(this->parent())->emitControlSeek(offset);
+	
+	return;
+}
+
+// Slot to issue a seek to position command.  pos is the stream position
+// in microsecods.
+void MediaPlayer2Player::SetToPosition(QDBusObjectPath obj, qlonglong pos)
+{
+	// first make sure function received valid arguments
+	if (! metadata.contains("mpris:trackid") ) return;
+	if (! metadata.contains("mpris:length") ) return;
+	if (obj != metadata["mpris:trackid"].value<QDBusObjectPath>() ) return;
+	if (pos < 0 || pos > metadata["mpris:length"].value<qlonglong>() ) return;
+	
+	// all test passed
+	this->Seek(pos - position);
+		
+	return;
+}
+
 /////////////////////// Private Functions //////////////////////////////
 //
 // Function to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()

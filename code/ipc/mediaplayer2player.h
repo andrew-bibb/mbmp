@@ -111,6 +111,8 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		Q_SCRIPTABLE void PlayPause();
 		Q_SCRIPTABLE void Stop();
 		Q_SCRIPTABLE void Play();
+		Q_SCRIPTABLE void Seek(qlonglong);
+		Q_SCRIPTABLE void SetToPosition(QDBusObjectPath, qlonglong);
 		
 
 	Q_SIGNALS:
