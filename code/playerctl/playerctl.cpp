@@ -1207,8 +1207,78 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				// initialize things based on player state	
 				if (msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) {
 					this->setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() ); 
-				}
+			
+					// Pass information from to mpris2.  
+					// Many of the mpris2 fields are lists of strings, while GStreamer tags are just
+					// strings.  I'll convert the tags to stringlists, but I'm not going to parse 
+					// them trying to break out space or comma separated fields.  Not worth the 
+					// effort and quite honestly I've come to the conclusion the mpris2 
+					// specification is nothing but a steaming smelly pile of Obama. 
+					bool ok = false;
+					QVariantMap vmap;
+					vmap["mpris:trackid"] = QVariant::fromValue(QDBusObjectPath(QString("/org/mbmp/Track/%1").arg(playlist->getCurrentRow())) );	
+					if (playlist->getCurrentDuration() >= 0)
+						vmap["mpris:length"] = QVariant::fromValue(static_cast<qlonglong>(playlist->getCurrentDuration()) );
+					
+					if (! playlist->getArtURL().isEmpty() )
+						vmap["mpris:artUrl"] = QVariant::fromValue(playlist->getArtURL());
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM).isEmpty() )
+						vmap["xesam:album"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_ALBUM));
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST).isEmpty() )
+						vmap["xesam:albumArtist"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST)));		
+					
+					if (! playlist->getCurrentArtist().isEmpty() )
+						vmap["xesam:artist"] = QVariant::fromValue(playlist->getCurrentArtist());
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_LYRICS).isEmpty() )
+						vmap["xesam:asText"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_LYRICS));
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE).isEmpty() ) {
+						double bpm = (playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE)).toDouble(&ok);
+						if (ok) {
+							vmap["xesam:audioBPM"] = QVariant::fromValue(static_cast<int>(bpm));
+						}	// if ok
+					} // if bpm tag exists
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_COMMENT).isEmpty() )
+						vmap["xesam:comment"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMMENT)));	
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_COMPOSER).isEmpty() )
+						vmap["xesam:composer"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMPOSER)));			
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER).isEmpty() ) {
+						uint vn = (playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER)).toUInt(&ok);
+						if (ok) {
+							vmap["xesam:discNumber"] = QVariant::fromValue(vn);
+						}	// if ok
+					}	// if volume number tag exists
+					
+					if (! playlist->getCurrentTagAsString(GST_TAG_GENRE).isEmpty() )
+						vmap["xesam:genre"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_GENRE)));	
+					
+					if (! playlist->getCurrentTitle().isEmpty() )
+						vmap["xesam:title"] = QVariant::fromValue(playlist->getCurrentTitle());
+					else	
+						vmap["xesam:title"] = QVariant::fromValue(msg);
 				
+					if (playlist->getCurrentSeq() >= 0)
+						vmap["xesam:trackNumber"] = QVariant::fromValue(playlist->getCurrentSeq() );
+					
+					if (! playlist->getCurrentUri().isEmpty() )
+						vmap["xesam:url"] = QVariant::fromValue(playlist->getCurrentUri());
+					
+					mpris2->setMetadata(vmap);
+					
+					// update mpris2 on previous, next, play, pause and seekable status
+					mpris2->setCanGoNext(playlist->canGoNext());
+					mpris2->setCanGoPrevious(playlist->canGoPrevious());
+					mpris2->setCanPlay(playlist->currentIsPlayable());
+					mpris2->setCanPause(playlist->currentIsPlayable());
+					mpris2->setCanSeek(gstiface->queryStreamSeek() );				
+				}	// if PAUSED to PLAYING
+						
 				// let mpris2 know about state changes	
 				mpris2->setState(gstiface->getState() );
 			}	// if PLAYER_NAME								
@@ -1228,7 +1298,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			if (loglevel >= 3) {
 					stream1 << msg << endl;
 					if (b_logtofile) stream2 << msg << endl;
-				}	// loglevel if								
+				}	// loglevel if
 			break;
 			
 		case MBMP_GI::Error:	// all errors printed regardless of loglevel
@@ -1674,76 +1744,5 @@ void PlayerControl::processMediaInfo(const QString& msg)
 		}	// if useNotifications
 	}	// if media type we want notifications for
 	
-	// Pass information from playlist to mpris2.  The track information
-	// is changed from processGstifaceMessages when a NewTrack signal is received.
-	// Many of the mpris2 fields are lists of strings, while GStreamer tags are just
-	// strings.  I'll convert the tags to stringlists, but I'm not going to parse 
-	// them trying to break out space or comma separated fields.  Not worth the 
-	// effort and quite honestly I've come to the conclusion the mpris2 
-	// specification is nothing but a steaming smelly pile of Obama. 
-	bool ok = false;
-	QVariantMap vmap;
-	vmap["mpris:trackid"] = QVariant::fromValue(QDBusObjectPath(QString("/org/mbmp/Track/%1").arg(playlist->getCurrentRow())) );	
-	if (playlist->getCurrentDuration() >= 0)
-		vmap["mpris:length"] = QVariant::fromValue(static_cast<qlonglong>(playlist->getCurrentDuration()) );
-	
-	if (! playlist->getArtURL().isEmpty() )
-		vmap["mpris:artUrl"] = QVariant::fromValue(playlist->getArtURL());
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM).isEmpty() )
-		vmap["xesam:album"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_ALBUM));
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST).isEmpty() )
-		vmap["xesam:albumArtist"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST)));		
-	
-	if (! playlist->getCurrentArtist().isEmpty() )
-		vmap["xesam:artist"] = QVariant::fromValue(playlist->getCurrentArtist());
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_LYRICS).isEmpty() )
-		vmap["xesam:asText"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_LYRICS));
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE).isEmpty() ) {
-		double bpm = (playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE)).toDouble(&ok);
-		if (ok) {
-			vmap["xesam:audioBPM"] = QVariant::fromValue(static_cast<int>(bpm));
-		}	// if ok
-	} // if bpm tag exists
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_COMMENT).isEmpty() )
-		vmap["xesam:comment"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMMENT)));	
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_COMPOSER).isEmpty() )
-		vmap["xesam:composer"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMPOSER)));			
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER).isEmpty() ) {
-		uint vn = (playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER)).toUInt(&ok);
-		if (ok) {
-			vmap["xesam:discNumber"] = QVariant::fromValue(vn);
-		}	// if ok
-	}	// if volume number tag exists
-	
-	if (! playlist->getCurrentTagAsString(GST_TAG_GENRE).isEmpty() )
-		vmap["xesam:genre"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_GENRE)));	
-	
-	if (! playlist->getCurrentTitle().isEmpty() )
-		vmap["xesam:title"] = QVariant::fromValue(playlist->getCurrentTitle());
-	else	
-		vmap["xesam:title"] = QVariant::fromValue(msg);
-
-	if (playlist->getCurrentSeq() >= 0)
-		vmap["xesam:trackNumber"] = QVariant::fromValue(playlist->getCurrentSeq() );
-	
-	if (! playlist->getCurrentUri().isEmpty() )
-		vmap["xesam:url"] = QVariant::fromValue(playlist->getCurrentUri());
-	
-	mpris2->setMetadata(vmap);
-	
-	// update mpris2 on previous, next, play, pause and seekable status
-	mpris2->setCanGoNext(playlist->canGoNext());
-	mpris2->setCanGoPrevious(playlist->canGoPrevious());
-	mpris2->setCanPlay(playlist->currentIsPlayable());
-	mpris2->setCanPause(playlist->currentIsPlayable());
-	mpris2->setCanSeek(playlist->currentIsSeekable());
-
 	return;
 }
