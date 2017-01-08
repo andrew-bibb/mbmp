@@ -335,23 +335,44 @@ void MediaPlayer2Player::OpenUri(QString uri)
 // Slot to return the current artist
 QString MediaPlayer2Player::getArtist()
 {
-	return metadata.contains("xesam:title") ? metadata["xesam:title"].value<QString>() : QString();
+	return metadata.contains("xesam:artist") ? metadata["xesam:artist"].value<QString>() : QString();
 }
 
+// Title and track could be different.  Title is read from the tags in
+// the playlist.  Track is read from the message when GStreamer issues
+// a NewTrack signal. For instance an internet radio stream will not
+// have any tags in the playlist, but will (may?) have information
+// when a NewTrack signal is fired.
 //
 // Slot to return the current title
 QString MediaPlayer2Player::getTitle()
 {
-	return metadata.contains("xesam:artist") ? metadata["xesam:artist"].value<QString>() : QString();
+	return metadata.contains("xesam:title") ? metadata["xesam:title"].value<QString>() : QString();
 }
 
 //
-// Slot to return the current duration in seconds. Note that mpris2 has all internal duration
-// and position values as microseconds.  GStreamer has the same in nanoseconds, and we typically
+// Slot to return the current track.
+QString MediaPlayer2Player::getTrack()
+{
+	return metadata.contains("mbmp:track") ? metadata["mbmp:track"].value<QString>() : QString();
+}
+
+//
+// Notes for the xxxInSeconds() functions:  Mpris2 has all internal duration and
+// position values as microseconds.  GStreamer has the same in nanoseconds, and we typically
 // use full seconds (although I would not be surprised to find millseconds here and there).
-int MediaPlayer2Player::getDuration()
+
+// Slot to return the current duration in seconds.
+int MediaPlayer2Player::getDurationInSeconds()
 {
 	return metadata.contains("mpris:length") ? static_cast<int>(metadata["mpris:length"].value<qlonglong>() / (1000 * 1000)) : 0;
+}
+
+//
+// Slot to return the current position in seconds. 
+int MediaPlayer2Player::getPositionInSeconds()
+{
+	return static_cast<int>(position / (1000 * 1000));
 }
 
 

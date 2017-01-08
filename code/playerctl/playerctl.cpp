@@ -1699,9 +1699,7 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	// Many of the mpris2 fields are lists of strings, while GStreamer tags are just
 	// strings.  I'll convert the tags to stringlists, but I'm not going to parse 
 	// them trying to break out space or comma separated fields.  Not worth the 
-	// effort and quite honestly I've come to the conclusion the mpris2 
-	// specification is nothing but a steaming smelly pile of Obama. 
-	
+	// effort.
 	bool ok = false;
 	QVariantMap vmap;
 		if (playlist->getCurrentRow() >= 0) {
@@ -1750,8 +1748,9 @@ void PlayerControl::processMediaInfo(const QString& msg)
 		
 		if (! playlist->getCurrentTitle().isEmpty() )
 			vmap["xesam:title"] = QVariant::fromValue(playlist->getCurrentTitle());
-		else	
-			vmap["xesam:title"] = QVariant::fromValue(msg);
+			
+		if (! msg.isEmpty() )
+			vmap["mbmp:track"] = QVariant::fromValue(msg);
 		
 		if (playlist->getCurrentSeq() >= 0)
 			vmap["xesam:trackNumber"] = QVariant::fromValue(playlist->getCurrentSeq() );

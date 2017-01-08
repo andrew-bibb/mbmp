@@ -120,8 +120,10 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		// functions I consider useful and which I lost when I converted from
 		// my own IPC to the standard Mpris2 IPC.
 		Q_SCRIPTABLE QString getTitle();
+		Q_SCRIPTABLE QString getTrack();
 		Q_SCRIPTABLE QString getArtist();
-		Q_SCRIPTABLE int getDuration();
+		Q_SCRIPTABLE int getDurationInSeconds();
+		Q_SCRIPTABLE int getPositionInSeconds();
 		Q_SCRIPTABLE void toggleConsume();
 		
 	Q_SIGNALS:
