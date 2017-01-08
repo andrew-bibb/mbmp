@@ -48,7 +48,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/videowidget/videowidget.h"
 # include "./code/scrollbox/scrollbox.h"
 # include "./code/notify/notify.h"
-# include "./code/ipc/ipcagent.h"
+# include "./code/ipc/mpris2.h"
 
 // To toggle DPMS.  Note that Xlib.h defines a macro Bool, and QT also defines
 // Bool in QMetaData. Need to undefine the X11 version - be careful using
@@ -73,6 +73,9 @@ class PlayerControl : public QDialog
 		void seekToPosition(QAction*);
 		void dvdNavigationCommand(QAction*);
 		void playPause();
+		void mpris2Pause();
+		void mpris2Seek(qlonglong);
+		void mpris2OpenUri(QString);
 		void toggleFullScreen();
 		void togglePlaylist();
 		void toggleGUI();
@@ -110,7 +113,7 @@ class PlayerControl : public QDialog
     VideoWidget* videowidget;
     ScrollBox* chtsht;
     NotifyClient* notifyclient;
-    IPC_Agent* ipcagent;
+    Mpris2* mpris2;
     QTimer* pos_timer;
     bool b_logtofile;
     short displaymode;

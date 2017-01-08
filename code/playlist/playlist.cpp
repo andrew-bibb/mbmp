@@ -81,6 +81,9 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // initialize class members
   geometry = QRect();
   ui.listWidget_playlist->clear();
+  arturl.clear();
+  cangoprevious = false;
+  cangonext = false;
   
   // Iconmanager with constructor only scope
   IconManager iconman(this);
@@ -231,8 +234,10 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (ui.actionToggleRandom, SIGNAL(triggered()), this, SLOT(toggleRandomMode()));
   connect (ui.actionToggleDetail, SIGNAL(triggered()), this, SLOT(toggleDetailMode()));
   connect (ui.listWidget_playlist, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentItemChanged(QListWidgetItem*, QListWidgetItem*)));
+  connect (ui.checkBox_wrap, SIGNAL(toggled(bool)), this, SIGNAL(wrapModeChanged(bool)));
+  connect (ui.checkBox_random, SIGNAL(toggled(bool)), this, SIGNAL(randomModeChanged(bool)));
   
- settings->deleteLater();
+	settings->deleteLater();
  
  return;
 }
@@ -449,6 +454,26 @@ void Playlist::addURL()
 }
 
 //
+// Slot to add a URI. URI's can only be delivered by mpris2 so there is no user interaction we
+// we need to coordinate with
+void Playlist::addURI(const QString& uri)
+{
+	QUrl url(uri);
+	
+	if (url.scheme().contains("file", Qt::CaseSensitive) ) { 
+		new PlaylistItem(url.toLocalFile(), ui.listWidget_playlist, MBMP_PL::File);
+    this->updateSummary();
+	}
+		
+	else if (url.scheme().contains("http", Qt::CaseSensitive) ) {
+		new PlaylistItem(url.toString(), ui.listWidget_playlist, MBMP_PL::Url);	
+		this->updateSummary();	
+	}
+	
+	return;
+}
+
+//
 // Slot to add tracks (for instance from an Audio CD) to the playlist.  Tracks and files/url's
 // can't coexist in the playlist, so clear the playlist first.  The <TOCEntry> list comes from 
 // GST_InterFace via PlayerControl/
@@ -658,10 +683,29 @@ void Playlist::albumArtRetrieved()
 void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 {
 	(void) old;
+	
+	// return now if no current item
+	cangonext = false;
+	cangoprevious = false;	
 	if (cur == NULL) return;
 	
+	// save the movement properties of current item
+	if (ui.checkBox_wrap->isChecked() ) {
+		cangonext = true;
+		cangoprevious = true;
+	}// if wrap checked
+	else {
+		int pl_row = this->getCurrentRow();
+		int pl_size = this->getPlaylistSize();
+		if (pl_size <= 1) {cangonext = false; cangoprevious = false;}			
+		else if (pl_size - pl_row == 1) {cangonext = false; cangoprevious = true;}
+			else if (pl_row == 0) {cangonext = true; cangoprevious = false;}
+				else {cangonext = true; cangoprevious = true;}
+	}	// else wrap not checked
+		
 	ui.label_iteminfo->clear();
 	ui.label_artwork->clear();
+	arturl.clear();
 	QStringList searchtags;
 	searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString("musicbrainz-albumid");
 	searchtags << static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM);
@@ -704,7 +748,6 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 		if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
 	}
 		
-	
 	return;	
 }
 
@@ -1142,6 +1185,7 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 	
 	namefilters.clear();
 	entlist.clear();
+	arturl.clear();
 	
 	// Look for any image in the media directory first, if a directory was provided
 	if (dir.exists() ) {
@@ -1149,8 +1193,10 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 			namefilters << QString("*%1").arg(ext.at(i));
 		}
 		entlist = dir.entryList(namefilters, QDir::Files, QDir::NoSort);
-		if (entlist.count() > 0)
+		if (entlist.count() > 0) {
+			arturl = QUrl::fromLocalFile(dir.absoluteFilePath(entlist.at(0)) );
 			return QPixmap(dir.absoluteFilePath(entlist.at(0)) );
+		}
 	}	// if dir exists
 	
 	// Not image in media directory, look in artwork_dir			
@@ -1161,6 +1207,7 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 		}
 		entlist = artwork_dir.entryList(namefilters, QDir::Files, QDir::NoSort);
 		if (entlist.count() > 0) {
+			arturl = QUrl::fromLocalFile(artwork_dir.absoluteFilePath(entlist.at(0)) );
 			return QPixmap(artwork_dir.absoluteFilePath(entlist.at(0)) );
 		}	// if found cover
 	}	// for searchtags

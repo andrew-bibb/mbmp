@@ -66,7 +66,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	videowidget = new VideoWidget(this);
 	hiatus_resume = -1;
 	notifyclient = NULL;
-	ipcagent = new IPC_Agent(this);
+	mpris2 = new Mpris2(this);
 	pos_timer = new QTimer(this);
 	
 	// Create the notifyclient, make four tries; first immediately in constructor, then
@@ -524,7 +524,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionAddMedia, SIGNAL (triggered()), playlist, SLOT(addMedia()));
 	connect (ui.actionToggleMute, SIGNAL (triggered()), gstiface, SLOT(toggleMute())); 
 	connect (volume_group, SIGNAL(triggered(QAction*)), this, SLOT(changeVolumeDialStep(QAction*)));
-	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));	
+	connect (ui.dial_volume, SIGNAL(valueChanged(int)), this, SLOT(changeVolume(int)));
+	connect (mpris2, SIGNAL(volumeChanged(int)), ui.dial_volume, SLOT(setValue(int)));	
 	connect (ui.actionVisualizer, SIGNAL(triggered()), this, SLOT(popupVisualizerMenu()));
 	connect (ui.actionOptions, SIGNAL(triggered()), this, SLOT(popupOptionsMenu()));
 	connect (vis_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeVisualizer(QAction*)));
@@ -538,13 +539,20 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
 	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
 	
-	connect(ipcagent, SIGNAL(controlStop()), ui.actionPlayerStop, SLOT(trigger()));
-	connect(ipcagent, SIGNAL(controlPlaypause()), ui.actionPlayPause, SLOT(trigger()));
-	connect(ipcagent, SIGNAL(controlPlaylistNext()), ui.actionPlaylistNext, SLOT(trigger()));
-	connect(ipcagent, SIGNAL(controlPlaylistBack()), ui.actionPlaylistBack, SLOT(trigger()));
-	connect(ipcagent, SIGNAL(controlToggleWrap()), playlist, SLOT(toggleWrapMode()));
-	connect(ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
-	connect(ipcagent, SIGNAL(controlToggleRandom()), playlist, SLOT(toggleRandomMode()));
+	connect (mpris2, SIGNAL(applicationStop()), qApp, SLOT(quit()));
+	connect (mpris2, SIGNAL(controlStop()), ui.actionPlayerStop, SLOT(trigger()));
+	connect (mpris2, SIGNAL(controlPlay()), this, SLOT(playMedia()));
+	connect (mpris2, SIGNAL(controlPlayPause()), ui.actionPlayPause, SLOT(trigger()));
+	connect (mpris2, SIGNAL(controlPause()), this, SLOT(mpris2Pause()));
+	connect (mpris2, SIGNAL(controlSeek(qlonglong)), this, SLOT(mpris2Seek(qlonglong)));
+	connect (mpris2, SIGNAL(playlistNext()), ui.actionPlaylistNext, SLOT(trigger()));
+	connect (mpris2, SIGNAL(playlistBack()), ui.actionPlaylistBack, SLOT(trigger()));
+	connect (playlist, SIGNAL(wrapModeChanged(bool)), mpris2, SLOT(setLoopStatus(bool)));
+	connect (mpris2, SIGNAL(loopStatusChanged(bool)), playlist, SLOT(setWrapMode(bool)));
+	connect (playlist, SIGNAL(randomModeChanged(bool)), mpris2, SLOT(setShuffle(bool)));
+	connect (mpris2, SIGNAL(shuffleChanged(bool)), playlist, SLOT(setRandomMode(bool)));
+	connect (mpris2, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
+	connect (mpris2, SIGNAL(controlOpenUri(QString)), this, SLOT(mpris2OpenUri(QString)));
 	
 	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -661,7 +669,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 
 ////////////////////////////// Public Functions ////////////////////////////
 //
-// Function to set the stream position.  This will set both the text
+// Function to set the stream position widgets. This will set both the text
 // label and the slider. Called from this->pos_timer. Position
 // is the stream position in seconds.
 //
@@ -673,19 +681,26 @@ void PlayerControl::setPositionWidgets()
 	// return if we are not playing
 	if (gstiface->getState() != GST_STATE_PLAYING) return;
 	
-	// variables
-	int position = gstiface->queryStreamPosition() / (1000 * 1000 * 1000);
+	// variables 
+	// gst stream position in nanoseconds
+	// nano * 1000 = micro
+	// micro * 1000 = milli
+	// mili * 1000 = full seconds
+	qint64 position = gstiface->queryStreamPosition();
 	
 	// position is zero or positive
 	if (position >= 0 ) {
 		QTime t(0,0,0);
-		t = t.addSecs(position);
+		int pos = position / (1000 * 1000 * 1000);
+		t = t.addSecs(pos);
 		ui.label_position->setText(t.toString("HH:mm:ss") );
-		ui.horizontalSlider_position->setSliderPosition(position);	
+		ui.horizontalSlider_position->setSliderPosition(pos);	
+		mpris2->setPosition(position);
 	}
 	// position is negative
 	else {
 		ui.label_position->setText("00:00:00");
+		mpris2->setPosition(0);
 	}
 	
 	// deactive xscreensaver, do this each time we process a new position (about twice a second)
@@ -702,16 +717,17 @@ void PlayerControl::changeVolume(int vol)
 	// Gstreamer volume ranges are doubles in the range of 0.0 to 10.0
 	// 0.0 = mute, 1.0 = 100%, so 10.0 must be really loud.  The volume
 	// scale is linear, and the default is 1.0  Our dial uses integers
-	// and is set up on a range of 0-30, with 10 being 100%. The conversions:
-	//	Vol%		GStreamer MBMP
-	//	  0%		0.0				0
-	//	100%		1.0				10
-	//	300%		3.0				30  This is the maximum we want to go
+	// and is set up on a range of 0-30, with 10 being 100%. Mpris2 is 
+	// based on doubles range from 0.0 to 1.0,  The conversions:
+	//	Vol%		GStreamer MBMP	mpris2
+	//	  0%		0.0				0			0.00
+	//	100%		1.0				10		0.33
+	//	300%		3.0				30  	1.00 	This is the maximum we want to go	
 	
-	double d_vol = 0.0;
-	d_vol = (static_cast<double>(vol) / 10.0);
+	gstiface->changeVolume(static_cast<double>(vol) / 10.0);
 	
-	gstiface->changeVolume(d_vol);
+	// let mpris2 know
+	mpris2->setVolume(static_cast<double>(vol) / 30.0);
 	
 	return;
 }
@@ -917,12 +933,44 @@ void PlayerControl::seekToPosition(QAction* act)
 	if (act != 0) ui.horizontalSlider_position->setSliderPosition(pos);
 			
 	if (pos < 0 ) pos = 0;
-	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();
-	
+	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();	
 	gstiface->seekToPosition(pos);
+	
+	// let mpris2 know about it
+	mpris2->seeked(static_cast<qlonglong>(pos * 1000 * 1000));
 	
 	return;
 }
+
+//
+// Slot to change the slider position, called from mpris2 seek
+void PlayerControl::mpris2Seek(qlonglong offset)
+{
+	// offset is microseconds, convert to seconds for slider
+	int pos = ui.horizontalSlider_position->sliderPosition() + static_cast<int>(offset / (1000 * 1000));
+	
+	// move and change stream
+	if (pos < 0 ) pos = 0;
+	if (pos > ui.horizontalSlider_position->maximum() ) pos = ui.horizontalSlider_position->maximum();
+	gstiface->seekToPosition(pos);
+	
+	// let mpris2 know about it (even though we came here from mpris2)
+	mpris2->seeked(static_cast<qlonglong>(pos * 1000 * 1000));
+	
+	return;
+}
+
+//
+// Slot to process an mpris2 OpenUri signal
+void PlayerControl::mpris2OpenUri(QString uri)
+{
+	playlist->addURI(uri);
+	
+	if (gstiface->getState() != GST_STATE_PLAYING)
+		QTimer::singleShot(10, this, SLOT(playMedia()));
+		
+	return;
+	}
 
 //
 // Slot to send a DVD navigation command to the stream.  Called when
@@ -947,6 +995,7 @@ void PlayerControl::dvdNavigationCommand(QAction* act)
 	return;
 }
 
+//
 // Slot to toggle pause and play on the media
 void PlayerControl::playPause()
 {
@@ -957,7 +1006,20 @@ void PlayerControl::playPause()
 		if (gstiface->getState() == GST_STATE_PLAYING) seek_group->setEnabled(false);
 		gstiface->playPause();
 	}
+	
+	return;	
+}
+
+//
+// Slot to pause the playback.  Only used from the mpris2 interface, which
+// means it will probably never be used.  
+void PlayerControl::mpris2Pause()
+{
+	if (gstiface->getState() == GST_STATE_PLAYING) {
+			ui.actionPlayPause->trigger();
+	}	
 		
+	return;
 }
 
 //
@@ -1164,11 +1226,11 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				// initialize things based on player state	
 				if (msg.contains("PAUSED to PLAYING", Qt::CaseSensitive) ) {
 					this->setDurationWidgets(gstiface->queryDuration() / (1000 * 1000 * 1000), gstiface->queryStreamSeek() ); 
-				}
-				
-				// let ipcagent know about state changes	
-				ipcagent->setProperty("state", gstiface->getState() );
-				ipcagent->updatedState();	
+				}	// if PAUSED to PLAYING
+		
+				// let mpris2 know about state changes	
+				mpris2->setState(gstiface->getState() );
+				mpris2->setCanSeek(gstiface->queryStreamSeek() );		
 			}	// if PLAYER_NAME								
 			
 			break;
@@ -1186,7 +1248,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			if (loglevel >= 3) {
 					stream1 << msg << endl;
 					if (b_logtofile) stream2 << msg << endl;
-				}	// loglevel if								
+				}	// loglevel if
 			break;
 			
 		case MBMP_GI::Error:	// all errors printed regardless of loglevel
@@ -1353,6 +1415,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 	return;
 }
 
+//
 // Slot to change the the volume dial in response to a QAction being triggered.  
 void PlayerControl::changeVolumeDialStep(QAction* act)
 {
@@ -1437,7 +1500,7 @@ void PlayerControl::cleanUp()
 	logfile.close();
 	
 	// stop the ipc agent
-	ipcagent->stopAgent();
+	//ipcagent->stopAgent();
 	
   return;
 }
@@ -1632,15 +1695,77 @@ void PlayerControl::processMediaInfo(const QString& msg)
 		}	// if useNotifications
 	}	// if media type we want notifications for
 	
-	// Pass information from playlist to ipcagent.  The track information
-	// is changed from processGstifaceMessages when a NewTrack signal is received. 
-	ipcagent->init();
-	ipcagent->setProperty("sequence", playlist->getCurrentSeq() );
-	ipcagent->setProperty("uri", playlist->getCurrentUri() );
-	ipcagent->setProperty("artist", playlist->getCurrentArtist() );
-	ipcagent->setProperty("title", playlist->getCurrentTitle() );
-	ipcagent->setProperty("duration", playlist->getCurrentDuration() );
-	ipcagent->setProperty("track", msg);	
-	ipcagent->updatedTrackInfo();	
+	// Pass information from to mpris2.  
+	// Many of the mpris2 fields are lists of strings, while GStreamer tags are just
+	// strings.  I'll convert the tags to stringlists, but I'm not going to parse 
+	// them trying to break out space or comma separated fields.  Not worth the 
+	// effort.
+	bool ok = false;
+	QVariantMap vmap;
+		if (playlist->getCurrentRow() >= 0) {
+			vmap["mpris:trackid"] = QVariant::fromValue(QDBusObjectPath(QString("/org/mbmp/Track/%1").arg(playlist->getCurrentRow())) );	
+		
+		if (playlist->getCurrentDuration() >= 0)
+			vmap["mpris:length"] = QVariant::fromValue(static_cast<qlonglong>(playlist->getCurrentDuration() * 1000 * 1000) );	// mpris2 wants microseconds
+		
+		if (! playlist->getArtURL().isEmpty() )
+			vmap["mpris:artUrl"] = QVariant::fromValue(playlist->getArtURL());
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM).isEmpty() )
+			vmap["xesam:album"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_ALBUM));
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST).isEmpty() )
+			vmap["xesam:albumArtist"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_ALBUM_ARTIST)));		
+		
+		if (! playlist->getCurrentArtist().isEmpty() )
+			vmap["xesam:artist"] = QVariant::fromValue(playlist->getCurrentArtist());
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_LYRICS).isEmpty() )
+			vmap["xesam:asText"] = QVariant::fromValue(playlist->getCurrentTagAsString(GST_TAG_LYRICS));
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE).isEmpty() ) {
+			double bpm = (playlist->getCurrentTagAsString(GST_TAG_BEATS_PER_MINUTE)).toDouble(&ok);
+			if (ok) {
+				vmap["xesam:audioBPM"] = QVariant::fromValue(static_cast<int>(bpm));
+			}	// if ok
+		} // if bpm tag exists
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_COMMENT).isEmpty() )
+			vmap["xesam:comment"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMMENT)));	
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_COMPOSER).isEmpty() )
+			vmap["xesam:composer"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_COMPOSER)));			
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER).isEmpty() ) {
+			uint vn = (playlist->getCurrentTagAsString(GST_TAG_ALBUM_VOLUME_NUMBER)).toUInt(&ok);
+			if (ok) {
+				vmap["xesam:discNumber"] = QVariant::fromValue(vn);
+			}	// if ok
+		}	// if volume number tag exists
+		
+		if (! playlist->getCurrentTagAsString(GST_TAG_GENRE).isEmpty() )
+			vmap["xesam:genre"] = QVariant::fromValue(QStringList(playlist->getCurrentTagAsString(GST_TAG_GENRE)));	
+		
+		if (! playlist->getCurrentTitle().isEmpty() )
+			vmap["xesam:title"] = QVariant::fromValue(playlist->getCurrentTitle());
+			
+		if (! msg.isEmpty() )
+			vmap["mbmp:track"] = QVariant::fromValue(msg);
+		
+		if (playlist->getCurrentSeq() >= 0)
+			vmap["xesam:trackNumber"] = QVariant::fromValue(playlist->getCurrentSeq() );
+		
+		if (! playlist->getCurrentUri().isEmpty() )
+			vmap["xesam:url"] = QVariant::fromValue(playlist->getCurrentUri());
+	}	// if current row >= 0
+	
+	mpris2->setMetadata(vmap);
+	
+	// update mpris2 on previous, next, play, pause and seekable status
+	mpris2->setCanGoNext(playlist->canGoNext());
+	mpris2->setCanGoPrevious(playlist->canGoPrevious());
+	mpris2->setCanPlay(playlist->currentIsPlayable());
+	mpris2->setCanPause(playlist->currentIsPlayable());	
+	
 	return;
 }

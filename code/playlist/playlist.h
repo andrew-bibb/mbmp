@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QListWidgetItem>
 # include <QDir>
 # include <QPixmap>
+# include <QUrl>
 
 # include "ui_playlist.h"
 # include "./code/playlist/playlistitem.h"
@@ -60,7 +61,7 @@ namespace MBMP_PL
     File = (QListWidgetItem::UserType) + 11,	// Playlist file 
     Url  = (QListWidgetItem::UserType) + 12,	// Playlist url
     ACD  = (QListWidgetItem::UserType) + 101,	// Playlist Audio CD
-    DVD  = (QListWidgetItem::UserType) + 102	// Playlist DVD	
+    DVD  = (QListWidgetItem::UserType) + 102,	// Playlist DVD	
   };
 } // namespace MBMP_PL
 
@@ -124,6 +125,7 @@ class Playlist : public QDialog
 		void addMedia();
 		void addFile(QAction*);	
 		void addURL();
+		void addURI(const QString&);
 		void addTracks(QList<TocEntry>);
 		void addChapters(int);
 		void removeItem();
@@ -140,8 +142,10 @@ class Playlist : public QDialog
 		inline void setCurrentChapter(int chap) {ui.listWidget_playlist->setCurrentRow(chap - 1);}
 		inline void setCurrentRow(const int& row) {ui.listWidget_playlist->setCurrentRow(row);}
 		inline void toggleWrapMode() {ui.checkBox_consume->setChecked(false); ui.checkBox_wrap->toggle();}
+		inline void setWrapMode(bool b_wm) {ui.checkBox_wrap->setChecked(b_wm);}
 		inline void toggleConsumeMode() {ui.checkBox_wrap->setChecked(false); ui.checkBox_consume->toggle();}
 		inline void toggleRandomMode() {ui.checkBox_random->toggle();}
+		inline void setRandomMode(bool b_rm) {ui.checkBox_random->setChecked(b_rm);}
 		inline void toggleDetailMode() {ui.checkBox_showinfo->toggle();}
 	
 		inline QString getCurrentUri() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getUri() : QString();}
@@ -150,10 +154,15 @@ class Playlist : public QDialog
 		inline QString getCurrentArtist() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getArtist() : QString();}
 		inline qint32 getCurrentDuration() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getDuration() : -1;}
 		inline int getCurrentRow() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentRow() : -1;}		
+		inline int getPlaylistSize() {return ui.listWidget_playlist->count();}
+		inline QString getArtURL() {return arturl.url(QUrl::None);}
+		inline QString getCurrentTagAsString(const QString& tag) {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->getTagAsString(tag) : QString();}
+		inline bool canGoNext() {return cangonext;}
+		inline bool	canGoPrevious() {return cangoprevious;}
 		
 		inline int currentItemType() {return ui.listWidget_playlist->count() > 0 ? ui.listWidget_playlist->currentItem()->type() : MBMP_PL::None;}
 		inline bool currentIsPlayable() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isPlayable() : false;}
-	
+		inline bool currentIsSeekable() {return ui.listWidget_playlist->count() > 0 ? static_cast<PlaylistItem*>(ui.listWidget_playlist->currentItem())->isSeekable() : false;}
 		void currentItemChanged(QListWidgetItem*, QListWidgetItem*);
 		
 	public:
@@ -179,8 +188,11 @@ class Playlist : public QDialog
 		QDir artwork_dir;
     QDir cdmeta_dir;
 	  MetaData* cdmetadata;
-	  MusicBrainzManager* mbman;     
-
+	  MusicBrainzManager* mbman; 
+	  QUrl arturl;
+	  bool cangonext;
+	  bool cangoprevious;
+	  
 	// functions
 		void processM3U(const QString&);
 		void processPLS(const QString&);
@@ -188,6 +200,10 @@ class Playlist : public QDialog
 		bool readCDMetaFile(const QString&);
 		void updateTracks();
 		QPixmap getLocalAlbumArt(const QStringList&, const QDir& = QDir("NONE"));
+		
+	Q_SIGNALS:	
+		void wrapModeChanged(const bool&);	
+		void randomModeChanged(const bool&);
 };
 
 #endif

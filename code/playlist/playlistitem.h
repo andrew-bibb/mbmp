@@ -48,6 +48,7 @@ class PlaylistItem : public QListWidgetItem
 		// get functions
 		inline qint16 getSequence() {return sequence;}
 		inline QString getUri() {return uri;}
+		inline bool isSeekable() {return seekable;}
 		inline QString getArtist() {return artist;}
 		inline QString getTitle() {return title;}
 		inline qint32 getDuration() {return duration;}
@@ -56,6 +57,7 @@ class PlaylistItem : public QListWidgetItem
 		inline bool hasArtwork() {return b_has_artwork;}
 		inline QPixmap getArtwork() {return pm_artwork;}
 		QString getTagAsString(const QString& tag);
+		inline QMap<QString,QString> getTagMap() {return tag_map;}
 		
 		// set functions
 		inline void setSequence(uint seq) {sequence = seq;}
