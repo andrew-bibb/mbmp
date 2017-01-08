@@ -68,7 +68,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		Q_PROPERTY (bool CanSeek READ getCanSeek);		
 		Q_PROPERTY (bool CanControl READ getCanControl);			
 		
-	// get functions for memebers
+	// get functions for memebers (properties)
 		inline QString getPlaybackStatus() const {return playbackstatus;}
 		inline QString getLoopStatus() const {return loopstatus;}
 		inline double getPlaybackRate() const {return playbackrate;}
@@ -93,7 +93,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		void setShuffle(const bool&);
 		void setMetadata(const QVariantMap&); 
 		void setVolume(const double&);
-		inline void setPosition(qlonglong pos) {position = pos;}	// propertyChanged not emitted when this changes
+		inline void setPos(qlonglong pos) {position = pos;}	// propertyChanged not emitted when this changes
 		inline void setMinimumRate(double d_mi) {(void) d_mi;}	// We don't allow changing the minimum rate
 		inline void setMaximumRate(double d_mx) {(void) d_mx;}	// We don't allow changing the maximum rate
 		void setCanGoNext(const bool& b_cgn); 		
@@ -104,7 +104,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		inline void setCanControl(bool b_ctl) {(void) b_ctl;}	// We don't allow changing the CanControl property
 		inline void emitSeeked(const qlonglong& pos) {emit Seeked(pos);} 
 
-	// public slots (Q_SCRIPTABLE not actually needed) are published on the dbus interface
+	// public slots (Q_SCRIPTABLE not actually needed) all slots published on the dbus interface
 	public Q_SLOTS:
 		Q_SCRIPTABLE void Next();
 		Q_SCRIPTABLE void Previous();
@@ -113,7 +113,8 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		Q_SCRIPTABLE void Stop();
 		Q_SCRIPTABLE void Play();
 		Q_SCRIPTABLE void Seek(qlonglong);
-		Q_SCRIPTABLE void SetToPosition(QDBusObjectPath, qlonglong);
+		Q_SCRIPTABLE void SetPosition(QDBusObjectPath, qlonglong);
+		Q_SCRIPTABLE void OpenUri(QString);
 		
 		// These are not part of the mpris2 specification.  They are to replace
 		// functions I consider useful and which I lost when I converted from

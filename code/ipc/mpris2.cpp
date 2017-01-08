@@ -130,7 +130,7 @@ void Mpris2::setVolume(const double& d_v)
 // position in nanoseonds.  Convert to microseconds
 void Mpris2::setPosition(const qint64& nano)
 {
-	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setPosition(static_cast<qlonglong>(nano / 1000) );
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->setPos(static_cast<qlonglong>(nano / 1000) );
 	
 	return;
 }

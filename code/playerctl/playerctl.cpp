@@ -552,6 +552,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	//connect (ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
 	connect (playlist, SIGNAL(randomModeChanged(bool)), mpris2, SLOT(setShuffle(bool)));
 	connect (mpris2, SIGNAL(shuffleChanged(bool)), playlist, SLOT(setRandomMode(bool)));
+	connect (mpris2, SIGNAL(controlOpenUri(QString)), this, SLOT(mpris2OpenUri(QString)));
 	
 	// create actions to accept a selected few playlist and gstiface shortcuts
 	QAction* pl_Act01 = new QAction(this);
@@ -958,6 +959,18 @@ void PlayerControl::mpris2Seek(qlonglong offset)
 	
 	return;
 }
+
+//
+// Slot to process an mpris2 OpenUri signal
+void PlayerControl::mpris2OpenUri(QString uri)
+{
+	playlist->addURI(uri);
+	
+	if (gstiface->getState() != GST_STATE_PLAYING)
+		QTimer::singleShot(10, this, SLOT(playMedia()));
+		
+	return;
+	}
 
 //
 // Slot to send a DVD navigation command to the stream.  Called when

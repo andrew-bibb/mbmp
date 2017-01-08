@@ -304,7 +304,7 @@ void MediaPlayer2Player::Seek(qlonglong offset)
 
 // Slot to issue a seek to position command.  pos is the stream position
 // in microsecods.
-void MediaPlayer2Player::SetToPosition(QDBusObjectPath obj, qlonglong pos)
+void MediaPlayer2Player::SetPosition(QDBusObjectPath obj, qlonglong pos)
 {
 	// first make sure function received valid arguments
 	if (! metadata.contains("mpris:trackid") ) return;
@@ -317,6 +317,15 @@ void MediaPlayer2Player::SetToPosition(QDBusObjectPath obj, qlonglong pos)
 		
 	return;
 }
+
+// Slot to issue a OpenUri command. 
+void MediaPlayer2Player::OpenUri(QString uri)
+{
+	// uri validation is done in playlist addURI() function
+	static_cast<Mpris2*>(this->parent())->emitControlOpenUri(uri);
+		
+	return;
+}	
 
 // These are not part of the mpris2 specification.  They are to replace
 // functions I consider useful and which I lost when I converted from
@@ -337,7 +346,9 @@ QString MediaPlayer2Player::getTitle()
 }
 
 //
-// Slot to return the current duration in seconds
+// Slot to return the current duration in seconds. Note that mpris2 has all internal duration
+// and position values as microseconds.  GStreamer has the same in nanoseconds, and we typically
+// use full seconds (although I would not be surprised to find millseconds here and there).
 int MediaPlayer2Player::getDuration()
 {
 	return metadata.contains("mpris:length") ? static_cast<int>(metadata["mpris:length"].value<qlonglong>() / (1000 * 1000)) : 0;

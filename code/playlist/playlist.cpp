@@ -454,6 +454,26 @@ void Playlist::addURL()
 }
 
 //
+// Slot to add a URI. URI's can only be delivered by mpris2 so there is no user interaction we
+// we need to coordinate with
+void Playlist::addURI(const QString& uri)
+{
+	QUrl url(uri);
+	
+	if (url.scheme().contains("file", Qt::CaseSensitive) ) { 
+		new PlaylistItem(url.toLocalFile(), ui.listWidget_playlist, MBMP_PL::File);
+    this->updateSummary();
+	}
+		
+	else if (url.scheme().contains("http", Qt::CaseSensitive) ) {
+		new PlaylistItem(url.toString(), ui.listWidget_playlist, MBMP_PL::Url);	
+		this->updateSummary();	
+	}
+	
+	return;
+}
+
+//
 // Slot to add tracks (for instance from an Audio CD) to the playlist.  Tracks and files/url's
 // can't coexist in the playlist, so clear the playlist first.  The <TOCEntry> list comes from 
 // GST_InterFace via PlayerControl/

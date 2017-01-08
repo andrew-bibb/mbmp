@@ -125,6 +125,7 @@ class Playlist : public QDialog
 		void addMedia();
 		void addFile(QAction*);	
 		void addURL();
+		void addURI(const QString&);
 		void addTracks(QList<TocEntry>);
 		void addChapters(int);
 		void removeItem();

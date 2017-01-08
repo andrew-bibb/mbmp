@@ -75,6 +75,7 @@ class PlayerControl : public QDialog
 		void playPause();
 		void mpris2Pause();
 		void mpris2Seek(qlonglong);
+		void mpris2OpenUri(QString);
 		void toggleFullScreen();
 		void togglePlaylist();
 		void toggleGUI();
