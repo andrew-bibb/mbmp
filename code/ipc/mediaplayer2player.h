@@ -125,6 +125,7 @@ class MediaPlayer2Player : public QDBusAbstractAdaptor
 		Q_SCRIPTABLE int getDurationInSeconds();
 		Q_SCRIPTABLE int getPositionInSeconds();
 		Q_SCRIPTABLE void toggleConsume();
+		Q_SCRIPTABLE bool isPaused();
 		
 	Q_SIGNALS:
 		Q_SCRIPTABLE void Seeked(qlonglong);

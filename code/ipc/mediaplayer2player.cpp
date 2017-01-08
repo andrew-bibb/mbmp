@@ -342,7 +342,7 @@ QString MediaPlayer2Player::getArtist()
 // the playlist.  Track is read from the message when GStreamer issues
 // a NewTrack signal. For instance an internet radio stream will not
 // have any tags in the playlist, but will (may?) have information
-// when a NewTrack signal is fired.
+// we want when it fires a NewTrack signal.
 //
 // Slot to return the current title
 QString MediaPlayer2Player::getTitle()
@@ -383,6 +383,13 @@ void MediaPlayer2Player::toggleConsume()
 	static_cast<Mpris2*>(this->parent())->emitControlToggleConsume();
 		
 	return;
+}
+
+//
+// Slot to return a bool based on the paused state
+bool MediaPlayer2Player::isPaused()
+{
+	return playbackstatus == "Paused" ? true : false;
 }
 
 /////////////////////// Private Functions //////////////////////////////
