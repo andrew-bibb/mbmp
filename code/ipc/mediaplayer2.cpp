@@ -3,7 +3,7 @@
 Code for the MediaPlayer2 interface on DBus.  When registered MBMP
 will communicate to other processes.  
 
-Copyright (C) 2013-2016
+Copyright (C) 2013-2017
 by: Andrew J. Bibb
 License: MIT 
 

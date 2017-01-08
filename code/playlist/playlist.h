@@ -2,7 +2,7 @@
 
 Code to manage the media playlist.
 
-Copyright (C) 2014-2016
+Copyright (C) 2014-2017
 by: Andrew J. Bibb
 License: MIT 
 

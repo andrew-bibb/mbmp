@@ -1,7 +1,7 @@
 /**************************** playerctl.h ******************************
 Main window which also handles all the controls.
 
-Copyright (C) 2014-2016
+Copyright (C) 2014-2017
 by: Andrew J. Bibb
 License: MIT 
 

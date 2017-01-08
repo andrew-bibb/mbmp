@@ -3,7 +3,7 @@
 Code to manage going out onto the internet to Musicbrainz and getting
 meta data to include album art
 
-Copyright (C) 2014-2016
+Copyright (C) 2014-2017
 by: Andrew J. Bibb
 License: MIT 
 
