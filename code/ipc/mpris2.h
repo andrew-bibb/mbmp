@@ -61,6 +61,9 @@ class Mpris2 : public QObject
 		inline void emitControlSeek(qlonglong offset) {emit controlSeek(offset);}
 		inline void emitControlOpenUri(QString uri) {emit controlOpenUri(uri);}
 		inline void emitControlToggleConsume() {emit controlToggleConsume();}
+		inline void emitControlToggleWrap() {emit controlToggleWrap();}
+		inline void emitControlToggleRandom() {emit controlToggleRandom();}
+		inline void emitControlToggleDetail() {emit controlToggleDetail();}
 		
 	private:
 		QDBusAbstractAdaptor* mediaplayer2;
@@ -102,6 +105,9 @@ class Mpris2 : public QObject
 		void controlSeek(qlonglong);
 		void controlOpenUri(QString);
 		void controlToggleConsume();
+		void controlToggleWrap();
+		void controlToggleRandom();
+		void controlToggleDetail();
 };		
 
 #endif

@@ -378,9 +378,36 @@ int MediaPlayer2Player::getPositionInSeconds()
 
 //
 // Slot to toggle the consume checkbox in the playlist
-void MediaPlayer2Player::toggleConsume()
+void MediaPlayer2Player::toggleConsumeMode()
 {
 	static_cast<Mpris2*>(this->parent())->emitControlToggleConsume();
+		
+	return;
+}
+
+//
+// Slot to toggle the wrap checkbox in the playlist
+void MediaPlayer2Player::toggleWrapMode()
+{
+	static_cast<Mpris2*>(this->parent())->emitControlToggleWrap();
+		
+	return;
+}
+
+//
+// Slot to toggle the random checkbox in the playlist
+void MediaPlayer2Player::toggleRandomMode()
+{
+	static_cast<Mpris2*>(this->parent())->emitControlToggleRandom();
+		
+	return;
+}
+
+//
+// Slot to toggle the detail checkbox in the playlist
+void MediaPlayer2Player::toggleDetailMode()
+{
+	static_cast<Mpris2*>(this->parent())->emitControlToggleDetail();
 		
 	return;
 }
@@ -390,6 +417,20 @@ void MediaPlayer2Player::toggleConsume()
 bool MediaPlayer2Player::isPaused()
 {
 	return playbackstatus == "Paused" ? true : false;
+}
+
+//
+// Slot to return a bool based on the playing state
+bool MediaPlayer2Player::isPlaying()
+{
+	return playbackstatus == "Playing" ? true : false;
+}
+
+//
+// Slot to return a bool based on the stopped state
+bool MediaPlayer2Player::isStopped()
+{
+	return playbackstatus == "Stopped" ? true : false;
 }
 
 /////////////////////// Private Functions //////////////////////////////

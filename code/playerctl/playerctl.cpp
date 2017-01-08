@@ -552,6 +552,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (playlist, SIGNAL(randomModeChanged(bool)), mpris2, SLOT(setShuffle(bool)));
 	connect (mpris2, SIGNAL(shuffleChanged(bool)), playlist, SLOT(setRandomMode(bool)));
 	connect (mpris2, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
+	connect (mpris2, SIGNAL(controlToggleWrap()), playlist, SLOT(toggleWrapMode()));
+	connect (mpris2, SIGNAL(controlToggleRandom()), playlist, SLOT(toggleRandomMode()));
+	connect (mpris2, SIGNAL(controlToggleDetail()), playlist, SLOT(toggleDetailMode()));
 	connect (mpris2, SIGNAL(controlOpenUri(QString)), this, SLOT(mpris2OpenUri(QString)));
 	
 	// create actions to accept a selected few playlist and gstiface shortcuts
@@ -1389,9 +1392,10 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 				stream1 << msg << endl;
 				if (b_logtofile) stream2 << msg << endl;
 			}	// loglevel if	
-			// Set the window title, notifications, and ipc data
+			
+			// Set the window title, notifications, and mpris2 data
 			if (msg.isEmpty() ) 
-			this->setWindowTitle(playlist->getWindowTitle());	
+				this->setWindowTitle(playlist->getWindowTitle());	
 			else   
 				this->setWindowTitle(msg);		
 			
@@ -1498,10 +1502,7 @@ void PlayerControl::cleanUp()
   			
   // close b_logtofile			
 	logfile.close();
-	
-	// stop the ipc agent
-	//ipcagent->stopAgent();
-	
+
   return;
 }
 
