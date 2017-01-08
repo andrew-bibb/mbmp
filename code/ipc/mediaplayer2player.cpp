@@ -327,7 +327,7 @@ void MediaPlayer2Player::OpenUri(QString uri)
 	return;
 }	
 
-// These are not part of the mpris2 specification.  They are to replace
+// Slots below are not part of the mpris2 specification.  They are to replace
 // functions I consider useful and which I lost when I converted from
 // my own IPC to the standard Mpris2 IPC.
 
@@ -354,6 +354,15 @@ int MediaPlayer2Player::getDuration()
 	return metadata.contains("mpris:length") ? static_cast<int>(metadata["mpris:length"].value<qlonglong>() / (1000 * 1000)) : 0;
 }
 
+
+//
+// Slot to toggle the consume checkbox in the playlist
+void MediaPlayer2Player::toggleConsume()
+{
+	static_cast<Mpris2*>(this->parent())->emitControlToggleConsume();
+		
+	return;
+}
 
 /////////////////////// Private Functions //////////////////////////////
 //

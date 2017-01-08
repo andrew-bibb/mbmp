@@ -60,6 +60,7 @@ class Mpris2 : public QObject
 		inline void emitControlPlay() {emit controlPlay();}
 		inline void emitControlSeek(qlonglong offset) {emit controlSeek(offset);}
 		inline void emitControlOpenUri(QString uri) {emit controlOpenUri(uri);}
+		inline void emitControlToggleConsume() {emit controlToggleConsume();}
 		
 	private:
 		QDBusAbstractAdaptor* mediaplayer2;
@@ -100,6 +101,7 @@ class Mpris2 : public QObject
 		void controlPlay();
 		void controlSeek(qlonglong);
 		void controlOpenUri(QString);
+		void controlToggleConsume();
 };		
 
 #endif

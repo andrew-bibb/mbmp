@@ -144,7 +144,7 @@ class Playlist : public QDialog
 		inline void toggleWrapMode() {ui.checkBox_consume->setChecked(false); ui.checkBox_wrap->toggle();}
 		inline void setWrapMode(bool b_wm) {ui.checkBox_wrap->setChecked(b_wm);}
 		inline void toggleConsumeMode() {ui.checkBox_wrap->setChecked(false); ui.checkBox_consume->toggle();}
-		inline void toggleRandomMode() {ui.checkBox_random->toggle();}
+		// NOT USED inline void toggleRandomMode() {ui.checkBox_random->toggle();}
 		inline void setRandomMode(bool b_rm) {ui.checkBox_random->setChecked(b_rm);}
 		inline void toggleDetailMode() {ui.checkBox_showinfo->toggle();}
 	

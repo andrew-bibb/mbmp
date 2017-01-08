@@ -549,9 +549,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (mpris2, SIGNAL(playlistBack()), ui.actionPlaylistBack, SLOT(trigger()));
 	connect (playlist, SIGNAL(wrapModeChanged(bool)), mpris2, SLOT(setLoopStatus(bool)));
 	connect (mpris2, SIGNAL(loopStatusChanged(bool)), playlist, SLOT(setWrapMode(bool)));
-	//connect (ipcagent, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
 	connect (playlist, SIGNAL(randomModeChanged(bool)), mpris2, SLOT(setShuffle(bool)));
 	connect (mpris2, SIGNAL(shuffleChanged(bool)), playlist, SLOT(setRandomMode(bool)));
+	connect (mpris2, SIGNAL(controlToggleConsume()), playlist, SLOT(toggleConsumeMode()));
 	connect (mpris2, SIGNAL(controlOpenUri(QString)), this, SLOT(mpris2OpenUri(QString)));
 	
 	// create actions to accept a selected few playlist and gstiface shortcuts
