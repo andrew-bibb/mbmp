@@ -3,7 +3,7 @@
 Code to manage going out onto the internet to Musicbrainz and getting
 meta data to include album art
 
-Copyright (C) 2014-2017
+Copyright (C) 2014-2016
 by: Andrew J. Bibb
 License: MIT 
 
@@ -29,11 +29,11 @@ DEALINGS IN THE SOFTWARE.
 # ifndef MUSICBRAINZ_MANAGER_H
 # define MUSIZBRAINZ_MANAGER_H
 
-# include <QNetworkAccessManager>
+# include <QObject>
 # include <QFile>
 # include <QDir>
 
-class MusicBrainzManager : public QNetworkAccessManager
+class MusicBrainzManager : public QObject
 {
   Q_OBJECT
   
