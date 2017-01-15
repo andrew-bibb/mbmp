@@ -1,6 +1,10 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b> 8 January 2017</b>
+<ul>
+<li>IPC replaced with an MPRIS2.2 compatible system.</li>
+</ul>
 <b>27 November 2016</b>
 <ul>
 <li>Fixed malformed XDG paths</li>

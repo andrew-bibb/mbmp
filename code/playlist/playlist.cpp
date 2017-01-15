@@ -73,13 +73,12 @@ void MetaData::clear()
 // playlist must end with ".m3u".  Additionally in the function addFile()
 // we assume that playlist must end with ".m3u"
 
-Playlist::Playlist(QWidget* parent) : QDialog(parent)
+Playlist::Playlist(QWidget* parent)
 {
   // setup the user interface
   ui.setupUi(this);
   
   // initialize class members
-  geometry = QRect();
   ui.listWidget_playlist->clear();
   arturl.clear();
   cangoprevious = false;
@@ -94,7 +93,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   // Class to hold audio CD metadata about the current disk
   cdmetadata = new MetaData(static_cast<QObject*>(this) );
   
-  // Process playlist related settings. The geometry and playlist contents
+  // Process playlist related settings. The playlist contents
   // are set in Playerctl.
 	QSettings* settings = new QSettings(ORG, APP, this);
 	settings->beginGroup("Preferences");
@@ -128,7 +127,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
 	ui.actionMoveDown->setIcon(iconman.getIcon("move_down"));
 	ui.actionAddMedia->setIcon(iconman.getIcon("add_media"));
 	ui.actionRemoveItem->setIcon(iconman.getIcon("remove_item"));
-	ui.actionHidePlaylist->setIcon(iconman.getIcon("hide_playlist"));
+	ui.actionHidePlaylist->setIcon(iconman.getIcon("toggle_playlist"));
 	ui.actionAddFiles->setIcon(iconman.getIcon("add_files"));
 	ui.actionAddURL->setIcon(iconman.getIcon("add_url"));
 	ui.actionAddAudio->setIcon(iconman.getIcon("add_audio"));
@@ -226,7 +225,7 @@ Playlist::Playlist(QWidget* parent) : QDialog(parent)
   connect (media_group, SIGNAL(triggered(QAction*)), this, SLOT(addFile(QAction*)));
   connect (ui.actionRemoveItem, SIGNAL(triggered()), this, SLOT(removeItem()));
   connect (ui.actionRemoveAll, SIGNAL(triggered()), this, SLOT(clearPlaylist()));
-  connect (ui.actionHidePlaylist, SIGNAL(triggered()), this, SLOT(hide()));
+  connect (ui.actionHidePlaylist, SIGNAL(triggered()), qobject_cast<PlayerControl*>(parent), SLOT(togglePlaylist()));
   connect (ui.listWidget_playlist, SIGNAL(itemDoubleClicked(QListWidgetItem*)), qobject_cast<PlayerControl*>(parent), SLOT(playMedia()));
   connect (ui.actionSavePlaylist, SIGNAL(triggered()), this, SLOT(savePlaylist()));
   connect (ui.actionToggleWrap, SIGNAL(triggered()), this, SLOT(toggleWrapMode()));
@@ -873,25 +872,6 @@ void Playlist::saveSettings(const int& pos)
 }
 
 //////////////////////////// Protected Functions ////////////////////////////
-//
-//	Reimplement the QHideEvent 
-void Playlist::hideEvent(QHideEvent* )
-{
-	
-	geometry = this->frameGeometry();
-	
-	return;
-}
-
-//
-//	Reimplement the QShowEvent
-void Playlist::showEvent(QShowEvent* )
-{
-  geometry.isNull() ? this->move(20,50) : this->setGeometry(geometry);	
-
-	return;
-}
-
 //
 //	Create a context menu activate by right click of the mouse.
 void Playlist::contextMenuEvent(QContextMenuEvent* e)

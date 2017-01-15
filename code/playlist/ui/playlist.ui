@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Playlist</class>
- <widget class="QDialog" name="Playlist">
+ <widget class="QWidget" name="Playlist">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1003</width>
-    <height>265</height>
+    <width>794</width>
+    <height>346</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Playlist</string>
-  </property>
-  <property name="sizeGripEnabled">
-   <bool>true</bool>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
@@ -58,8 +55,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>919</width>
-             <height>68</height>
+             <width>710</width>
+             <height>77</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">

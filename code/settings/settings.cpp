@@ -205,6 +205,17 @@ void Settings::saveElementGeometry(const QString& elem, const bool& vis, const Q
 }
 
 //
+// function to save the state of a widget
+void Settings::saveElementState(const QString& elem, const QString& key, const QVariant& val)
+{
+	settings->beginGroup("State");
+	settings->setValue(QString("%1_%2").arg(elem).arg(key), val);
+	settings->endGroup();
+	
+	return;
+}
+
+//
 // Function to restore the geometry of a window
 void Settings::restoreElementGeometry(const QString& elem, QWidget* win)
 {
@@ -230,7 +241,7 @@ QVariant Settings::getSetting(const QString& group, const QString& elem)
 	
 	return v;	
 }
-
+ 
 //
 // Function to set ui elements while trying to connect to a notification daemon
 void Settings::setNotificationsTrying(const QString& s)

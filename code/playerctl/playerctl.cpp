@@ -60,10 +60,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		else QIcon::setThemeName(INTERNAL_THEME);
 			
 	// data members
+	stackedwidget = new QStackedWidget(this);
+	videowidget = new VideoWidget(this);
 	playlist = new Playlist(this); 
 	gstiface = new GST_Interface(this);
 	ncurs = this->cursor();
-	videowidget = new VideoWidget(this);
 	hiatus_resume = -1;
 	notifyclient = NULL;
 	mpris2 = new Mpris2(this);
@@ -79,7 +80,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   
   // setup the user interface
   ui.setupUi(this);	
-  ui.gridLayout->addWidget(videowidget, 0, 0);
+  ui.gridLayout->addWidget(stackedwidget, 0, 0);
+  ui.gridLayout->setRowStretch(0,1);
+  stackedwidget->addWidget(videowidget);
+  stackedwidget->addWidget(playlist);
+
 
 	// Set the style
 	QString styl = diag_settings->getSetting("Preferences", "style").toString();
@@ -91,14 +96,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 		f0.close();
 		qApp->setStyleSheet(qss);
 	}
-  
-  // Show or hide GUI.  useState() governs if it is set
-  ui.widget_control->setVisible(false);
-  if (! diag_settings->useState()) {
-		if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
-		else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_gui").toBool() ) ui.widget_control->setVisible(true);
-	}	// if useState();
-    	
+      	
 	// Setup the icon manager and give it a color
 	IconManager iconman(this);
 	iconman.setIconColor(QColor(diag_settings->getSetting("Preferences", "colorize_icons").toString()) );
@@ -492,16 +490,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	chtsht->setWindowTitle(tr("Key Bindings"));
 	chtsht->setDisplayText(scman.getCheatSheet());
 	chtsht->setWindowModality(Qt::NonModal);	
-	
-	// Options to start fullscreen or shade, if both are set fullscreen takes precedence
-	// Settings ->useState takes precedence over both
-	if (! diag_settings->useState()) {
-		if (parser.isSet("fullscreen") ) this->toggleFullScreen();
-			else if (parser.isSet("shademode") ) this->toggleShadeMode();
-				else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->toggleFullScreen();
-					else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_shademode").toBool() ) this->toggleShadeMode();
-	}	// if useState()
-	
+		
   // connect signals to slots 
   connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
   connect (ui.actionToggleStreamInfo, SIGNAL (triggered()), gstiface, SLOT(toggleStreamInfo()));
@@ -621,8 +610,23 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	//restore GUI elements
 	if (diag_settings->useState()) {
 		diag_settings->restoreElementGeometry("playerctl", this);
-		diag_settings->restoreElementGeometry("playlist", playlist);
+		ui.widget_control->setVisible(diag_settings->getSetting("State", "playerctl_gui").toBool() );
+		stackedwidget->setCurrentIndex(diag_settings->getSetting("State", "playerctl_stackedwidget").toInt() );
 	}	// if useState
+
+	// Options to start fullscreen, shade and gui. If both fullscreen and shade
+	// are set then fullscreen takes precedence
+	// Settings ->useState takes precedence over both
+	else {
+		ui.widget_control->setVisible(false);
+		if (parser.isSet("gui") ) ui.widget_control->setVisible(true);
+		else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_gui").toBool() ) ui.widget_control->setVisible(true);
+		
+		if (parser.isSet("fullscreen") ) this->toggleFullScreen();
+			else if (parser.isSet("shademode") ) this->toggleShadeMode();
+				else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->toggleFullScreen();
+					else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_shademode").toBool() ) this->toggleShadeMode();
+	}	// else not useState()
 
 	// seed the playlist with the positional arguments from the command line
 	if (parser.positionalArguments().count() > 0 )
@@ -1029,17 +1033,15 @@ void PlayerControl::mpris2Pause()
 //	Slot to toggle full screen on and off
 void PlayerControl::toggleFullScreen()
 {
-	static bool playlistup = false;
 	static bool cheatsheetup = false;
 	static QSize savedsize;
 	static QPoint savedpoint;
 	
 	// If we're in shademode bring the video window back
-	if (! videowidget->isVisible() ) this->toggleShadeMode();
+	if (! stackedwidget->isVisible() ) this->toggleShadeMode();
 	
 	// Now do the toggle
 	if (this->isFullScreen() ) {
-		if (playlistup) playlist->show();
 		if (cheatsheetup) chtsht->show();
 		this->showNormal();
 		this->resize(savedsize);
@@ -1048,11 +1050,9 @@ void PlayerControl::toggleFullScreen()
 		this->setCursor(ncurs);
 		}
 	else {
-		playlistup = playlist->isVisible();
 		cheatsheetup = chtsht->isVisible();
 		savedsize = this->size();
 		savedpoint = this->pos();
-		if (playlistup) playlist->hide();
 		if (cheatsheetup) chtsht->hide();
 		if (vis_menu->isTearOffMenuVisible() ) vis_menu->hideTearOffMenu();	
 		this->showFullScreen();
@@ -1066,7 +1066,7 @@ void PlayerControl::toggleFullScreen()
 //	Slot to toggle the playlist up and down
 void PlayerControl::togglePlaylist()
 {
-	playlist->isVisible() ? playlist->hide() : playlist->show();
+	stackedwidget->setCurrentIndex(stackedwidget->currentIndex() == 0 ? 1 : 0); 
 	
 	return;
 }
@@ -1091,14 +1091,14 @@ void PlayerControl::toggleShadeMode()
 	if (this->isFullScreen() ) this->toggleFullScreen();
 	
 	// Now do the toggle
-	if (videowidget->isVisible() ) {
+	if (stackedwidget->isVisible() ) {
 		savedsize = this->size();
 		savedpoint = this->pos();
-		videowidget->setVisible(false);
+		stackedwidget->setVisible(false);
 		this->resize(this->sizeHint().width(), ui.widget_control->height());
 	}
 	else {
-		videowidget->setVisible(true);
+		stackedwidget->setVisible(true);
 		this->resize(savedsize);
 		this->move(savedpoint);
 	}
@@ -1492,13 +1492,14 @@ void PlayerControl::changeOptions(QAction* act)
 void PlayerControl::cleanUp()
 {
 	// stop playing
+	playlist->saveSettings(ui.horizontalSlider_position->sliderPosition() );
 	stopPlaying();
 	
   // write settings
   diag_settings->saveElementGeometry("playerctl", true, this->size(), this->pos() );
-	diag_settings->saveElementGeometry("playlist", playlist->isVisible(),  playlist->size(), playlist->pos() );	
+  diag_settings->saveElementState("playerctl", "gui", ui.widget_control->isVisible() );
+  diag_settings->saveElementState("playerctl", "stackedwidget", stackedwidget->currentIndex() );
   diag_settings->writeSettings();
-  playlist->saveSettings(ui.horizontalSlider_position->sliderPosition() );
   			
   // close b_logtofile			
 	logfile.close();

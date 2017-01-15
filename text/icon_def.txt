@@ -105,9 +105,9 @@ fdo_name = list-remove
 
 [icon]
 icon_name = hide_playlist 
-resource = :/images/images/24x24/raw_art/application-exit2.png
-colorize = AF0605
-fdo_name = application-exit
+resource = :/images/images/24x24/raw_art/bmp.png
+colorize = yes
+fdo_name = audio-x-generic
 
 [icon]
 icon_name = add_files 

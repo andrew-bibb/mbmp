@@ -59,6 +59,7 @@ class Settings : public QDialog
     inline bool useYouTubeDL() {return ui.checkBox_useyoutubedl->isChecked();}
     
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
+  	void saveElementState(const QString&, const QString&, const QVariant&);
   	void restoreElementGeometry(const QString&, QWidget*);
   	QStringList getPlaylist();
   	QVariant getSetting(const QString&, const QString&);

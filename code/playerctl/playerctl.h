@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QMenu>
 # include <QMessageBox>
 # include <QTimer>
+# include <QStackedWidget>
 
 # include "ui_playerctl.h"
 
@@ -107,6 +108,7 @@ class PlayerControl : public QDialog
   private:
   // mbmp members 
     Ui::PlayerControl ui;
+    QStackedWidget* stackedwidget;
     Settings* diag_settings;
     GST_Interface* gstiface;
     Playlist* playlist;

@@ -29,8 +29,6 @@ DEALINGS IN THE SOFTWARE.
 # define PLAYLIST_H
 
 # include <QListWidget>
-# include <QDialog>
-# include <QRect>
 # include <QContextMenuEvent>
 # include <QString>
 # include <QStringList>
@@ -112,7 +110,7 @@ class MetaData : public QObject
 };
     
 //	This class is based on a QListWidget and a QDialog
-class Playlist : public QDialog 
+class Playlist : public QWidget 
 {	
   Q_OBJECT
 
@@ -173,14 +171,11 @@ class Playlist : public QDialog
 		void saveSettings(const int&);
 
 	protected:
-		void hideEvent(QHideEvent*);
-		void showEvent(QShowEvent*);
 		void contextMenuEvent(QContextMenuEvent*);	
 
   private:
   // members 
     Ui::Playlist ui;  
-		QRect geometry;	
 		QActionGroup* media_group;
 		QMenu* playlist_menu;
 		QMenu* media_menu;
