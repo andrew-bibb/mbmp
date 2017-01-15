@@ -58,7 +58,7 @@ NotifyClient::NotifyClient(QObject* parent)
 
   // Create our client and try to connect to the notify server
   if (! QDBusConnection::sessionBus().isConnected() )
-    qCritical("CMST - Cannot connect to the session bus.");
+    qCritical("MBMP - Cannot connect to the session bus.");
   // else try to connect to a notification server
   else 
 		connectToServer();
@@ -111,7 +111,7 @@ void NotifyClient::init()
 // of arguments to the org.freedesktop.Notifications.Notify method.  The arguments are mandatory
 // and must be arranged from outside this class. The getxxx functions may be used to obtain server
 // information for this purpose.
-///////// COMMENTED OUT SINCE WE DON'T USE IT IN CMST /////////////////////
+///////// COMMENTED OUT SINCE WE DON'T USE IT IN MBMP /////////////////////
 //void NotifyClient::notify (QString app_name, quint32 replaces_id, QString app_icon, QString summary, QString body, QStringList actions, QVariantMap hints, qint32 expire_timeout)
 //{
   //// make sure we have a connection we can send the notification to.
@@ -123,9 +123,9 @@ void NotifyClient::init()
     //current_id = reply.value();
   //else
   	//#if QT_VERSION >= 0x050400 
-  	//qCritical("CMST - Error reply received to the Notify method: %s", qUtf8Printable(reply.error().message()) );
+  	//qCritical("MBMP - Error reply received to the Notify method: %s", qUtf8Printable(reply.error().message()) );
 		//#else
-    //qCritical("CMST - Error reply received to the Notify method: %s", qPrintable(reply.error().message()) );
+    //qCritical("MBMP - Error reply received to the Notify method: %s", qPrintable(reply.error().message()) );
     //#endif
   
   //return;
@@ -212,9 +212,9 @@ void NotifyClient::sendNotification ()
   
   else
 	#if QT_VERSION >= 0x050400 
-		qCritical("CMST - Error reply received to the Notify method: %s", qUtf8Printable(reply.error().message()) );
+		qCritical("MBMP - Error reply received to the Notify method: %s", qUtf8Printable(reply.error().message()) );
   #else
-    qCritical("CMST - Error reply received to the Notify method: %s", qPrintable(reply.error().message()) );
+    qCritical("MBMP - Error reply received to the Notify method: %s", qPrintable(reply.error().message()) );
   #endif
   
   return;
@@ -241,13 +241,13 @@ void NotifyClient::getServerInformation()
   
   else {
     if (reply.type() == QDBusMessage::InvalidMessage)
-      qCritical("CMST - Invalid reply received to GetServerInformation method.");
+      qCritical("MBMP - Invalid reply received to GetServerInformation method.");
     
     else if (reply.type() == QDBusMessage::ErrorMessage) 
     #if QT_VERSION >= 0x050400 
-			qCritical("CMST - Error reply received to GetServerInforation method: %s", qUtf8Printable(reply.errorMessage()) );
+			qCritical("MBMP - Error reply received to GetServerInforation method: %s", qUtf8Printable(reply.errorMessage()) );
     #else
-      qCritical("CMST - Error reply received to GetServerInforation method: %s", qPrintable(reply.errorMessage()) );
+      qCritical("MBMP - Error reply received to GetServerInforation method: %s", qPrintable(reply.errorMessage()) );
     #endif
   } // else some error occured
   
@@ -269,9 +269,9 @@ void NotifyClient::getCapabilities()
     sl_capabilities = reply.value();
   else
   #if QT_VERSION >= 0x050400 
-		qCritical("CMST - Error reply received to GetCapabilities method: %s", qUtf8Printable(reply.error().message()) );
+		qCritical("MBMP - Error reply received to GetCapabilities method: %s", qUtf8Printable(reply.error().message()) );
   #else
-    qCritical("CMST - Error reply received to GetCapabilities method: %s", qPrintable(reply.error().message()) );
+    qCritical("MBMP - Error reply received to GetCapabilities method: %s", qPrintable(reply.error().message()) );
   #endif
   
   return;
@@ -287,13 +287,13 @@ void NotifyClient::closeNotification(quint32 id)
   QDBusMessage reply = notifyclient->call(QLatin1String("CloseNotification"), id);
   
   if (reply.type() == QDBusMessage::InvalidMessage)
-    qCritical("CMST - Invalid reply received to CloseNotification method.");
+    qCritical("MBMP - Invalid reply received to CloseNotification method.");
   
   else if (reply.type() == QDBusMessage::ErrorMessage) 
   #if QT_VERSION >= 0x050400 
-		qCritical("CMST - Error reply received to CloseNotification method: %s", qUtf8Printable(reply.errorMessage()) );
+		qCritical("MBMP - Error reply received to CloseNotification method: %s", qUtf8Printable(reply.errorMessage()) );
   #else
-    qCritical("CMST - Error reply received to CloseNotification method: %s", qPrintable(reply.errorMessage()) );
+    qCritical("MBMP - Error reply received to CloseNotification method: %s", qPrintable(reply.errorMessage()) );
   #endif
   
   return;

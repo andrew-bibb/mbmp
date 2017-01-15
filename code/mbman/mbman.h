@@ -29,11 +29,11 @@ DEALINGS IN THE SOFTWARE.
 # ifndef MUSICBRAINZ_MANAGER_H
 # define MUSIZBRAINZ_MANAGER_H
 
-# include <QObject>
+# include <QNetworkAccessManager>
 # include <QFile>
 # include <QDir>
 
-class MusicBrainzManager : public QObject
+class MusicBrainzManager : public QNetworkAccessManager
 {
   Q_OBJECT
   

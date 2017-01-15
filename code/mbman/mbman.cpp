@@ -35,14 +35,14 @@ DEALINGS IN THE SOFTWARE.
 # include <QXmlStreamWriter>
 # include <QUrl>
 # include <QUrlQuery>
-# include <QNetworkAccessManager>
 # include <QNetworkRequest>
 # include <QNetworkReply>
 # include <QImage>
 
 // Constructor
-MusicBrainzManager::MusicBrainzManager(QObject* parent) : QObject(parent) 
+MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(parent) 
 {
+	
   // Setup the data directories 
   // APP defined in resource.h
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -84,17 +84,15 @@ void MusicBrainzManager::retrieveReleaseData(const QString& release, const QStri
 	// Create the request
 	QNetworkRequest request;
 	request.setUrl(url);
-	#if QT_VERSION >= 0x050400 
-		qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
-	# else	
-		qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qPrintable(release), qPrintable(artist) );
-	# endif
+	//#if QT_VERSION >= 0x050400 
+		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
+	//# else	
+		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qPrintable(release), qPrintable(artist) );
+	//# endif
 	
 	// Create and connect the reply message to the processing slot
-	QNetworkAccessManager manager;
-	QNetworkReply* reply = manager.get(request);
+	QNetworkReply* reply = this->get(request);
 	connect(reply, SIGNAL(finished()), this, SLOT(releaseDataFinished()));
-	reply->deleteLater();
 	
 	return;
 }
@@ -113,10 +111,8 @@ void MusicBrainzManager::retrieveCDMetaData(const QString& discid)
 	// need to go online which kind of defeats the purpose of saving a file to avoid going online.   
 	destfile.setFileName(cdmeta_dir.absoluteFilePath(QString(discid + ".xml")) );
 	
-	QNetworkAccessManager manager;
-	QNetworkReply* reply = manager.get(request);
+	QNetworkReply* reply = this->get(request);
 	connect(reply, SIGNAL(finished()), this, SLOT(metaDataFinished()));
-	reply->deleteLater();
 		
 	return;
 }
@@ -131,10 +127,8 @@ void MusicBrainzManager::retrieveAlbumArt(const QString& relgrpid, const QString
 	
 	// Store the artwork using the savename as the filename.
 	artfile.setFileName(artwork_dir.absoluteFilePath(QString(savename + ".jpg")) );
-	QNetworkAccessManager manager;
-	QNetworkReply* reply = manager.get(request);
+	QNetworkReply* reply = this->get(request);
 	connect(reply, SIGNAL(finished()), this, SLOT(artworkRequestFinished()));
-	reply->deleteLater();
 	
 	return;
 }
@@ -361,8 +355,7 @@ void MusicBrainzManager::artworkRequestFinished()
 	
 	// check for the redirection
 	if(rtncode == 302 || rtncode == 307 ) {
-		QNetworkAccessManager manager;
-		connect (manager.get(QNetworkRequest(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl())),
+		connect (get(QNetworkRequest(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl())),
 					SIGNAL(finished()),
 					this,
 					SLOT(artworkRequestFinished()) );

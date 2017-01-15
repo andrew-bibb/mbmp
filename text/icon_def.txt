@@ -56,7 +56,7 @@
 # internal icons from the resource file.
 #
 # If this file becomes corrupted by editing or by other means is can be 
-# regenerated simply by deleting it, then stopping and starting CMST.
+# regenerated simply by deleting it, then stopping and starting MBMP.
 #
 # Icon selections at runtime are as follows:
 # If the -i (--icon-theme) command line switch or preferences setting is not
