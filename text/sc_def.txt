@@ -43,7 +43,8 @@
 #                                                                                     menus         shortcuts 
 # These actions are related to the main playercontrol window                          pc  pl  si    pc  pl  si
 #CMD                  KEYS              DESCRIPTION
-cmd_playlist =        L               # Toggle the playlist on and off                y   y         E
+cmd_playlist =        L V             # Toggle the playlist on and off                y   y         E
+cmd_video_window =		V L						 
 cmd_streaminfo =      I               # Toggle the streaminfo dialog on and off       y             E               
 cmd_quit =            Q escape        # Quit the program                              y             E     
 cmd_gui =             G               # Toggle the GUI interface                      y             E 

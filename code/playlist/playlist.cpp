@@ -199,23 +199,17 @@ Playlist::Playlist(QWidget* parent)
 	playlist_menu->addAction(ui.actionToggleRandom);
 	playlist_menu->addAction(ui.actionToggleDetail);
 		  
-  // add the shortcuts defined by the user to the actions
+  // add the shortcuts defined by the user to the actions.  Actions
+  // not shown here,for instance all the addxxx and togglexxx actions
+  // are defined in playerctl and flow down here.
   ShortCutManager scman(this);
   ui.actionMoveUp->setShortcuts(scman.getKeySequence("cmd_moveup") );
   ui.actionMoveDown->setShortcuts(scman.getKeySequence("cmd_movedown") );
-  ui.actionAddAudio->setShortcuts(scman.getKeySequence("cmd_addaudio") );
-  ui.actionAddVideo->setShortcuts(scman.getKeySequence("cmd_addvideo") );
-  ui.actionAddPlaylist->setShortcuts(scman.getKeySequence("cmd_addplaylist") );
-  ui.actionAddFiles->setShortcuts(scman.getKeySequence("cmd_addfile") );
-  ui.actionAddURL->setShortcuts(scman.getKeySequence("cmd_addurl") );  
   ui.actionRemoveItem->setShortcuts(scman.getKeySequence("cmd_removeitem") );
   ui.actionRemoveAll->setShortcuts(scman.getKeySequence("cmd_removeall") );
   ui.actionHidePlaylist->setShortcuts(scman.getKeySequence("cmd_playlist") );
   ui.actionSavePlaylist->setShortcuts(scman.getKeySequence("cmd_saveplaylist") );
-  ui.actionToggleWrap->setShortcuts(scman.getKeySequence("cmd_togglewrap") );
-  ui.actionToggleConsume->setShortcuts(scman.getKeySequence("cmd_toggleconsume") );
-  ui.actionToggleRandom->setShortcuts(scman.getKeySequence("cmd_togglerandom") );
-  ui.actionToggleDetail->setShortcuts(scman.getKeySequence("cmd_toggledetail") );
+
   
   // connect signals to slots
   connect (ui.actionMoveUp, SIGNAL(triggered()), this, SLOT(moveItemUp()));

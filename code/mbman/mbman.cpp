@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./mbman.h"
 # include "./code/resource.h"
 
+# include <QtCore/QDebug>
 # include <QProcessEnvironment>
 # include <QXmlStreamReader>
 # include <QXmlStreamWriter>
@@ -42,7 +43,6 @@ DEALINGS IN THE SOFTWARE.
 // Constructor
 MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(parent) 
 {
-	
   // Setup the data directories 
   // APP defined in resource.h
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -51,8 +51,7 @@ MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(
 	if (! artwork_dir.exists()) artwork_dir.mkpath(artwork_dir.absolutePath() ); 
 	cdmeta_dir = QDir(QString(env.value("XDG_DATA_HOME", QString(QDir::homePath()) + "/.local/share") + "/%1/cdmeta").arg(QString(APP).toLower()) );
 	if (! cdmeta_dir.exists()) cdmeta_dir.mkpath(cdmeta_dir.absolutePath() );	
-	
-	
+		
 	return;
 }
 
@@ -84,11 +83,11 @@ void MusicBrainzManager::retrieveReleaseData(const QString& release, const QStri
 	// Create the request
 	QNetworkRequest request;
 	request.setUrl(url);
-	//#if QT_VERSION >= 0x050400 
-		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
-	//# else	
-		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qPrintable(release), qPrintable(artist) );
-	//# endif
+	#if QT_VERSION >= 0x050400 
+		qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
+	# else	
+		qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qPrintable(release), qPrintable(artist) );
+	# endif
 	
 	// Create and connect the reply message to the processing slot
 	QNetworkReply* reply = this->get(request);

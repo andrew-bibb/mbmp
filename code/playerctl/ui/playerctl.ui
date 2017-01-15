@@ -401,7 +401,7 @@
     <string>Toggle Playlist</string>
    </property>
    <property name="toolTip">
-    <string>Toggle Playlist</string>
+    <string>Toggle beween playlist and video window</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>

@@ -44,7 +44,9 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 	artist = QString();
 	album = QString();
 	errors = QString();	
+	lyrics = QString();
 	tag_map.clear();
+	b_has_lyrics = false;
 	b_has_artwork = false;
 	pm_artwork = QPixmap();
 	
@@ -213,7 +215,7 @@ void PlaylistItem::makeToolTip()
 		
 		// scan through tags find the ones we want to display
 		QStringList blacklist;
-		blacklist << GST_TAG_IMAGE << GST_TAG_PREVIEW_IMAGE;
+		blacklist << GST_TAG_IMAGE << GST_TAG_PREVIEW_IMAGE << GST_TAG_LYRICS;
 		QMapIterator<QString, QString> itr(tag_map);
 		while (itr.hasNext()) {
 			itr.next();
@@ -331,6 +333,13 @@ void PlaylistItem::runDiscoverer()
 		
 		if (gst_tag_list_get_string (tags, GST_TAG_ARTIST, &str)) {
 			if (str) artist = QString(str);
+		}
+		
+		if (gst_tag_list_get_string (tags, GST_TAG_LYRICS, &str)) {
+			if (str) {
+				lyrics = QString(str);
+				b_has_lyrics = true;
+			}	// if
 		}
 		
 		if (gst_tag_list_get_string (tags, GST_TAG_ALBUM, &str)) {

@@ -85,7 +85,6 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   stackedwidget->addWidget(videowidget);
   stackedwidget->addWidget(playlist);
 
-
 	// Set the style
 	QString styl = diag_settings->getSetting("Preferences", "style").toString();
 	styl.prepend(":/stylesheets/stylesheets/");
@@ -1037,7 +1036,7 @@ void PlayerControl::toggleFullScreen()
 	static QSize savedsize;
 	static QPoint savedpoint;
 	
-	// If we're in shademode bring the video window back
+	// If we're in shademode bring the stackedwidget back
 	if (! stackedwidget->isVisible() ) this->toggleShadeMode();
 	
 	// Now do the toggle

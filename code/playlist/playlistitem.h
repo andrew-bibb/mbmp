@@ -54,6 +54,8 @@ class PlaylistItem : public QListWidgetItem
 		inline qint32 getDuration() {return duration;}
 		inline bool isPlayable() {return errors.isEmpty() ? true : false;}
 		inline QString getInfoText() {return toolTip();}
+		inline bool hasLyrics() {return b_has_lyrics;}
+		inline QString getLyrics() {return lyrics;}		
 		inline bool hasArtwork() {return b_has_artwork;}
 		inline QPixmap getArtwork() {return pm_artwork;}
 		QString getTagAsString(const QString& tag);
@@ -79,6 +81,8 @@ class PlaylistItem : public QListWidgetItem
 		QString artist;				// the artist tag
 		QString album;				// the album tag
 		QString errors;				// compliation of any errors encountered in creating the item		
+		QString lyrics;				// song lyrics (if found)
+		bool b_has_lyrics;		// true if the tags contain lyrics
 		bool b_has_artwork;		// true if the tags contain artwork 
 		QPixmap pm_artwork;		// the artwork extracted from GStreamer tags
 		QMap<QString,QString> tag_map;	// tags and values stored in a QMap
