@@ -109,7 +109,11 @@ Playlist::Playlist(QWidget* parent)
   
   // Show or hide the details box. After this show and hide controlled
   // by signals and slots in the UI.
-  ui.widget_details->setVisible(ui.checkBox_showinfo->isChecked() );
+  ui.scrollArea_iteminfo->setVisible(ui.checkBox_showinfo->isChecked() );
+  
+  // Set the maximum size of the thumbnail
+  const int sf = 3;
+  ui.label_artwork->setMaximumSize(ui.toolButton_save->sizeHint() * sf);
   
   // Setup the data directories 
   // APP defined in resource.h

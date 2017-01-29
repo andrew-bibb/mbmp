@@ -1,6 +1,11 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>In Progress</b>
+<ul>
+<li>Moved playlist into main widget.</li>
+<li>Showing album art in playlist as small thumbnail.</li>
+</ul>
 <b> 8 January 2017</b>
 <ul>
 <li>IPC replaced with an MPRIS2.2 compatible system.</li>
