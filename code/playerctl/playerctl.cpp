@@ -69,6 +69,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	notifyclient = NULL;
 	mpris2 = new Mpris2(this);
 	pos_timer = new QTimer(this);
+	albumart = new QLabel(this);
+	albumart->setAlignment(Qt::AlignCenter);
 	
 	// Create the notifyclient, make four tries; first immediately in constructor, then
   // at 1/2 second, 2 seconds and finally at 8 seconds
@@ -84,6 +86,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   ui.gridLayout->setRowStretch(0,1);
   stackedwidget->addWidget(videowidget);
   stackedwidget->addWidget(playlist);
+  stackedwidget->addWidget(albumart);
 
 	// Set the style
 	QString styl = diag_settings->getSetting("Preferences", "style").toString();
@@ -220,6 +223,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   // If there is no toolbutton for the action then just add the action.
   this->addAction(ui.actionTogglePlaylist);	
 	this->ui.toolButton_toggleplaylist->setDefaultAction(ui.actionTogglePlaylist);
+	this->addAction(ui.actionToggleVideoWindow);
+	this->addAction(ui.actionToggleAlbumArt);
 	this->addAction(ui.actionToggleStreamInfo);
 	this->addAction(ui.actionQuit);
 	this->ui.toolButton_quit->setDefaultAction(ui.actionQuit);
@@ -324,6 +329,11 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	dvd_group->addAction(ui.actionDVDDown);
 	dvd_group->addAction(ui.actionDVDActivate);
 	
+	stackedwidget_group = new QActionGroup(this);
+	stackedwidget_group->addAction(ui.actionTogglePlaylist);
+	stackedwidget_group->addAction(ui.actionToggleVideoWindow);
+	stackedwidget_group->addAction(ui.actionToggleAlbumArt);
+	
 	// create the visualizer menu. It is tearoff enabled.
 	vis_menu = new QMenu(this);
 	vis_menu->setTitle(ui.actionVisualizer->text());
@@ -395,6 +405,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// create the control_menu
 	control_menu = new QMenu(this);
 	control_menu->addAction(ui.actionTogglePlaylist);
+	control_menu->addAction(ui.actionToggleVideoWindow);
+	control_menu->addAction(ui.actionToggleAlbumArt);
 	control_menu->addAction(ui.actionAddMedia);
 	control_menu->addAction(ui.actionAudioCD);
 	control_menu->addAction(ui.actionDVD);
@@ -436,6 +448,8 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	// now assign the shortcuts to each action
 	ShortCutManager scman(this);
 	ui.actionTogglePlaylist->setShortcuts(scman.getKeySequence("cmd_playlist"));
+	ui.actionToggleVideoWindow->setShortcuts(scman.getKeySequence("cmd_videowindow"));
+	ui.actionToggleAlbumArt->setShortcuts(scman.getKeySequence("cmd_albumart"));
 	ui.actionToggleStreamInfo->setShortcuts(scman.getKeySequence("cmd_streaminfo"));
 	ui.actionQuit->setShortcuts(scman.getKeySequence("cmd_quit"));
 	ui.actionToggleGUI->setShortcuts(scman.getKeySequence("cmd_gui"));
@@ -491,7 +505,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	chtsht->setWindowModality(Qt::NonModal);	
 		
   // connect signals to slots 
-  connect (ui.actionTogglePlaylist, SIGNAL (triggered()), this, SLOT(togglePlaylist()));	
+  connect (stackedwidget_group, SIGNAL (triggered(QAction*)), this, SLOT(advanceStackedWidget(QAction*)));	
   connect (ui.actionToggleStreamInfo, SIGNAL (triggered()), gstiface, SLOT(toggleStreamInfo()));
 	connect (ui.actionQuit, SIGNAL (triggered()), qApp, SLOT(quit()));
 	connect (ui.actionToggleGUI, SIGNAL (triggered()), this, SLOT(toggleGUI()));
@@ -1029,6 +1043,42 @@ void PlayerControl::mpris2Pause()
 }
 
 //
+// Slot to advance the stacked widget to the specified page.  If the
+// stackedwidget is already displaying the requested page advance to 
+// the next page in the stack.
+// Called when something in the stackedWidgetGroup is triggered 
+void PlayerControl::advanceStackedWidget(QAction* act)
+{
+	// find the target index
+	int targetidx = -1;
+	if (act == ui.actionTogglePlaylist) targetidx = stackedwidget->indexOf(playlist);
+		else if (act == ui.actionToggleAlbumArt) targetidx = stackedwidget->indexOf(albumart);
+			else targetidx = stackedwidget->indexOf(videowidget);
+	
+	// advance to the next page if act pointed to the current page
+	if (targetidx == stackedwidget->currentIndex() ) {
+		if (stackedwidget->currentIndex() == stackedwidget->count() - 1 )
+			stackedwidget->setCurrentIndex(0);
+		else
+			stackedwidget->setCurrentIndex(stackedwidget->currentIndex() + 1);
+	}	// if
+	
+	// else go to the requested page	
+	else {
+		if (act == ui.actionTogglePlaylist)
+			stackedwidget->setCurrentWidget(playlist);
+			else if (act == ui.actionToggleAlbumArt)
+				stackedwidget->setCurrentWidget(albumart);
+				else if (act == ui.actionToggleVideoWindow)
+					stackedwidget->setCurrentWidget(videowidget);
+					else
+						stackedwidget->setCurrentWidget(videowidget);			
+		}	// else
+			
+	return;
+}
+
+//
 //	Slot to toggle full screen on and off
 void PlayerControl::toggleFullScreen()
 {
@@ -1057,15 +1107,6 @@ void PlayerControl::toggleFullScreen()
 		this->showFullScreen();
 		this->setCursor(Qt::BlankCursor);
 	}
-	
-	return;
-}
-
-//
-//	Slot to toggle the playlist up and down
-void PlayerControl::togglePlaylist()
-{
-	stackedwidget->setCurrentIndex(stackedwidget->currentIndex() == 0 ? 1 : 0); 
 	
 	return;
 }
@@ -1232,7 +1273,8 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 		
 				// let mpris2 know about state changes	
 				mpris2->setState(gstiface->getState() );
-				mpris2->setCanSeek(gstiface->queryStreamSeek() );		
+				mpris2->setCanSeek(gstiface->queryStreamSeek() );	
+					
 			}	// if PLAYER_NAME								
 			
 			break;
@@ -1768,5 +1810,12 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	mpris2->setCanPlay(playlist->currentIsPlayable());
 	mpris2->setCanPause(playlist->currentIsPlayable());	
 	
+	// set the album art page
+	albumart->clear();
+	if (playlist->getAlbumArt() == NULL)
+		albumart->setText(tr("<center><b>No Album Art Found</b>"));
+	else
+		albumart->setPixmap(*playlist->getAlbumArt() );
+		
 	return;
 }

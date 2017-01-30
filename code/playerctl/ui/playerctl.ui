@@ -394,14 +394,11 @@
    </item>
   </layout>
   <action name="actionTogglePlaylist">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>Toggle Playlist</string>
    </property>
    <property name="toolTip">
-    <string>Toggle beween playlist and video window</string>
+    <string>Toggle the playlist on</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
@@ -898,6 +895,22 @@
    </property>
    <property name="text">
     <string>Toggle Shade</string>
+   </property>
+  </action>
+  <action name="actionToggleVideoWindow">
+   <property name="text">
+    <string>Toggle Video Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle the video window on</string>
+   </property>
+  </action>
+  <action name="actionToggleAlbumArt">
+   <property name="text">
+    <string>Toggle Album Art</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle the album art window on</string>
    </property>
   </action>
  </widget>

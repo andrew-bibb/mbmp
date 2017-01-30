@@ -40,6 +40,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QMessageBox>
 # include <QTimer>
 # include <QStackedWidget>
+# include <QLabel>
 
 # include "ui_playerctl.h"
 
@@ -77,8 +78,8 @@ class PlayerControl : public QDialog
 		void mpris2Pause();
 		void mpris2Seek(qlonglong);
 		void mpris2OpenUri(QString);
-		void toggleFullScreen();
-		void togglePlaylist();
+		void advanceStackedWidget(QAction* act = 0);
+		void toggleFullScreen();		
 		void toggleGUI();
 		void toggleShadeMode();
 		void toggleCheatsheet();
@@ -119,6 +120,7 @@ class PlayerControl : public QDialog
     QTimer* pos_timer;
     bool b_logtofile;
     short displaymode;
+    QLabel* albumart;
  
   // plain members 
 		QActionGroup* playlist_group;    
@@ -126,6 +128,7 @@ class PlayerControl : public QDialog
 		QActionGroup* seek_group;
 		QActionGroup* dvd_group;
 		QActionGroup* vis_group;
+		QActionGroup* stackedwidget_group;
 		QMenu* control_menu;
 		QMenu* vis_menu;
 		QMenu* advanced_menu;

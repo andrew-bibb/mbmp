@@ -169,6 +169,7 @@ class Playlist : public QWidget
 		QStringList getCurrentList();
 		QString getWindowTitle();
 		void saveSettings(const int&);
+		const QPixmap* getAlbumArt();
 
 	protected:
 		void contextMenuEvent(QContextMenuEvent*);	

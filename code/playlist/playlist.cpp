@@ -223,7 +223,7 @@ Playlist::Playlist(QWidget* parent)
   connect (media_group, SIGNAL(triggered(QAction*)), this, SLOT(addFile(QAction*)));
   connect (ui.actionRemoveItem, SIGNAL(triggered()), this, SLOT(removeItem()));
   connect (ui.actionRemoveAll, SIGNAL(triggered()), this, SLOT(clearPlaylist()));
-  connect (ui.actionHidePlaylist, SIGNAL(triggered()), qobject_cast<PlayerControl*>(parent), SLOT(togglePlaylist()));
+  connect (ui.actionHidePlaylist, SIGNAL(triggered()), qobject_cast<PlayerControl*>(parent), SLOT(advanceStackedWidget()));
   connect (ui.listWidget_playlist, SIGNAL(itemDoubleClicked(QListWidgetItem*)), qobject_cast<PlayerControl*>(parent), SLOT(playMedia()));
   connect (ui.actionSavePlaylist, SIGNAL(triggered()), this, SLOT(savePlaylist()));
   connect (ui.actionToggleWrap, SIGNAL(triggered()), this, SLOT(toggleWrapMode()));
@@ -869,6 +869,13 @@ void Playlist::saveSettings(const int& pos)
 	return;
 }
 
+//
+// Function to return the album art
+const QPixmap* Playlist::getAlbumArt()
+{
+	return ui.label_artwork->pixmap();
+}
+
 //////////////////////////// Protected Functions ////////////////////////////
 //
 //	Create a context menu activate by right click of the mouse.
@@ -1193,3 +1200,4 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 	// no luck, return a null pixmap
 	return QPixmap();
 }
+
