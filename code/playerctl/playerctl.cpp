@@ -69,8 +69,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	notifyclient = NULL;
 	mpris2 = new Mpris2(this);
 	pos_timer = new QTimer(this);
-	albumart = new QLabel(this);
-	albumart->setAlignment(Qt::AlignCenter);
+	albumart = new ArtWidget(this);
 	
 	// Create the notifyclient, make four tries; first immediately in constructor, then
   // at 1/2 second, 2 seconds and finally at 8 seconds
@@ -1811,11 +1810,7 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	mpris2->setCanPause(playlist->currentIsPlayable());	
 	
 	// set the album art page
-	albumart->clear();
-	if (playlist->getAlbumArt() == NULL)
-		albumart->setText(tr("<center><b>No Album Art Found</b>"));
-	else
-		albumart->setPixmap(*playlist->getAlbumArt() );
+		albumart->setInfo(playlist->getAlbumArt(), playlist->getCurrentTitle(), playlist->getCurrentArtist() );
 		
 	return;
 }

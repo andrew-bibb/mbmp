@@ -1,9 +1,8 @@
-/**************************** videowidget.h ****************************
+/**************************** artwidget.h ****************************
 
-Code to manage the videowidget. Gstreamer renders a video stream on to
-this widget
+Code to manage the widget used to display album art. 
 
-Copyright (C) 2014-2017
+Copyright (C) 2017
 by: Andrew J. Bibb
 License: MIT 
 
@@ -26,31 +25,32 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ***********************************************************************/ 
 
-# ifndef VIDEOWIDGET_H
-# define VIDEOWIDGET_H
+# ifndef ARTWIDGET_H
+# define ARTWIDGET_H
 
-# include <QWidget>
-# include <QMouseEvent>
-# include <QKeyEvent>
-# include <QString>
+# include <QLabel>
 
-class VideoWidget : public QWidget 
+class ArtWidget : public QLabel 
 {	
   Q_OBJECT
 
   public:
-		VideoWidget (QWidget*);
-		
-	signals:
-		void navsignal (QString event, int button, int x, int y); 	
+		ArtWidget (QWidget*);
+	
+	// functions
+		void setInfo(const QPixmap*, const QString& = QString(), const QString& = QString(), const int& = 5);
+	
+	public Q_SLOTS:
+		void makeDisplay();
+		void makeOverlaidDisplay(const QString&, const QString&, const int&);
 		
 	protected:
-		void	mouseDoubleClickEvent(QMouseEvent*);
-		void	mouseMoveEvent(QMouseEvent*);
-		void	mousePressEvent(QMouseEvent*);
-		void	mouseReleaseEvent(QMouseEvent*);	
-		void keyPressEvent(QKeyEvent*);
-		void keyReleaseEvent(QKeyEvent*);
+		void resizeEvent(QResizeEvent*);
+		
+	private:
+		QPixmap background;
+		QPixmap display;
+
 };
 
 #endif

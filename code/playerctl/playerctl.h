@@ -40,7 +40,6 @@ DEALINGS IN THE SOFTWARE.
 # include <QMessageBox>
 # include <QTimer>
 # include <QStackedWidget>
-# include <QLabel>
 
 # include "ui_playerctl.h"
 
@@ -51,6 +50,7 @@ DEALINGS IN THE SOFTWARE.
 # include "./code/scrollbox/scrollbox.h"
 # include "./code/notify/notify.h"
 # include "./code/ipc/mpris2.h"
+# include "./code/artwidget/artwidget.h"
 
 // To toggle DPMS.  Note that Xlib.h defines a macro Bool, and QT also defines
 // Bool in QMetaData. Need to undefine the X11 version - be careful using
@@ -120,7 +120,7 @@ class PlayerControl : public QDialog
     QTimer* pos_timer;
     bool b_logtofile;
     short displaymode;
-    QLabel* albumart;
+    ArtWidget* albumart;
  
   // plain members 
 		QActionGroup* playlist_group;    

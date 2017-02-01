@@ -1,4 +1,4 @@
-/**************************** videowidget.cpp **************************
+ /**************************** videowidget.cpp **************************
 
 Code to manage the videowidget. Gstreamer renders a video stream on to
 this widget

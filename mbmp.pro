@@ -64,6 +64,7 @@ HEADERS		+= ./code/ipc/mpris2.h
 HEADERS		+= ./code/ipc/mediaplayer2.h
 HEADERS		+= ./code/ipc/mediaplayer2player.h
 HEADERS		+= ./code/mbman/mbman.h
+HEADERS		+= ./code/artwidget/artwidget.h
 
 #	forms
 FORMS		+= ./code/playerctl/ui/playerctl.ui
@@ -89,6 +90,7 @@ SOURCES += ./code/ipc/mpris2.cpp
 SOURCES += ./code/ipc/mediaplayer2.cpp
 SOURCES += ./code/ipc/mediaplayer2player.cpp
 SOURCES += ./code/mbman/mbman.cpp
+SOURCES += ./code/artwidget/artwidget.cpp
 
 #	resource files
 RESOURCES 	+= mbmp.qrc
