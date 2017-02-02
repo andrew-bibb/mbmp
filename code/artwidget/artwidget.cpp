@@ -27,6 +27,10 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QDebug>
 # include <QTimer>
+# include <QFont>
+# include <QFontMetrics>
+# include <QPainter>
+# include <QBrush>
 
 # include "./code/artwidget/artwidget.h"	
 
@@ -70,9 +74,14 @@ void ArtWidget::makeDisplay()
 {
 	qDebug() << "inside plain display:";
 	display = background;
-	this->setPixmap(display);
-	repaint();
-	
+
+  // get dimensions of the label
+	const int w = this->width();
+	const int h = this->height();
+
+	// set a scaled pixmap to a w x h window keeping its aspect ratio 
+	this->setPixmap(display.scaled(w,h,Qt::KeepAspectRatio));	
+
 	return;
 }
 
@@ -80,12 +89,46 @@ void ArtWidget::makeDisplay()
 // Slot to make an overlaid display
 void ArtWidget::makeOverlaidDisplay(const QString& title, const QString& artist, const int& dur)
 {
+  //  constants
+  const int titleheight = 36;
+  const int artistheight = 20;
+  const QString fontfamily = "Helvetica"; 
+  const int w = this->width();
+	const int h = this->height();
+  
+	// save and set variables
+	int boxheight = -1;
+	int boxwidth = -1;
+	QFont curfont = QFont();
 	qDebug() << "title: " << title << "artist: " << artist << "duration: " << dur;
+	display = background.scaled(w,h,Qt::KeepAspectRatio);
 	
-	display = background;
-	this->setPixmap(display);
-	repaint();
+	QFont titlefont = QFont(fontfamily, titleheight);
+	QFont artistfont = QFont(fontfamily, artistheight);
+	QFontMetrics titlemetrics = QFontMetrics(titlefont);
+	QFontMetrics artistmetrics = QFontMetrics(artistfont);
+	boxheight = titlemetrics.height() + artistmetrics.height();
+	boxwidth = titlemetrics.width(title);
+	if (artistmetrics.width(artist) > boxwidth ) boxwidth = artistmetrics.width(artist);
 	
+	// make sure there is enough room to display the notification
+	if (boxheight > h  || boxwidth > w) {
+		makeDisplay();
+		return;
+	}  
+	
+	// paint the overlay onto the background
+	qDebug() << "starting to paint";
+	QPainter p(&display); 
+	p.setBrush(QBrush(QColor("darkgray"), Qt::SolidPattern) );
+	p.drawRoundedRect(0, 0, boxwidth, boxheight, 10.0, 10.0);
+	p.setPen(Qt::black);
+	p.drawText(0, 20, "HI andy");
+	p.end(); 
+
+
+	// set a scaled pixmap to a w x h window keeping its aspect ratio 
+	this->setPixmap(display);	
 	
 	// overlay timeout
 	QTimer::singleShot(dur * 1000, this, SLOT(makeDisplay()) );
