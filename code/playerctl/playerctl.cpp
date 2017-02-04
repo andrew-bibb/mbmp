@@ -44,7 +44,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 {
 	// Set the Locale (probably not necessary since the default is the system one anyway)
   QLocale::setDefault(QLocale::system() );	
-	
+
 	// Set the window title
 	this->setWindowTitle(LONG_NAME);
 

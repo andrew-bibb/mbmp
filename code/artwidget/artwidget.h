@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.
 # define ARTWIDGET_H
 
 # include <QLabel>
+# include <QColor>
 
 class ArtWidget : public QLabel 
 {	
@@ -36,21 +37,26 @@ class ArtWidget : public QLabel
 
   public:
 		ArtWidget (QWidget*);
-	
-	// functions
+		
 		void setInfo(const QPixmap*, const QString& = QString(), const QString& = QString(), const int& = 5);
 	
 	public Q_SLOTS:
-		void makeDisplay();
-		void makeOverlaidDisplay(const QString&, const QString&, const int&);
-		
+		void turnOffPopup();
+			
 	protected:
 		void resizeEvent(QResizeEvent*);
 		
 	private:
-		QPixmap background;
-		QPixmap display;
-
+		// members
+		QPixmap pxm_albumart;
+		QString artist;
+		QString title;
+		bool b_showpopup;
+		const QColor col_background = QColor("lightgray");
+		const QColor col_osd = QColor("darkgray");
+	
+	// functions
+	void makeDisplay();
 };
 
 #endif

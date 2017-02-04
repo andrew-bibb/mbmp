@@ -1,6 +1,6 @@
 /**************************** artwidget.cpp **************************
 
-Code to manage the widget used to display album art. 
+Code to manage the widget used to pxm_display album art. 
 
 Copyright (C) 2017
 by: Andrew J. Bibb
@@ -31,6 +31,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QFontMetrics>
 # include <QPainter>
 # include <QBrush>
+# include <QPen>
 
 # include "./code/artwidget/artwidget.h"	
 
@@ -39,103 +40,53 @@ DEALINGS IN THE SOFTWARE.
 ArtWidget::ArtWidget(QWidget* parent) : QLabel(parent)
 {	
 	// data members
-	background = QPixmap();
-	display = QPixmap();
-	
+	pxm_albumart = QPixmap();
+	title = QString();
+	artist = QString();
+	b_showpopup = false;
+		
 	setAlignment(Qt::AlignCenter);
+		
 }
 
 
 ///////////////////// Public Functions /////////////////////////////
 //
-// Function to receive and process information to be displayed
-void ArtWidget::setInfo(const QPixmap* src, const QString& title, const QString& artist, const int& dur)
+// Function to receive and process information to be pxm_displayed
+void ArtWidget::setInfo(const QPixmap* src, const QString& t, const QString& a, const int& dur)
 {
-	this->clear();
-	if (src == NULL) return;
-	
+	// initialize values
+	pxm_albumart = QPixmap();
+	title = QString();
+	artist = QString();
+	b_showpopup = false;
+
 	// save data we need
-	background = QPixmap(*src);
-		
-	// make a plain or overlaid display
-	if (artist.isEmpty() && title.isEmpty() )
-		makeDisplay();
-	else
-	  makeOverlaidDisplay(title, artist, dur);	
+	if (src != NULL) {
+		pxm_albumart = QPixmap(*src);
+		title = t;
+		artist = a;
+	}
 	
+	// set a timer to turn off the popup
+	QTimer::singleShot(dur * 1000, this, SLOT(turnOffPopup()) );
+		
+	// make pxm_display based on new information	
+	makeDisplay();	
 	
 	return;
 }
 
 ///////////////////// Public Slots /////////////////////////////
 //
-// Slot to make a plain display image
-void ArtWidget::makeDisplay()
+// Slot to turn off the popup.  Called from singleShot timer in setInfo()
+void ArtWidget::turnOffPopup()
 {
-	qDebug() << "inside plain display:";
-	display = background;
-
-  // get dimensions of the label
-	const int w = this->width();
-	const int h = this->height();
-
-	// set a scaled pixmap to a w x h window keeping its aspect ratio 
-	this->setPixmap(display.scaled(w,h,Qt::KeepAspectRatio));	
-
-	return;
-}
-
-//
-// Slot to make an overlaid display
-void ArtWidget::makeOverlaidDisplay(const QString& title, const QString& artist, const int& dur)
-{
-  //  constants
-  const int titleheight = 36;
-  const int artistheight = 20;
-  const QString fontfamily = "Helvetica"; 
-  const int w = this->width();
-	const int h = this->height();
-  
-	// save and set variables
-	int boxheight = -1;
-	int boxwidth = -1;
-	QFont curfont = QFont();
-	qDebug() << "title: " << title << "artist: " << artist << "duration: " << dur;
-	display = background.scaled(w,h,Qt::KeepAspectRatio);
-	
-	QFont titlefont = QFont(fontfamily, titleheight);
-	QFont artistfont = QFont(fontfamily, artistheight);
-	QFontMetrics titlemetrics = QFontMetrics(titlefont);
-	QFontMetrics artistmetrics = QFontMetrics(artistfont);
-	boxheight = titlemetrics.height() + artistmetrics.height();
-	boxwidth = titlemetrics.width(title);
-	if (artistmetrics.width(artist) > boxwidth ) boxwidth = artistmetrics.width(artist);
-	
-	// make sure there is enough room to display the notification
-	if (boxheight > h  || boxwidth > w) {
-		makeDisplay();
-		return;
-	}  
-	
-	// paint the overlay onto the background
-	qDebug() << "starting to paint";
-	QPainter p(&display); 
-	p.setBrush(QBrush(QColor("darkgray"), Qt::SolidPattern) );
-	p.drawRoundedRect(0, 0, boxwidth, boxheight, 10.0, 10.0);
-	p.setPen(Qt::black);
-	p.drawText(0, 20, "HI andy");
-	p.end(); 
-
-
-	// set a scaled pixmap to a w x h window keeping its aspect ratio 
-	this->setPixmap(display);	
-	
-	// overlay timeout
-	QTimer::singleShot(dur * 1000, this, SLOT(makeDisplay()) );
+	b_showpopup = false;
+	makeDisplay();
 	
 	return;
 }
-	
 
 ///////////////////// Protected Functions /////////////////////////////
 //
@@ -143,12 +94,71 @@ void ArtWidget::makeOverlaidDisplay(const QString& title, const QString& artist,
 void ArtWidget::resizeEvent(QResizeEvent* e)
 {
 	(void) e;
-	if (pixmap() == NULL) return;
-	
-	// get dimensions
-	int w = this->width();
-	int h = this->height();
 
-	// set a scaled pixmap to a w x h window keeping its aspect ratio 
-	this->setPixmap(display.scaled(w,h,Qt::KeepAspectRatio));	
+	makeDisplay();
+	
+	return;
 }
+
+
+///////////////////// Private Functions /////////////////////////////
+//
+// Slot to make an overlaid pxm_display
+void ArtWidget::makeDisplay()
+{
+  //  constants
+  const int titlepoint = 12; // minimum height we want to display
+  const int artistpoint = 10; // same
+  const QString fontfamily = "Helvetica"; 
+  const float percentwidth = 0.75;
+	const float percentheight = 0.25;
+	QPixmap pxm_display = QPixmap();
+  
+	// save and set variables
+	int osdheight = -1;
+	int osdwidth = -1;
+	
+	// start building the display
+	this->clear();
+	pxm_display = QPixmap(this->width(), this->height() );
+	pxm_display.fill(col_background);
+	
+	if (! pxm_albumart.isNull() ) {
+		QPainter p(&pxm_display); 
+		p.setPen(Qt::black);
+		p.setBrush(QBrush(col_osd, Qt::SolidPattern) );
+		
+		// draw artwork
+		QPixmap artwork = pxm_albumart.scaled(this->width(), this->height(), Qt::KeepAspectRatio);
+		p.drawPixmap( (this->width() - artwork.width())/ 2, (this->height() - artwork.height()) / 2, artwork);	
+	
+		////determine the minimum size of the osd box we want 
+		//QFont displayfont = QFont(fontfamily);
+		//displayfont.setPointSize(titlepoint);
+		//QFontMetrics fontmetrics = QFontMetrics(displayfont);
+		//osdheight = fontmetrics.height();
+		//osdwidth = fontmetrics.width(title);
+		//displayfont.setPointSize(artistpoint);
+		//fontmetrics = QFontMetrics(displayfont);
+		//osdheight += fontmetrics.height();
+		//if (fontmetrics.width(artist) > osdwidth ) osdwidth = fontmetrics.width(artist);
+	
+		 //make sure there is enough room to pxm_display the notification
+		//if (b_showpopup && osdheight <= label_h * percentheight  && osdwidth <= label_w * percentwidth) {	
+			//osdheight = label_h * percentheight;
+			//osdwidth = label_w * percentwidth;
+			
+			//// paint the overlay onto the pxm_display	
+			//p.drawRoundedRect((label_w - osdwidth) / 2.0, (label_h - osdheight) / 2.0, osdwidth, osdheight, 10.0, 10.0);		
+			//p.drawText(0, 20, title);	
+		//}	// if there is enough room and b_showpopup is true
+		
+		p.end(); 	
+	}	// if pxm_albumart not null
+
+	// set pixmap on this 
+	this->setPixmap(pxm_display);	
+	
+	return;
+}
+	
