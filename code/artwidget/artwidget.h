@@ -1,6 +1,6 @@
 /**************************** artwidget.h ****************************
 
-Code to manage the widget used to display album art. 
+
 
 Copyright (C) 2017
 by: Andrew J. Bibb
@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 
 # include <QLabel>
 # include <QColor>
+# include <QTimer>
 
 class ArtWidget : public QLabel 
 {	
@@ -52,8 +53,11 @@ class ArtWidget : public QLabel
 		QString artist;
 		QString title;
 		bool b_showpopup;
-		const QColor col_background = QColor("lightgray");
-		const QColor col_osd = QColor("darkgray");
+		QTimer* timer;
+		// values below may become user modifiable eventually (along with duration in setInfo)
+		const QColor col_background = QColor("ivory");
+		const QColor col_osd = QColor("wheat");
+		const QString fontfamily = "Helvetica";
 	
 	// functions
 	void makeDisplay();
