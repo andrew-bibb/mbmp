@@ -59,7 +59,7 @@ void ArtWidget::setInfo(const QPixmap* src, const QString& t, const QString& a, 
 	pxm_albumart = QPixmap();
 	title = QString();
 	artist = QString();
-	b_showpopup = false;
+	b_showpopup = true;
 
 	// save data we need
 	if (src != NULL) {
@@ -110,9 +110,8 @@ void ArtWidget::makeDisplay()
   const int titlepoint = 12; // minimum height we want to display
   const int artistpoint = 10; // same
   const QString fontfamily = "Helvetica"; 
-  const float percentwidth = 0.75;
-	const float percentheight = 0.25;
-	QPixmap pxm_display = QPixmap();
+  const float percentwidth = 0.75;	// maximum width of the osd popup
+	const float percentheight = 0.25;	// maximum height of the osd popup
   
 	// save and set variables
 	int osdheight = -1;
@@ -120,7 +119,7 @@ void ArtWidget::makeDisplay()
 	
 	// start building the display
 	this->clear();
-	pxm_display = QPixmap(this->width(), this->height() );
+	QPixmap pxm_display = QPixmap(this->width(), this->height() );
 	pxm_display.fill(col_background);
 	
 	if (! pxm_albumart.isNull() ) {
@@ -130,28 +129,36 @@ void ArtWidget::makeDisplay()
 		
 		// draw artwork
 		QPixmap artwork = pxm_albumart.scaled(this->width(), this->height(), Qt::KeepAspectRatio);
-		p.drawPixmap( (this->width() - artwork.width())/ 2, (this->height() - artwork.height()) / 2, artwork);	
+		p.drawPixmap( ((this->width() - artwork.width())/ 2), ((this->height() - artwork.height()) / 2), artwork);	
 	
-		////determine the minimum size of the osd box we want 
-		//QFont displayfont = QFont(fontfamily);
-		//displayfont.setPointSize(titlepoint);
-		//QFontMetrics fontmetrics = QFontMetrics(displayfont);
-		//osdheight = fontmetrics.height();
-		//osdwidth = fontmetrics.width(title);
-		//displayfont.setPointSize(artistpoint);
-		//fontmetrics = QFontMetrics(displayfont);
-		//osdheight += fontmetrics.height();
-		//if (fontmetrics.width(artist) > osdwidth ) osdwidth = fontmetrics.width(artist);
+		//determine the minimum size of the osd box we want 
+		QFont displayfont = QFont(fontfamily);
+		displayfont.setPointSize(titlepoint);
+		QFontMetrics fontmetrics = QFontMetrics(displayfont);
+		osdheight = fontmetrics.height();
+		osdwidth = fontmetrics.width(title);
+		displayfont.setPointSize(artistpoint);
+		fontmetrics = QFontMetrics(displayfont);
+		osdheight += fontmetrics.height();
+		if (fontmetrics.width(artist) > osdwidth ) osdwidth = fontmetrics.width(artist);
 	
-		 //make sure there is enough room to pxm_display the notification
-		//if (b_showpopup && osdheight <= label_h * percentheight  && osdwidth <= label_w * percentwidth) {	
-			//osdheight = label_h * percentheight;
-			//osdwidth = label_w * percentwidth;
+		// if b_showpopup and if there is enough room to display our minimum size osd box
+		if (b_showpopup && osdheight <= this->height() * percentheight  && osdwidth <= this->width() * percentwidth) {	
+			osdheight = this->height() * percentheight;
+			displayfont.setPixelSize(osdheight * 0.45);
+			fontmetrics = QFontMetrics(displayfont);
+			osdwidth = fontmetrics.width(title);
+			displayfont.setPixelSize(osdheight * 0.40);
+			fontmetrics = QFontMetrics(displayfont);
+			if (fontmetrics.width(artist) > osdwidth ) osdwidth = fontmetrics.width(artist);
 			
-			//// paint the overlay onto the pxm_display	
-			//p.drawRoundedRect((label_w - osdwidth) / 2.0, (label_h - osdheight) / 2.0, osdwidth, osdheight, 10.0, 10.0);		
-			//p.drawText(0, 20, title);	
-		//}	// if there is enough room and b_showpopup is true
+			// paint the overlay onto the pxm_display	
+			p.drawRoundedRect((this->width() - osdwidth) / 2.0, (this->height() - osdheight) / 2.0, osdwidth, osdheight, 10.0, 10.0);		
+			displayfont.setPixelSize(osdheight * 0.45);
+			p.drawText( ((this->width() - osdwidth) / 2), ((this->height() - osdheight) / 2), osdwidth, 0.45 * osdheight, Qt::AlignCenter, title);
+			displayfont.setPixelSize(osdheight * 0.40);
+			p.drawText( ((this->width() - osdwidth) / 2), ((this->height() - osdheight) / 2 + osdheight * 0.55), osdwidth, 0.40 * osdheight, Qt::AlignCenter, artist); 	
+		}	// if there is enough room and b_showpopup is true
 		
 		p.end(); 	
 	}	// if pxm_albumart not null
