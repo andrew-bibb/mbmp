@@ -819,6 +819,10 @@ void PlayerControl::initializeDVD()
 // is when ui.actionPlayPause is toggled.  It is also called from playlist
 // when a playlist item is double clicked.  This bypasses the action so
 // we need to keep the action in sync with setChecked
+//
+// Use this slot to trigger notifications which have to happen even if
+// there are no tag information in the media stream (for instance changing
+// the album art page, setting DPMS, etc) 
 void PlayerControl::playMedia(QAction* act)
 {
 	// Figure out which way we want to go in the playlist
@@ -927,7 +931,6 @@ void PlayerControl::stopPlaying()
 	this->setWindowTitle(LONG_NAME);
 	this->pos_timer->stop();
 	
-		
 	// Restore Display Power Message Signaling
 	if (playlist->getCurrentRow() < 0) return;
 	Display* dpy = XOpenDisplay(NULL);
@@ -1705,7 +1708,11 @@ QString PlayerControl::readTextFile(const char* textfile)
 //
 // Function to process the media info (tags) from the playlist and
 // select various pieces for display, etc.
-// Called from processGstifaceMessages.  
+//
+// Called from processGstifaceMessages then a newtrack signal is emitted.
+// This signal comes from an actual Gstreamer TAG bus message, and not
+// all streams have tags.  Use this only to show information where we 
+// think said information would come from a tag.
 void PlayerControl::processMediaInfo(const QString& msg)
 {
 	// Don't show notifications if playing CD's or DVD's

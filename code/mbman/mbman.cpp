@@ -84,12 +84,14 @@ void MusicBrainzManager::retrieveReleaseData(const QString& release, const QStri
 	QNetworkRequest request;
 	request.setUrl(url);
 	request.setRawHeader("User-Agent", useragent.toLatin1());
-	//#if QT_VERSION >= 0x050400 
-		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
-	//# else	
-		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qPrintable(release), qPrintable(artist) );
-	//# endif
 	
+	#if QT_VERSION >= 0x050400 
+		qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
+	# else	
+		qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qPrintable(release), qPrintable(artist) );
+	# endif
+	
+	//qDebug() << url;
 	// Create and connect the reply message to the processing slot
 	QNetworkReply* reply = this->get(request);
 	connect(reply, SIGNAL(finished()), this, SLOT(releaseDataFinished()));
