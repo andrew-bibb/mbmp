@@ -28,7 +28,6 @@ DEALINGS IN THE SOFTWARE.
 
 
 # include "./mbman.h"
-# include "./code/resource.h"
 
 # include <QProcessEnvironment>
 # include <QXmlStreamReader>
@@ -84,6 +83,7 @@ void MusicBrainzManager::retrieveReleaseData(const QString& release, const QStri
 	// Create the request
 	QNetworkRequest request;
 	request.setUrl(url);
+	request.setRawHeader("User-Agent", useragent.toLatin1());
 	//#if QT_VERSION >= 0x050400 
 		//qInfo("Retrieving database information from Musicbrainz for release %s by %s.\n", qUtf8Printable(release), qUtf8Printable(artist) );
 	//# else	
@@ -111,6 +111,7 @@ void MusicBrainzManager::retrieveCDMetaData(const QString& discid)
 	// need to go online which kind of defeats the purpose of saving a file to avoid going online.   
 	destfile.setFileName(cdmeta_dir.absoluteFilePath(QString(discid + ".xml")) );
 	
+	request.setRawHeader("User-Agent", useragent.toLatin1());
 	QNetworkReply* reply = this->get(request);
 	connect(reply, SIGNAL(finished()), this, SLOT(metaDataFinished()));
 		
@@ -127,6 +128,7 @@ void MusicBrainzManager::retrieveAlbumArt(const QString& relgrpid, const QString
 	
 	// Store the artwork using the savename as the filename.
 	artfile.setFileName(artwork_dir.absoluteFilePath(QString(savename + ".jpg")) );
+	request.setRawHeader("User-Agent", useragent.toLatin1());
 	QNetworkReply* reply = this->get(request);
 	connect(reply, SIGNAL(finished()), this, SLOT(artworkRequestFinished()));
 	

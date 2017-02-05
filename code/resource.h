@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 ///////////////////////////////// Program Values ///////////////////////
 //
 // Program Info (may be visible, but don't mark for tranalation) 
-#define VERSION "2017.02.04-2"
+#define VERSION "2017.02.04-3"
 #define RELEASE_DATE "2017.01.08"
 #define COPYRIGHT_DATE "2013-2017"
 
@@ -45,6 +45,7 @@ DEALINGS IN THE SOFTWARE.
 #define APP "mbmp"
 #define LOG_NAME "MBMP"
 #define PLAYER_NAME "mbmp_player"
+#define URL "https://github.com/andrew-bibb/mbmp"
 
 // Program Values - Misc. (not user visible)
 #define INTERNAL_THEME "MBMP_Icon_Theme"

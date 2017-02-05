@@ -33,6 +33,8 @@ DEALINGS IN THE SOFTWARE.
 # include <QFile>
 # include <QDir>
 
+# include "./code/resource.h"
+
 class MusicBrainzManager : public QNetworkAccessManager
 {
   Q_OBJECT
@@ -60,6 +62,7 @@ class MusicBrainzManager : public QNetworkAccessManager
   QFile artfile;
   QDir artwork_dir;
   QDir cdmeta_dir;
+  const QString useragent = QString("%1/%2 (%3)").arg(LONG_NAME).arg(VERSION).arg(URL);
     
 };
 
