@@ -12,6 +12,7 @@
     <file>media/silence.ogg</file>
   </qresource>
   <qresource prefix="images">
+    <file>images/128x128/mbmp.png</file>
     <file>images/24x24/raw_art/gtk-zoom-fit.png</file>
     <file>images/24x24/raw_art/mbmp.png</file>
     <file>images/24x24/raw_art/view-restore.png</file>

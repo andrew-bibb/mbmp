@@ -885,6 +885,9 @@ void PlayerControl::playMedia(QAction* act)
 	// start the position timer
 	pos_timer->start(500);
 	
+	// set the album art page.
+	albumart->setInfo(playlist->getAlbumArt(), playlist->getCurrentTitle(), playlist->getCurrentArtist() );
+	
 	// Turn of Display Power Message Signaling if requested
 	Display* dpy = XOpenDisplay(NULL);
 	DPMSInfo(dpy, &dpms_power_level, &dpms_state); 
@@ -1808,9 +1811,6 @@ void PlayerControl::processMediaInfo(const QString& msg)
 	mpris2->setCanGoPrevious(playlist->canGoPrevious());
 	mpris2->setCanPlay(playlist->currentIsPlayable());
 	mpris2->setCanPause(playlist->currentIsPlayable());	
-	
-	// set the album art page
-		albumart->setInfo(playlist->getAlbumArt(), playlist->getCurrentTitle(), playlist->getCurrentArtist() );
-		
+			
 	return;
 }

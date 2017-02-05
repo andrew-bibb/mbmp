@@ -59,7 +59,7 @@ ArtWidget::ArtWidget(QWidget* parent) : QLabel(parent)
 //
 // Function to receive and process information to be pxm_displayed
 void ArtWidget::setInfo(const QPixmap* src, const QString& t, const QString& a, const int& dur)
-{qDebug() << "in setinfo";
+{
 	// save data we need
 	if (src == NULL) 
 		pxm_albumart = QPixmap();
@@ -134,7 +134,7 @@ void ArtWidget::makeDisplay()
 		
 	// draw artwork
 	if (pxm_albumart.isNull() ) 
-		p.drawTiledPixmap(0, 0, this->width(), this->height(), QPixmap(":/images/images/24x24/raw_art/mbmp.png"));
+		p.drawTiledPixmap(0, 0, this->width(), this->height(), QPixmap(":/images/images/128x128/mbmp.png"));
 	else {
 		QPixmap artwork = pxm_albumart.scaled(this->width(), this->height(), Qt::KeepAspectRatio);
 		p.drawPixmap( ((this->width() - artwork.width())/ 2), ((this->height() - artwork.height()) / 2), artwork);	
@@ -152,7 +152,7 @@ void ArtWidget::makeDisplay()
 	if (fontmetrics.width(artist) > osdwidth ) osdwidth = fontmetrics.width(artist);
 
 	// make osd overlay assuming everything is good to go
-	if (b_showpopup && osdheight <= this->height() * osd_pct_height  && osdwidth <= this->width() * osd_pct_width && (! artist.isEmpty() || title.isEmpty()) ) {	
+	if (b_showpopup && osdheight <= this->height() * osd_pct_height  && osdwidth <= this->width() * osd_pct_width && (! artist.isEmpty() || ! title.isEmpty()) ) {	
 		osdheight = this->height() * osd_pct_height;
 		displayfont.setPixelSize(osdheight * title_pct_hgt);
 		fontmetrics = QFontMetrics(displayfont);
@@ -160,6 +160,11 @@ void ArtWidget::makeDisplay()
 		displayfont.setPixelSize(osdheight * artist_pct_hgt);
 		fontmetrics = QFontMetrics(displayfont);
 		if (fontmetrics.width(artist) > osdwidth ) osdwidth = fontmetrics.width(artist);
+		// now make sure the text did not drive the osd width too wide
+		if (osdwidth > this->width() * osd_pct_width) {
+			osdheight *=  (this->width() * osd_pct_width) / osdwidth;
+			osdwidth = (this->width() * osd_pct_width);
+		}
 		
 		// paint the overlay onto the pxm_display	
 		float pad = osdheight * (1.0 - title_pct_hgt - artist_pct_hgt) / 3.0;

@@ -82,9 +82,6 @@
          </widget>
         </item>
        </layout>
-       <zorder>label_iteminfo</zorder>
-       <zorder>splitter</zorder>
-       <zorder>label_artwork</zorder>
       </widget>
      </widget>
     </widget>
