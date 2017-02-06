@@ -892,6 +892,9 @@ void PlayerControl::playMedia(QAction* act)
 	// set the album art page.
 	albumart->setInfo(playlist->getAlbumArt(), playlist->getCurrentTitle(), playlist->getCurrentArtist() );
 	
+	// clear mpris2 metadata
+	mpris2->clearMetaData(); 
+	
 	// Turn of Display Power Message Signaling if requested
 	Display* dpy = XOpenDisplay(NULL);
 	DPMSInfo(dpy, &dpms_power_level, &dpms_state); 
@@ -928,6 +931,7 @@ void PlayerControl::stopPlaying()
 		
 	// Set window title and duration labels to zero, will also disable seek ui elements
 	this->setDurationWidgets(-1);
+	mpris2->setPosition(0);
 	this->setWindowTitle(LONG_NAME);
 	this->pos_timer->stop();
 	

@@ -80,8 +80,7 @@ class MediaPlayer2 : public QDBusAbstractAdaptor
 	  inline void setIdentity(QString s_id) {identity = s_id; changeditems.append(MBMP_MPRIS::Identity); sendPropertyChanged();}
 	  inline void setDesktopEntry(QString s_de) {desktopentry = s_de; changeditems.append(MBMP_MPRIS::DesktopEntry); sendPropertyChanged();}	 
 		inline void setSupportedUriSchemes(QStringList sl_u) {supportedurischemes = sl_u; changeditems.append(MBMP_MPRIS::UriSchemes); sendPropertyChanged();}	
-		inline void setSupportedMimeSchemes(QStringList sl_m) {supportedmimetypes = sl_m; changeditems.append(MBMP_MPRIS::MimeTypes); sendPropertyChanged();}			  		  
-			  
+		inline void setSupportedMimeSchemes(QStringList sl_m) {supportedmimetypes = sl_m; changeditems.append(MBMP_MPRIS::MimeTypes); sendPropertyChanged();}			  		  	  
 
 	public Q_SLOTS:
 		Q_SCRIPTABLE void Quit(); 

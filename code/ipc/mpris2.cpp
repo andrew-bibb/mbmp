@@ -184,6 +184,14 @@ void Mpris2::seeked(const qlonglong& pos)
 	
 	return;
 }	
+
+// Function to clear the mediaplayer2player metadata
+void Mpris2::clearMetaData()
+{
+	static_cast<MediaPlayer2Player*>(mediaplayer2player)->clearMetaData();
+	
+	return;
+}		
 		
 	
 

@@ -67,7 +67,6 @@ void MediaPlayer2::Quit()
 	static_cast<Mpris2*>(this->parent())->emitApplicationStop();
 }
 
-
 /////////////////////// Private Functions ///////////////////////////////
 //
 // Function to emit the org.freedesktop.Dbus.Properties.PropertiesChanged()
