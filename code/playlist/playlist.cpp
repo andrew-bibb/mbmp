@@ -730,7 +730,7 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 				settings->deleteLater();
 				if (! b_disable_internet) {
 					if (mbman == NULL) mbman = new MusicBrainzManager(this);
-					mbman->retrieveReleaseData(static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM), this->getCurrentArtist() );
+					mbman->startLooking(static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM), this->getCurrentArtist(),static_cast<PlaylistItem*>(cur)->getTagAsString("musicbrainz-albumid"));
 					connect(mbman, SIGNAL(artworkRetrieved()), this, SLOT(albumArtRetrieved()));
 				}	// if allowed to go out on the internet
 			}	// else need to go out and look

@@ -40,11 +40,11 @@ PlaylistItem::PlaylistItem(const QString& text, QListWidget* parent, int type) :
 	duration = -1;	
 	uri = QString();	
 	seekable = false;		
-	title = QString();
-	artist = QString();
-	album = QString();
-	errors = QString();	
-	lyrics = QString();
+	title.clear();
+	artist.clear();
+	album.clear();
+	errors.clear();	
+	lyrics.clear();
 	tag_map.clear();
 	b_has_lyrics = false;
 	b_has_artwork = false;

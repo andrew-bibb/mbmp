@@ -44,28 +44,33 @@ class MusicBrainzManager : public QNetworkAccessManager
     MusicBrainzManager(QObject* parent);  
     
 	// functions
-		void retrieveReleaseData(const QString&, const QString&);
+		void startLooking(const QString&, const QString&, const QString&);
 		void retrieveCDMetaData(const QString&);
 		void retrieveAlbumArt(const QString&, const QString&);
 	
-	public slots:
+	private Q_SLOTS:
+		void retrieveReleaseData();
 		void releaseDataFinished();
 		void metaDataFinished();
 		void artworkRequestFinished();
 
-	signals:
+	Q_SIGNALS:
 		void metaDataRetrieved(const QString&);
 		void artworkRetrieved();
+		void abort();
 
   private:
-  QFile destfile;
-  QFile artfile;
-  QDir artwork_dir;
-  QDir cdmeta_dir;
-  const QString useragent = QString("%1/%2 (%3)").arg(LONG_NAME).arg(VERSION).arg(URL);
+		QFile destfile;
+		QFile artfile;
+		QDir artwork_dir;
+		QDir cdmeta_dir;
+		QString release;
+		QString artist;
+		QString releaseid;
+		QString releasegrpid;
+		short queryreq;
+		const QString useragent = QString("%1/%2 (%3)").arg(LONG_NAME).arg(VERSION).arg(URL);
     
 };
-
-
 
 #endif
