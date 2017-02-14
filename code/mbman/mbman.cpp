@@ -127,10 +127,10 @@ void MusicBrainzManager::retrieveReleaseData()
 			urlq.addQueryItem("query", QString("reid:" + releaseid) );
 			break;
 		case 2: 	
-			urlq.addQueryItem("query", QString("release:" + rel + " AND " + "artist:" + ast) );
+			urlq.addQueryItem("query", QString("release:\"" + rel + "\" AND \"" + "artist:\"" + ast) );
 			break;
 		case 3:
-			urlq.addQueryItem("query", QString("release:" + rel) );
+			urlq.addQueryItem("query", QString("release:\"" + rel + "\"") );
 			break;
 		default:
 			return;	
@@ -142,7 +142,7 @@ void MusicBrainzManager::retrieveReleaseData()
 	QNetworkRequest request;
 	request.setUrl(url);
 	request.setRawHeader("User-Agent", useragent.toLatin1());
-	
+
 	#if QT_VERSION >= 0x050400 
 		qInfo("Search Case %i - Retrieving database information from Musicbrainz for release %s by %s.\n", queryreq, qUtf8Printable(release), qUtf8Printable(artist) );
 	# else	
@@ -205,7 +205,8 @@ void MusicBrainzManager::retrieveAlbumArt(const QString& releasegrpid, const QSt
 // 
 void MusicBrainzManager::releaseDataFinished()
 {
-	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());	
+	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	
 	if (reply->error() != QNetworkReply::NoError) {
 		#if QT_VERSION >= 0x050400 
 			qCritical("Network error getting Track info from Musicbrainz:\n %s", qUtf8Printable(reply->errorString()) );
@@ -215,7 +216,7 @@ void MusicBrainzManager::releaseDataFinished()
 		reply->deleteLater();
 		return;
 	}
-	
+
 	// Read through the reply data and store pieces we want locally
 	QXmlStreamReader* xml = new QXmlStreamReader(reply);	
 	QStringList pos;
