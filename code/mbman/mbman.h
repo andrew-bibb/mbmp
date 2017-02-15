@@ -44,7 +44,7 @@ class MusicBrainzManager : public QNetworkAccessManager
     MusicBrainzManager(QObject* parent);  
     
 	// functions
-		void startLooking(const QString&, const QString&, const QString&);
+		void startLooking(const QString&, const QString&, const QString&, const QString&, const QString&);
 		void retrieveCDMetaData(const QString&);
 		void retrieveAlbumArt(const QString&, const QString&);
 	
@@ -66,7 +66,9 @@ class MusicBrainzManager : public QNetworkAccessManager
 		QDir cdmeta_dir;
 		QString release;
 		QString artist;
+		QString title;
 		QString releaseid;
+		QString trackid;
 		QString releasegrpid;
 		short queryreq;
 		const QString useragent = QString("%1/%2 (%3)").arg(LONG_NAME).arg(VERSION).arg(URL);

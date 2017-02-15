@@ -53,7 +53,9 @@ MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(
 	
 	release.clear();
   artist.clear();
+  title.clear();
   releaseid.clear();
+  trackid.clear();
   releasegrpid.clear();
   queryreq = 0;
 	
@@ -65,7 +67,7 @@ MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(
 //
 // Function to start looking for metadata about a track based on track title, artist or releaseid
 // If we have releaseid use that.  If not try title and artist, if that fails try title only 
-void MusicBrainzManager::startLooking(const QString& rel, const QString& ast, const QString& relid)
+void MusicBrainzManager::startLooking(const QString& rel, const QString& ast, const QString& tit, const QString& relid, const QString& trkid)
 {
 	// abort any active network requests, downloads, etc.
 	this->emit abort();
@@ -73,7 +75,9 @@ void MusicBrainzManager::startLooking(const QString& rel, const QString& ast, co
 	// save data sent
 	release = rel;
 	artist = ast;
+	title = tit;
 	releaseid = relid;
+	trackid = trkid;
 	releasegrpid.clear();
 	queryreq = 0;
 		
@@ -85,7 +89,19 @@ void MusicBrainzManager::startLooking(const QString& rel, const QString& ast, co
 	}
 	
 	++queryreq;
+	if (! trackid.isEmpty() ) {
+		retrieveReleaseData();
+		return;
+	}
+	
+	++queryreq;
 	if (! release.isEmpty() && ! artist.isEmpty() ) {
+		retrieveReleaseData();
+		return;
+	}
+	
+	++queryreq;
+	if (! release.isEmpty() && ! title.isEmpty() ) {
 		retrieveReleaseData();
 		return;
 	}
@@ -108,6 +124,7 @@ void MusicBrainzManager::retrieveReleaseData()
 {
 	QString rel = release;
 	QString ast = artist;
+	QString tit = title;
 	
 	// Process special characters for Lucene
 	QStringList sl_specials;
@@ -115,21 +132,35 @@ void MusicBrainzManager::retrieveReleaseData()
 	for (int i = 0; i < sl_specials.count(); ++i) {
 		rel.replace(sl_specials.at(i), QString("%5C" + sl_specials.at(i)) );
 		ast.replace(sl_specials.at(i), QString("%5C" + sl_specials.at(i)) );
+		tit.replace(sl_specials.at(i), QString("%5C" + sl_specials.at(i)) );
 	}
 	
 			
 	// Create the URL
-	QUrl url(QString("http://musicbrainz.org/ws/2/release") );
+	QUrl url;
+	url.setScheme("http");
+	url.setHost("musicbrainz.org");
 	QUrlQuery urlq;
 	switch (queryreq)
 	{
 		case 1:
+			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("reid:" + releaseid) );
 			break;
-		case 2: 	
+		case 2:
+			url.setPath(QString("/ws/2/recording") );
+			urlq.addQueryItem("query", QString("rid:" + trackid) );
+			break;	
+		case 3: 	
+			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("release:\"" + rel + "\" AND \"" + "artist:\"" + ast) );
 			break;
-		case 3:
+		case 4: 	
+			url.setPath(QString("/ws/2/recording") );
+			urlq.addQueryItem("query", QString("release:\"" + rel + "\" AND \"" + "recording:\"" + tit) );
+			break;		
+		case 5:
+			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("release:\"" + rel + "\"") );
 			break;
 		default:
@@ -142,7 +173,7 @@ void MusicBrainzManager::retrieveReleaseData()
 	QNetworkRequest request;
 	request.setUrl(url);
 	request.setRawHeader("User-Agent", useragent.toLatin1());
-
+qDebug() << url;
 	#if QT_VERSION >= 0x050400 
 		qInfo("Search Case %i - Retrieving database information from Musicbrainz for release %s by %s.\n", queryreq, qUtf8Printable(release), qUtf8Printable(artist) );
 	# else	
@@ -238,14 +269,16 @@ void MusicBrainzManager::releaseDataFinished()
 					if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
 				}
 				
-				else if (pos.join(',') == "metadata,release-list,release,title") {
-					if (release.isEmpty() ) release = xml->readElementText(QXmlStreamReader::SkipChildElements);	
+				// case 2 search by trackid
+				else if (pos.join(',') == "metadata,recording-list,recording,release-list,release,release-group") {
+					if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
 					pos.removeLast();
 				}
+				
 				break;	// startElement
 						
 			case QXmlStreamReader::EndElement:	
-				pos.removeLast();			
+				if (! pos.isEmpty() ) pos.removeLast();			
 				//qDebug() << pos.join(',');
 				break;	
 				
@@ -267,7 +300,7 @@ void MusicBrainzManager::releaseDataFinished()
 		if (! releasegrpid.isEmpty() && ! release.isEmpty() ) break;	// break once we've got what we want (and the first instance of same)
 	}	// while	
 	delete xml;
-	
+
 	// Get Album art for the releasegrpid or try another query
 	if (! releasegrpid.isEmpty() && ! releaseid.isEmpty() )
 		retrieveAlbumArt(releasegrpid, releaseid);
