@@ -72,6 +72,9 @@ void MusicBrainzManager::startLooking(const QString& rel, const QString& ast, co
 	// abort any active network requests, downloads, etc.
 	this->emit abort();
 	
+	// if release is empty return - we can't do anything without the release name
+	if (rel.isEmpty() ) return;
+	
 	// save data sent
 	release = rel;
 	artist = ast;
@@ -141,27 +144,28 @@ void MusicBrainzManager::retrieveReleaseData()
 	url.setScheme("http");
 	url.setHost("musicbrainz.org");
 	QUrlQuery urlq;
+	const QString dquote("\"");
 	switch (queryreq)
 	{
 		case 1:
 			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("reid:" + releaseid) );
 			break;
-		case 2:
+		case 2:	
 			url.setPath(QString("/ws/2/recording") );
 			urlq.addQueryItem("query", QString("rid:" + trackid) );
 			break;	
-		case 3: 	
+		case 3:	//  	
 			url.setPath(QString("/ws/2/release") );
-			urlq.addQueryItem("query", QString("release:\"" + rel + "\" AND \"" + "artist:\"" + ast) );
+			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote + " AND " + "artist:" + dquote + ast + dquote) );
 			break;
 		case 4: 	
 			url.setPath(QString("/ws/2/recording") );
-			urlq.addQueryItem("query", QString("release:\"" + rel + "\" AND \"" + "recording:\"" + tit) );
+			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote + " AND " + "recording:" + dquote + tit + dquote) );
 			break;		
 		case 5:
 			url.setPath(QString("/ws/2/release") );
-			urlq.addQueryItem("query", QString("release:\"" + rel + "\"") );
+			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote) );
 			break;
 		default:
 			return;	
@@ -234,15 +238,17 @@ void MusicBrainzManager::retrieveAlbumArt(const QString& releasegrpid, const QSt
 }
 
 // 
+// Parse XML returned from Musicbrainz looking for releasegroupid,
+// Called via signal/slot from retrieveReleaseData().  
 void MusicBrainzManager::releaseDataFinished()
 {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	
 	if (reply->error() != QNetworkReply::NoError) {
 		#if QT_VERSION >= 0x050400 
-			qCritical("Network error getting Track info from Musicbrainz:\n %s", qUtf8Printable(reply->errorString()) );
+			qCritical("Network error getting XML info from:%s\n %s", qUtf8Printable(reply->url().toString()), qUtf8Printable(reply->errorString()) );
 		# else	
-			qCritical("Network error getting Track info from Musicbrainz:\n %s", qPrintable(reply->errorString()) );
+			qCritical("Network error getting XML info from:%s\n %s", qPrintable(reply->url().toString()), qPrintable(reply->errorString()) );
 		# endif
 		reply->deleteLater();
 		return;
@@ -259,17 +265,18 @@ void MusicBrainzManager::releaseDataFinished()
 
 				// Note that it is not possible to get a releaseid from artist and title.  There could
 				// be multiple releases for this case, so starting with only with artist and title we can
-				// only retrieve the releasegrpid. Releaseid will only be filled in if the file was tagged
-				// with that value (as presumabably some human determined what the proper release was).
+				// only retrieve the releasegrpid. 
+				//
+				// query /ws/2/release
 				if (pos.join(',') == "metadata,release-list,release,release-group") {
 					if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
 				}
 				
-				else if (pos.join(',') == "metadata,release-list,release-group") {
-					if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
-				}
+				//else if (pos.join(',') == "metadata,release-list,release-group") {
+					//if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
+				//}
 				
-				// case 2 search by trackid
+				// query /ws/2/recording
 				else if (pos.join(',') == "metadata,recording-list,recording,release-list,release,release-group") {
 					if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
 					pos.removeLast();
@@ -297,7 +304,7 @@ void MusicBrainzManager::releaseDataFinished()
 				continue;
 		}	// switch
 		
-		if (! releasegrpid.isEmpty() && ! release.isEmpty() ) break;	// break once we've got what we want (and the first instance of same)
+		if (! releasegrpid.isEmpty() ) break;	// break once we've got what we want (and the first instance of same)
 	}	// while	
 	delete xml;
 
