@@ -101,6 +101,7 @@ class PlayerControl : public QDialog
     void connectNotifyClient();
     void setDurationWidgets(int, bool seek_enabled = false);
     void setPositionWidgets();
+    void artworkRetrieved();
 
 	protected:
 		void contextMenuEvent(QContextMenuEvent*);		

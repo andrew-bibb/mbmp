@@ -110,6 +110,12 @@ void MusicBrainzManager::startLooking(const QString& rel, const QString& ast, co
 	}
 	
 	++queryreq;
+	if (! title.isEmpty() && ! artist.isEmpty() ) {
+		retrieveReleaseData();
+		return;
+	}
+	
+	++queryreq;
 	if (! release.isEmpty() ) {
 		retrieveReleaseData();
 		return;
@@ -145,25 +151,36 @@ void MusicBrainzManager::retrieveReleaseData()
 	url.setHost("musicbrainz.org");
 	QUrlQuery urlq;
 	const QString dquote("\"");
+	 
+	if (queryreq == 1 && releaseid.isEmpty() ) ++queryreq;
+	if (queryreq == 2 && trackid.isEmpty() ) ++queryreq;
+	if (queryreq == 3 && rel.isEmpty() && ast.isEmpty() ) ++queryreq;
+	if (queryreq == 4 && rel.isEmpty() && tit.isEmpty() ) ++queryreq;
+	if (queryreq == 5 && tit.isEmpty() && ast.isEmpty() ) ++queryreq;
+	if (queryreq == 6 && rel.isEmpty() ) ++queryreq;
 	switch (queryreq)
 	{
-		case 1:
+		case 1:	// match releaseid
 			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("reid:" + releaseid) );
 			break;
-		case 2:	
+		case 2:	// match trackid
 			url.setPath(QString("/ws/2/recording") );
 			urlq.addQueryItem("query", QString("rid:" + trackid) );
 			break;	
-		case 3:	//  	
+		case 3:	// match release (album title) and artist  	
 			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote + " AND " + "artist:" + dquote + ast + dquote) );
 			break;
-		case 4: 	
+		case 4: // match release (album title) and song title 	
 			url.setPath(QString("/ws/2/recording") );
 			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote + " AND " + "recording:" + dquote + tit + dquote) );
-			break;		
-		case 5:
+			break;
+		case 5:	// match song title and artist (this is equally likely to return a good result as it is a bad - for instance "best of" compliations)  	
+			url.setPath(QString("/ws/2/recording") );
+			urlq.addQueryItem("query", QString("recording:" + dquote + tit + dquote + " AND " + "artist:" + dquote + ast + dquote) );
+			break;			
+		case 6: // match release (album title) - this is also quite likely to return bad results as over the years there are duplicate album titles
 			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote) );
 			break;
@@ -177,7 +194,7 @@ void MusicBrainzManager::retrieveReleaseData()
 	QNetworkRequest request;
 	request.setUrl(url);
 	request.setRawHeader("User-Agent", useragent.toLatin1());
-qDebug() << url;
+	//qDebug() << url;
 	#if QT_VERSION >= 0x050400 
 		qInfo("Search Case %i - Retrieving database information from Musicbrainz for release %s by %s.\n", queryreq, qUtf8Printable(release), qUtf8Printable(artist) );
 	# else	
@@ -263,25 +280,21 @@ void MusicBrainzManager::releaseDataFinished()
 				pos.append(xml->name().toString() );
 				//qDebug() << pos.join(',');
 
-				// Note that it is not possible to get a releaseid from artist and title.  There could
-				// be multiple releases for this case, so starting with only with artist and title we can
-				// only retrieve the releasegrpid. 
-				//
+				// Note that it is not possible to get an accurate releaseid from release (album title), artist 
+				// or song title as there could be multiple releases (therefore releaseid's) searching on any of these.
+				// Starting with any of these in isolation or combination we can only retrieve the releasegrpid. 
+				
 				// query /ws/2/release
 				if (pos.join(',') == "metadata,release-list,release,release-group") {
 					if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
 				}
 				
-				//else if (pos.join(',') == "metadata,release-list,release-group") {
-					//if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
-				//}
-				
-				// query /ws/2/recording
-				else if (pos.join(',') == "metadata,recording-list,recording,release-list,release,release-group") {
-					if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
-					pos.removeLast();
-				}
-				
+				// query /ws/2/recording				
+					else if (pos.join(',') == "metadata,recording-list,recording,release-list,release,release-group") {
+						if (releasegrpid.isEmpty() ) releasegrpid = xml->attributes().value("id").toString();
+						pos.removeLast();
+					}
+
 				break;	// startElement
 						
 			case QXmlStreamReader::EndElement:	
@@ -411,7 +424,7 @@ void MusicBrainzManager::metaDataFinished()
 									if (xml->name() == "recording") {
 										xmlwriter.writeEndElement();	// track	
 									}
-									pos.removeLast();
+									if (! pos.isEmpty() ) pos.removeLast();
 									//qDebug() << pos.join(',');
 									break;	
 								default:
@@ -426,8 +439,8 @@ void MusicBrainzManager::metaDataFinished()
 					}	// if track-list,track
 					break;	// startElement
 							
-				case QXmlStreamReader::EndElement:	
-					pos.removeLast();
+				case QXmlStreamReader::EndElement:
+					if (! pos.isEmpty() ) pos.removeLast();			
 					//qDebug() << pos.join(',');
 					break;	
 				case QXmlStreamReader::Invalid:

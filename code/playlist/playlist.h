@@ -200,6 +200,7 @@ class Playlist : public QWidget
 	Q_SIGNALS:	
 		void wrapModeChanged(const bool&);	
 		void randomModeChanged(const bool&);
+		void artworkRetrieved();
 };
 
 #endif

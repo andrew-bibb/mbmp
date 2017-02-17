@@ -671,6 +671,9 @@ void Playlist::albumArtRetrieved()
 	QPixmap pm = getLocalAlbumArt(searchtags);
 	if (! pm.isNull() ) ui.label_artwork->setPixmap(pm);
 	
+	// send the artworkretireved signal on
+	emit (artworkRetrieved() );
+	
 	disconnect(mbman, SIGNAL(artworkRetrieved()), 0, 0);	
 	return;
 }

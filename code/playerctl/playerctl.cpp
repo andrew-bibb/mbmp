@@ -537,8 +537,9 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	connect (ui.actionDVD, SIGNAL (triggered()), this, SLOT(initializeDVD()));
 	connect (videowidget, SIGNAL(navsignal(QString,int,int,int)), gstiface, SLOT(mouseNavEvent(QString,int,int,int)));
 	connect (options_menu, SIGNAL(triggered(QAction*)), this, SLOT(changeOptions(QAction*)));
-	connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
-	connect(pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
+	connect (qApp, SIGNAL(aboutToQuit()), this, SLOT(cleanUp()));
+	connect (pos_timer, SIGNAL(timeout()), this, SLOT(setPositionWidgets()));
+	connect (playlist, SIGNAL(artworkRetrieved()), this, SLOT(artworkRetrieved()));
 	
 	connect (mpris2, SIGNAL(applicationStop()), qApp, SLOT(quit()));
 	connect (mpris2, SIGNAL(controlStop()), ui.actionPlayerStop, SLOT(trigger()));
@@ -724,6 +725,16 @@ void PlayerControl::setPositionWidgets()
 	
 	// deactive xscreensaver, do this each time we process a new position (about twice a second)
 	if (diag_settings->useDisableXSS() ) QProcess::execute("xscreensaver-command -deactivate");
+	
+	return;
+}
+
+//
+// Slot to set the albumart widget when new artwork is retrieved
+// Called from a playlist signal
+void PlayerControl::artworkRetrieved()
+{
+	albumart->setInfo(playlist->getAlbumArt(), playlist->getCurrentTitle(), playlist->getCurrentArtist() );
 	
 	return;
 }
