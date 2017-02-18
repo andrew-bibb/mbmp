@@ -57,6 +57,7 @@ class Settings : public QDialog
     inline bool useDisableDPMS() {return ui.checkBox_disabledpms->isChecked();}
     inline bool useDisableInternet() {return ui.checkBox_disableinternet->isChecked();}
     inline bool useYouTubeDL() {return ui.checkBox_useyoutubedl->isChecked();}
+    inline int	getYouTubeDLTimeout() {return ui.spinBox_youtubedl_timeout->value();}
     
   	void saveElementGeometry(const QString&, const bool&, const QSize&, const QPoint&);
   	void saveElementState(const QString&, const QString&, const QVariant&);

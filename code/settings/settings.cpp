@@ -68,6 +68,7 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_colorize->setText(settings->value("colorize_icons").toString() );
 	ui.checkBox_disableinternet->setChecked(settings->value("disable_internet").toBool() );
 	ui.checkBox_useyoutubedl->setChecked(settings->value("use_youtube-dl").toBool() );
+	ui.spinBox_youtubedl_timeout->setValue(settings->value("youtube-dl_timeout").toInt() );
 	QDir res(":/stylesheets/stylesheets/");
 	QStringList styles = res.entryList(QDir::Files);
 	styles << tr("None");
@@ -162,6 +163,7 @@ void Settings::writeSettings()
   settings->setValue("style", ui.comboBox_style->currentText() );
   settings->setValue("disable_internet", ui.checkBox_disableinternet->isChecked() );
   settings->setValue("use_youtube-dl", ui.checkBox_useyoutubedl->isChecked() );
+  settings->setValue("youtube-dl_timeout", ui.spinBox_youtubedl_timeout->value() );
   settings->endGroup();
   
   settings->beginGroup("Notifications");
