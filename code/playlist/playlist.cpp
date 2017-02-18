@@ -1194,7 +1194,7 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 			return QPixmap(dir.absoluteFilePath(entlist.at(0)) );
 		}
 	}	// if dir exists
-	
+
 	// Not image in media directory, look in artwork_dir			
 	for (int i = 0; i < searchtags.count(); ++i) {
 		if (! searchtags.at(i).isEmpty() ) {

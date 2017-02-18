@@ -874,7 +874,7 @@ void PlayerControl::playMedia(QAction* act)
 		if (diag_settings->useYouTubeDL() && QUrl::fromUserInput(playlist->getCurrentUri()).port() == -1 ) {
 			QProcess p;
 			p.start(QString("youtube-dl -g -f best %1").arg(playlist->getCurrentUri()) );
-			if (p.waitForFinished(5000) )	// 5 second timeout
+			if (p.waitForFinished(10000) )	// 5 second timeout
 				gstiface->playMedia(videowidget->winId(), p.readAll());
 			else {
 				this->processGstifaceMessages(MBMP_GI::Info, tr("Failed processing %1 through youtube-dl. Skipping URL").arg(playlist->getCurrentUri()) );

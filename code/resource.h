@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 ///////////////////////////////// Program Values ///////////////////////
 //
 // Program Info (may be visible, but don't mark for tranalation) 
-#define VERSION "2017.02.17-2"
+#define VERSION "2017.02.17-3"
 #define RELEASE_DATE "2017.01.08"
 #define COPYRIGHT_DATE "2013-2017"
 
