@@ -733,9 +733,12 @@ void Playlist::currentItemChanged(QListWidgetItem* cur, QListWidgetItem* old)
 				settings->deleteLater();
 				if (! b_disable_internet) {
 					if (mbman == NULL) mbman = new MusicBrainzManager(this);
+					QString ast = this->getCurrentArtist();
+					if (ast.isEmpty() ) ast = static_cast<PlaylistItem*>(cur)->getTagAsString("album-artist");
+					if (ast.isEmpty() ) ast = static_cast<PlaylistItem*>(cur)->getTagAsString("composer");
 					mbman->startLooking(
 						static_cast<PlaylistItem*>(cur)->getTagAsString(GST_TAG_ALBUM),
-						this->getCurrentArtist(),
+						ast,
 						this->getCurrentTitle(),
 						static_cast<PlaylistItem*>(cur)->getTagAsString("musicbrainz-albumid"),
 						static_cast<PlaylistItem*>(cur)->getTagAsString("musicbrainz-trackid"));
@@ -1195,16 +1198,16 @@ QPixmap Playlist::getLocalAlbumArt(const QStringList& searchtags, const QDir& di
 	// Not image in media directory, look in artwork_dir			
 	namefilters.clear();
 	for (int i = 0; i < searchtags.count(); ++i) {
-		for (int j = 0; j < ext.count(); ++j) {
-			namefilters << QString("%1%2").arg(searchtags.at(i)).arg(ext.at(j));
-		}
-		entlist = artwork_dir.entryList(namefilters, QDir::Files, QDir::NoSort);
-		if (entlist.count() > 0) {
-			arturl = QUrl::fromLocalFile(artwork_dir.absoluteFilePath(entlist.at(0)) );
-			return QPixmap(artwork_dir.absoluteFilePath(entlist.at(0)) );
-		}	// if found cover
-	}	// for searchtags
-	
+		if (! searchtags.at(i).isEmpty() ) {
+			for (int j = 0; j < ext.count(); ++j) {
+				if (artwork_dir.exists(searchtags.at(i) + ext.at(j)) ) {
+					arturl = QUrl::fromLocalFile(artwork_dir.absoluteFilePath(searchtags.at(i) + ext.at(j)) );
+					return QPixmap(artwork_dir.absoluteFilePath(searchtags.at(i) + ext.at(j)) );
+				}	// if exists
+			}	// j loop
+		}	// if not empty
+	}	// i loop
+
 	// no luck, return a null pixmap
 	return QPixmap();
 }

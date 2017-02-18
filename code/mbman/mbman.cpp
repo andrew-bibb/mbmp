@@ -37,6 +37,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QNetworkRequest>
 # include <QNetworkReply>
 # include <QImage>
+# include <QRegularExpression>
 
 // Constructor
 MusicBrainzManager::MusicBrainzManager(QObject* parent) : QNetworkAccessManager(parent) 
@@ -144,6 +145,10 @@ void MusicBrainzManager::retrieveReleaseData()
 		tit.replace(sl_specials.at(i), QString("%5C" + sl_specials.at(i)) );
 	}
 	
+
+	// Note that it is not possible to get an accurate releaseid from release (album title), artist 
+	// or song title as there could be multiple releases (therefore releaseid's) searching on any of these.
+	// Starting with any of these in isolation or combination we can only retrieve the releasegrpid. 
 			
 	// Create the URL
 	QUrl url;
@@ -151,13 +156,27 @@ void MusicBrainzManager::retrieveReleaseData()
 	url.setHost("musicbrainz.org");
 	QUrlQuery urlq;
 	const QString dquote("\"");
-	 
+	
+	// create a release string to search for that is not necessarily exactly
+	// what the release string is in the media tag.  We've observed that
+	// the release (album title) is more likely to have a differing entry
+	// in the Musicbrainz data base than the song title or artist.
+	QString srchrel = rel;
+	srchrel.remove(QRegularExpression("\\ba\\b",QRegularExpression::CaseInsensitiveOption) );
+	srchrel.remove(QRegularExpression("\\bto\\b",QRegularExpression::CaseInsensitiveOption) );
+	srchrel.remove(QRegularExpression("\\bof\\b",QRegularExpression::CaseInsensitiveOption) );
+	srchrel.remove(QRegularExpression("\\bthe\\b",QRegularExpression::CaseInsensitiveOption) );
+	srchrel.prepend("release:(");
+	srchrel.append(")");
+	
+	// only do queries we have enough information to do 
 	if (queryreq == 1 && releaseid.isEmpty() ) ++queryreq;
 	if (queryreq == 2 && trackid.isEmpty() ) ++queryreq;
-	if (queryreq == 3 && rel.isEmpty() && ast.isEmpty() ) ++queryreq;
-	if (queryreq == 4 && rel.isEmpty() && tit.isEmpty() ) ++queryreq;
-	if (queryreq == 5 && tit.isEmpty() && ast.isEmpty() ) ++queryreq;
+	if (queryreq == 3 && (rel.isEmpty() || ast.isEmpty()) ) ++queryreq;
+	if (queryreq == 4 && (rel.isEmpty() || tit.isEmpty()) ) ++queryreq;
+	if (queryreq == 5 && (tit.isEmpty() || ast.isEmpty() || srchrel.isEmpty()) ) ++queryreq;
 	if (queryreq == 6 && rel.isEmpty() ) ++queryreq;
+	
 	switch (queryreq)
 	{
 		case 1:	// match releaseid
@@ -176,9 +195,9 @@ void MusicBrainzManager::retrieveReleaseData()
 			url.setPath(QString("/ws/2/recording") );
 			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote + " AND " + "recording:" + dquote + tit + dquote) );
 			break;
-		case 5:	// match song title and artist (this is equally likely to return a good result as it is a bad - for instance "best of" compliations)  	
+		case 5:	// match song title, artist and keywords out of the title
 			url.setPath(QString("/ws/2/recording") );
-			urlq.addQueryItem("query", QString("recording:" + dquote + tit + dquote + " AND " + "artist:" + dquote + ast + dquote) );
+			urlq.addQueryItem("query", QString("recording:" + dquote + tit + dquote + " AND " + "artist:" + dquote + ast + dquote + " AND " + srchrel) );
 			break;			
 		case 6: // match release (album title) - this is also quite likely to return bad results as over the years there are duplicate album titles
 			url.setPath(QString("/ws/2/release") );
@@ -194,7 +213,8 @@ void MusicBrainzManager::retrieveReleaseData()
 	QNetworkRequest request;
 	request.setUrl(url);
 	request.setRawHeader("User-Agent", useragent.toLatin1());
-	//qDebug() << url;
+	//./mb	
+	qDebug() << url;
 	#if QT_VERSION >= 0x050400 
 		qInfo("Search Case %i - Retrieving database information from Musicbrainz for release %s by %s.\n", queryreq, qUtf8Printable(release), qUtf8Printable(artist) );
 	# else	
@@ -279,10 +299,6 @@ void MusicBrainzManager::releaseDataFinished()
 			case QXmlStreamReader::StartElement:
 				pos.append(xml->name().toString() );
 				//qDebug() << pos.join(',');
-
-				// Note that it is not possible to get an accurate releaseid from release (album title), artist 
-				// or song title as there could be multiple releases (therefore releaseid's) searching on any of these.
-				// Starting with any of these in isolation or combination we can only retrieve the releasegrpid. 
 				
 				// query /ws/2/release
 				if (pos.join(',') == "metadata,release-list,release,release-group") {
