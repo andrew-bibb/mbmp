@@ -73,8 +73,8 @@ void MusicBrainzManager::startLooking(const QString& rel, const QString& ast, co
 	// abort any active network requests, downloads, etc.
 	this->emit abort();
 	
-	// if release is empty return - we can't do anything without the release name
-	if (rel.isEmpty() ) return;
+	// if release, releaseid and trackid are empty return - we can't do anything without at least one of these
+	if (rel.isEmpty() && relid.isEmpty() && trkid.isEmpty() ) return;
 	
 	// save data sent
 	release = rel;
@@ -157,10 +157,11 @@ void MusicBrainzManager::retrieveReleaseData()
 	QUrlQuery urlq;
 	const QString dquote("\"");
 	
-	// create a release string to search for that is not necessarily exactly
-	// what the release string is in the media tag.  We've observed that
+	// Create a release string to search for that is not necessarily exactly
+	// with what the release string is in the media tag.  We've observed that
 	// the release (album title) is more likely to have a differing entry
-	// in the Musicbrainz data base than the song title or artist.
+	// in the Musicbrainz data base than the song title or artist.   This is
+	// only used in case 5 with title and artist.
 	QString srchrel = rel;
 	srchrel.remove(QRegularExpression("\\ba\\b",QRegularExpression::CaseInsensitiveOption) );
 	srchrel.remove(QRegularExpression("\\bto\\b",QRegularExpression::CaseInsensitiveOption) );
@@ -199,7 +200,7 @@ void MusicBrainzManager::retrieveReleaseData()
 			url.setPath(QString("/ws/2/recording") );
 			urlq.addQueryItem("query", QString("recording:" + dquote + tit + dquote + " AND " + "artist:" + dquote + ast + dquote + " AND " + srchrel) );
 			break;			
-		case 6: // match release (album title) - this is also quite likely to return bad results as over the years there are duplicate album titles
+		case 6: // match release (album title) - this is quite likely to return bad results as over the years there are probably duplicate album titles by different artists
 			url.setPath(QString("/ws/2/release") );
 			urlq.addQueryItem("query", QString("release:" + dquote + rel + dquote) );
 			break;
@@ -213,8 +214,7 @@ void MusicBrainzManager::retrieveReleaseData()
 	QNetworkRequest request;
 	request.setUrl(url);
 	request.setRawHeader("User-Agent", useragent.toLatin1());
-	//./mb	
-	qDebug() << url;
+
 	#if QT_VERSION >= 0x050400 
 		qInfo("Search Case %i - Retrieving database information from Musicbrainz for release %s by %s.\n", queryreq, qUtf8Printable(release), qUtf8Printable(artist) );
 	# else	
@@ -262,6 +262,12 @@ void MusicBrainzManager::retrieveAlbumArt(const QString& releasegrpid, const QSt
 {
 	QNetworkRequest request;
 	request.setUrl(QUrl(QString("http://coverartarchive.org/release-group/%1/front").arg(releasegrpid)) );      
+	
+	#if QT_VERSION >= 0x050400 
+		qInfo("Retrieving artwork from URL: %s\n", qUtf8Printable(request.url().url()) );
+	# else	
+		qInfo("Retrieving artwork from URL: %s\n", qPrintable(request.url().url()) );
+	# endif
 	
 	// Store the artwork using savename 
 	artfile.setFileName(artwork_dir.absoluteFilePath(QString(savename + ".jpg")) );
