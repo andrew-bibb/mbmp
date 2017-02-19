@@ -68,7 +68,7 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_colorize->setText(settings->value("colorize_icons").toString() );
 	ui.checkBox_disableinternet->setChecked(settings->value("disable_internet").toBool() );
 	ui.checkBox_useyoutubedl->setChecked(settings->value("use_youtube-dl").toBool() );
-	ui.spinBox_youtubedl_timeout->setValue(settings->value("youtube-dl_timeout").toInt() );
+	ui.spinBox_youtubedl_timeout->setValue(settings->value("youtube-dl_timeout", 9).toInt() );
 	QDir res(":/stylesheets/stylesheets/");
 	QStringList styles = res.entryList(QDir::Files);
 	styles << tr("None");

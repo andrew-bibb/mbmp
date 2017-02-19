@@ -7,7 +7,8 @@
 <li>Showing album art in playlist as small thumbnail.</li>
 <li>Added a widget to display album art with an OSD popup to show title and artist.</li>
 <li>Added a user-agent to Musicbrainz GET requests to make them work better.</li>
-<li>Musicbrainz search a bit more robust.</li>
+<li>Musicbrainz database search more robust.</li>
+<li>Youtube-dl timeout can now be set by the user.</li>
 </ul>
 <b> 8 January 2017</b>
 <ul>
