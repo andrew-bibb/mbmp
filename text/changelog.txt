@@ -1,13 +1,13 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>In Progress</b>
+<b>19 February 2017</b>
 <ul>
 <li>Moved playlist into main widget.</li>
 <li>Showing album art in playlist as small thumbnail.</li>
 <li>Added a widget to display album art with an OSD popup to show title and artist.</li>
 <li>Added a user-agent to Musicbrainz GET requests to make them work better.</li>
-<li>Musicbrainz database search more robust.</li>
+<li>Musicbrainz database search is now more robust.</li>
 <li>Youtube-dl timeout can now be set by the user.</li>
 </ul>
 <b> 8 January 2017</b>
