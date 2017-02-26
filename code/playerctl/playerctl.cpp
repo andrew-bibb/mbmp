@@ -946,6 +946,10 @@ void PlayerControl::stopPlaying()
 	this->setWindowTitle(LONG_NAME);
 	this->pos_timer->stop();
 	
+	// Reset and hide the buffering bar
+	ui.progressBar_buffering->hide();
+	ui.progressBar_buffering->setValue(0);
+	
 	// Restore Display Power Message Signaling
 	if (playlist->getCurrentRow() < 0) return;
 	Display* dpy = XOpenDisplay(NULL);
