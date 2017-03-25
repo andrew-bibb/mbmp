@@ -149,7 +149,6 @@ class PlayerControl : public QDialog
 		int xss_prefer_blanking_return;
 		int xss_allow_exposures_return;
 		
-  
   // functions
 		QString readTextFile(const char*);
 		void processMediaInfo(const QString&);

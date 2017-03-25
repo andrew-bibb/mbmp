@@ -332,7 +332,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	stackedwidget_group->addAction(ui.actionTogglePlaylist);
 	stackedwidget_group->addAction(ui.actionToggleVideoWindow);
 	stackedwidget_group->addAction(ui.actionToggleAlbumArt);
-	
+		
 	// create the visualizer menu. It is tearoff enabled.
 	vis_menu = new QMenu(this);
 	vis_menu->setTitle(ui.actionVisualizer->text());
@@ -496,6 +496,18 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	ui.actionDVDDown->setShortcuts(scman.getKeySequence("cmd_dvd_down"));
 	ui.actionDVDActivate->setShortcuts(scman.getKeySequence("cmd_dvd_activate"));
 	ui.actionOptions->setShortcuts(scman.getKeySequence("cmd_options"));
+	
+	// radio button text and tooltips
+	ui.radioButton_video->setText(scman.getKeySequence("cmd_videowindow").at(0).toString() );
+	ui.radioButton_playlist->setText(scman.getKeySequence("cmd_playlist").at(0).toString() );
+	ui.radioButton_albumart->setText(scman.getKeySequence("cmd_albumart").at(0).toString() );
+	ui.radioButton_video->setToolTip(ui.actionToggleVideoWindow->toolTip() );
+	ui.radioButton_playlist->setToolTip(ui.actionTogglePlaylist->toolTip() );
+	ui.radioButton_albumart->setToolTip(ui.actionToggleAlbumArt->toolTip() );
+	connect (ui.radioButton_video, SIGNAL (clicked()), ui.actionToggleVideoWindow, SLOT (trigger()));
+	connect (ui.radioButton_playlist, SIGNAL (clicked()), ui.actionTogglePlaylist, SLOT (trigger()));
+	connect (ui.radioButton_albumart, SIGNAL (clicked()), ui.actionToggleAlbumArt, SLOT (trigger()));
+	ui.radioButton_video->setChecked(true);
 
   // setup the cheatsheet message box
 	chtsht = new ScrollBox(this);
@@ -624,9 +636,14 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 	if (diag_settings->useState()) {
 		diag_settings->restoreElementGeometry("playerctl", this);
 		ui.widget_control->setVisible(diag_settings->getSetting("State", "playerctl_gui").toBool() );
-		stackedwidget->setCurrentIndex(diag_settings->getSetting("State", "playerctl_stackedwidget").toInt() );
+		
+		int idx = diag_settings->getSetting("State", "playerctl_stackedwidget").toInt();
+		stackedwidget->setCurrentIndex(idx);
+		// ui.radioButton_video is already checked
+		if (idx == stackedwidget->indexOf(playlist) ) ui.radioButton_playlist->setChecked(true);	
+		if (idx == stackedwidget->indexOf(albumart) ) ui.radioButton_albumart->setChecked(true);
 	}	// if useState
-
+		
 	// Options to start fullscreen, shade and gui. If both fullscreen and shade
 	// are set then fullscreen takes precedence
 	// Settings ->useState takes precedence over both
@@ -640,7 +657,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 				else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_fullscreen").toBool() ) this->toggleFullScreen();
 					else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "start_shademode").toBool() ) this->toggleShadeMode();
 	}	// else not useState()
-
+	
 	// seed the playlist with the positional arguments from the command line
 	if (parser.positionalArguments().count() > 0 )
 		playlist->seedPlaylist(parser.positionalArguments() );
@@ -1075,9 +1092,10 @@ void PlayerControl::advanceStackedWidget(QAction* act)
 {
 	// find the target index
 	int targetidx = -1;
-	if (act == ui.actionTogglePlaylist) targetidx = stackedwidget->indexOf(playlist);
-		else if (act == ui.actionToggleAlbumArt) targetidx = stackedwidget->indexOf(albumart);
-			else targetidx = stackedwidget->indexOf(videowidget);
+	if (act == ui.actionToggleVideoWindow) targetidx = stackedwidget->indexOf(videowidget);
+		else if (act == ui.actionTogglePlaylist) targetidx = stackedwidget->indexOf(playlist);
+			else if (act == ui.actionToggleAlbumArt) targetidx = stackedwidget->indexOf(albumart);
+				else targetidx = stackedwidget->currentIndex();
 	
 	// advance to the next page if act pointed to the current page
 	if (targetidx == stackedwidget->currentIndex() ) {
@@ -1098,7 +1116,15 @@ void PlayerControl::advanceStackedWidget(QAction* act)
 					else
 						stackedwidget->setCurrentWidget(videowidget);			
 		}	// else
-			
+
+	// sync the radio buttons 
+	if (stackedwidget->currentIndex() == stackedwidget->indexOf(videowidget) )
+			ui.radioButton_video->setChecked(true);
+	else if (stackedwidget->currentIndex() == stackedwidget->indexOf(playlist) )	
+			ui.radioButton_playlist->setChecked(true);
+	else if (stackedwidget->currentIndex() == stackedwidget->indexOf(albumart) )
+			ui.radioButton_albumart->setChecked(true); 
+
 	return;
 }
 

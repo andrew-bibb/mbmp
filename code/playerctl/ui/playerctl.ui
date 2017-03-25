@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>711</width>
+    <width>741</width>
     <height>404</height>
    </rect>
   </property>
@@ -327,20 +327,7 @@
         </item>
        </layout>
       </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QProgressBar" name="progressBar_buffering">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream buffering percentage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="value">
-         <number>0</number>
-        </property>
-        <property name="format">
-         <string>Buffering %p%</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" rowspan="4">
+      <item row="0" column="3" rowspan="4">
        <widget class="QDial" name="dial_volume">
         <property name="enabled">
          <bool>true</bool>
@@ -389,6 +376,47 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QProgressBar" name="progressBar_buffering">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stream buffering percentage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="format">
+         <string>Buffering %p%</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" rowspan="3">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QRadioButton" name="radioButton_video">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="autoRepeat">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_playlist">
+          <property name="text">
+           <string>1</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButton_albumart">
+          <property name="text">
+           <string>2</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
@@ -398,7 +426,7 @@
     <string>Toggle Playlist</string>
    </property>
    <property name="toolTip">
-    <string>Toggle the playlist on</string>
+    <string>Toggle the playlist</string>
    </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
@@ -872,7 +900,7 @@
   <action name="actionOptions">
    <property name="icon">
     <iconset theme="preferences-system">
-     <normaloff>../../../../../../../../../../../../../../../../../../.designer/backup</normaloff>../../../../../../../../../../../../../../../../../../.designer/backup</iconset>
+     <normaloff>../../../../../../../../../../../../../../../../../../../../../../.designer/backup</normaloff>../../../../../../../../../../../../../../../../../../../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Options</string>
@@ -902,7 +930,7 @@
     <string>Toggle Video Window</string>
    </property>
    <property name="toolTip">
-    <string>Toggle the video window on</string>
+    <string>Toggle the video window</string>
    </property>
   </action>
   <action name="actionToggleAlbumArt">
@@ -910,7 +938,7 @@
     <string>Toggle Album Art</string>
    </property>
    <property name="toolTip">
-    <string>Toggle the album art window on</string>
+    <string>Toggle the album art window</string>
    </property>
   </action>
  </widget>
