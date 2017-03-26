@@ -1085,28 +1085,32 @@ void PlayerControl::mpris2Pause()
 
 //
 // Slot to advance the stacked widget to the specified page.  If the
-// stackedwidget is already displaying the requested page advance to 
-// the next page in the stack.
+// stackedwidget is already displaying the requested page toggle back
+// to the previous page
 // Called when something in the stackedWidgetGroup is triggered 
 void PlayerControl::advanceStackedWidget(QAction* act)
 {
+	// store previous index to use for toggling
+	static int previdx;
+	
 	// find the target index
 	int targetidx = -1;
 	if (act == ui.actionToggleVideoWindow) targetidx = stackedwidget->indexOf(videowidget);
 		else if (act == ui.actionTogglePlaylist) targetidx = stackedwidget->indexOf(playlist);
 			else if (act == ui.actionToggleAlbumArt) targetidx = stackedwidget->indexOf(albumart);
 				else targetidx = stackedwidget->currentIndex();
-	
-	// advance to the next page if act pointed to the current page
+
+	// toggle back to previous if act pointed to the current page
 	if (targetidx == stackedwidget->currentIndex() ) {
-		if (stackedwidget->currentIndex() == stackedwidget->count() - 1 )
-			stackedwidget->setCurrentIndex(0);
-		else
-			stackedwidget->setCurrentIndex(stackedwidget->currentIndex() + 1);
+		if (previdx >= 0) { 
+			stackedwidget->setCurrentIndex(previdx);
+			previdx = targetidx;
+		}
 	}	// if
 	
 	// else go to the requested page	
 	else {
+		previdx = stackedwidget->currentIndex();
 		if (act == ui.actionTogglePlaylist)
 			stackedwidget->setCurrentWidget(playlist);
 			else if (act == ui.actionToggleAlbumArt)
