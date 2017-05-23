@@ -682,7 +682,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 			gstiface->rankElement(el_list.at(i), true);
 		}
 	}	// if
-	
+		
 	el.clear();
 	if (parser.isSet("blacklist") ) el = parser.value("blacklist");
   else if (diag_settings->useStartOptions() ) el = diag_settings->getSetting("StartOptions", "blacklisted-elements").toString();
@@ -696,6 +696,12 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 			gstiface->rankElement(el_list.at(i), false);
 		}
 	}	// if	
+	
+	// enable or disable hardware decoding
+	b_01=true;
+	if (parser.isSet("no-hardware-decoding")) b_01=false;
+	else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "no_hardware_decoding").toBool() )  b_01=false;
+	gstiface->hardwareDecoding(b_01);	
 	
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback

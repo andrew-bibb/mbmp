@@ -111,7 +111,8 @@ class GST_Interface : public QObject
     GST_Interface(QObject*);
     ~GST_Interface();
     
-    void rankElement(const QString&, bool);  
+    void rankElement(const QString&, bool);
+    void hardwareDecoding(bool);  
     int checkCD(QString); 
     int checkDVD(QString);      
     void playMedia(WId, QString, int track = 0);

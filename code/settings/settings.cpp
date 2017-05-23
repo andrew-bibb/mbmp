@@ -96,6 +96,7 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_icontheme->setText(settings->value("icon_theme_name").toString() );
 	ui.spinBox_loglevel->setValue(settings->value("log_level").toInt() );
 	ui.checkBox_visualizer->setChecked(settings->value("start_visualizer").toBool() );
+	ui.checkBox_nohardwaredecoding->setChecked(settings->value("no_hardware_decoding").toBool() );
 	ui.checkBox_subtitles->setChecked(settings->value("start_subtitles").toBool() );
 	ui.checkBox_streambuffering->setChecked(settings->value("use_stream_buffering").toBool() );
 	ui.checkBox_downloadbuffering->setChecked(settings->value("use_download_buffering").toBool() );
@@ -178,6 +179,7 @@ void Settings::writeSettings()
   settings->setValue("icon_theme_name", ui.lineEdit_icontheme->text()  );
   settings->setValue("log_level", ui.spinBox_loglevel->value() );
   settings->setValue("start_visualizer", ui.checkBox_visualizer->isChecked() );
+  settings->setValue("no_hardware_decoding", ui.checkBox_nohardwaredecoding->isChecked() );
   settings->setValue("start_subtitles", ui.checkBox_subtitles->isChecked() );
   settings->setValue("use_stream_buffering", ui.checkBox_streambuffering->isChecked() );
   settings->setValue("use_download_buffering", ui.checkBox_downloadbuffering->isChecked() );

@@ -36,16 +36,15 @@ DEALINGS IN THE SOFTWARE.
 # include <QTime>
 # include <QMessageBox>
 
-//  Callback Function: Return TRUE if this is a Visualization element 
-static gboolean filter_vis_features (GstPluginFeature *feature, gpointer data)
+//  Callback Function: Return TRUE if the element is of type defined in data
+static gboolean filter_features (GstPluginFeature *feature, gpointer data)
 { 
-  (void) data;
   GstElementFactory* factory;
    
   if (!GST_IS_ELEMENT_FACTORY (feature))
     return FALSE;
   factory = GST_ELEMENT_FACTORY (feature);
-  if (!g_strrstr (gst_element_factory_get_klass (factory), "Visualization"))
+  if (!g_strrstr (gst_element_factory_get_klass (factory), (gchar*)data) )
     return FALSE;
    
   return TRUE;
@@ -119,15 +118,15 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   // Create a QMap of the available audio visualizers.  Map format is
   // QString key
   // GstElementFactory* value
-  GList* list;
+  GList* vis_list;
   GList* walk;
  
   // Get a list of all visualization plugins.  Use the helper function
-  // filter_vis_features() at the top of this file.
-  list = gst_registry_feature_filter (gst_registry_get(), filter_vis_features, FALSE, NULL);
+  // filter_features() at the top of this file.
+  vis_list = gst_registry_feature_filter (gst_registry_get(), filter_features, FALSE, (gchar*)"Visualization");
   
   // Walk through each visualizer plugin looking for visualizers
-  for (walk = list; walk != NULL; walk = g_list_next (walk)) {
+  for (walk = vis_list; walk != NULL; walk = g_list_next (walk)) {
     const gchar* name;
     GstElementFactory* factory;
      
@@ -137,7 +136,7 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   } // for
   
   // clean up
-  g_list_free(list);
+  g_list_free(vis_list);
   g_list_free(walk); 
   
   // This is a hack. When playing Audio CD's I cannot get pipeline_playbin into PAUSED
@@ -205,7 +204,7 @@ GST_Interface::~GST_Interface()
 // Function to raise or lower the ranking of a GStreamer element
 // name is the GStreamer element to to operate on, if enable is true raise
 // the rank, if false lower the rank
-void GST_Interface::rankElement (const QString& (name) , bool enable)
+void GST_Interface::rankElement (const QString& (name), bool enable)
 {
 	// variables
 	GstRegistry* registry = NULL;
@@ -234,6 +233,44 @@ void GST_Interface::rankElement (const QString& (name) , bool enable)
 	return;
 }
 
+//
+// Function to enable or disable hardware decoding
+// if enable is true then promote the decodeer, demote it if false
+void GST_Interface::hardwareDecoding(bool enable)
+{
+	// list of known hardware decoders
+	QStringList hdwr_decoders;
+	hdwr_decoders << "vdpaumpegdec" << "vaapidecode" << "fluvadec" << "vtdec";
+	
+	// look for hardware decoders in the dec_map
+  GstElementFactory *factory;
+  GstElement * element;
+	for (int i = 0; i < hdwr_decoders.count(); ++i) {
+		factory = gst_element_factory_find (qPrintable(hdwr_decoders.at(i)) );
+		if (!factory) {
+			qDebug() << "Failed to find factory of type" << hdwr_decoders.at(i);
+			}
+		else {			
+			element = gst_element_factory_create (factory, "Decoders");
+			gst_object_unref (GST_OBJECT (factory));
+			
+			if (!element) {
+				qDebug() << "Failed to create element, even though its factory exists!";
+			}	// if
+			else {
+				qDebug() << "changing rank of hardware decoder " << hdwr_decoders.at(i) << enable;
+				rankElement(hdwr_decoders.at(i), enable); 	
+				gst_object_unref (GST_OBJECT (element));
+			}	// else element exists
+		}	// else factory exists
+	}	// for
+
+	// cleanup
+
+
+  
+	return;
+}
 
 //
 // Slot to query an audio CD for the number of audio tracks on it.
@@ -715,6 +752,7 @@ gint64 GST_Interface::queryStreamPosition()
   return position;
 } 
 
+//
 // Function to process bus messages and emit signals for messages we 
 // choose to deal with. Called by busCallback().  Do minimal processing here
 // and emit the signalMessage signal for PlayerControl::processBusMessage

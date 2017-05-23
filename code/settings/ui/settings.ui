@@ -316,6 +316,19 @@
        <string>Start Options</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
+       <item row="22" column="1">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>127</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="1" column="0">
         <widget class="QCheckBox" name="checkBox_downloadbuffering">
          <property name="enabled">
@@ -329,7 +342,7 @@
          </property>
         </widget>
        </item>
-       <item row="16" column="2">
+       <item row="17" column="2">
         <widget class="QLineEdit" name="lineEdit_audiocd">
          <property name="enabled">
           <bool>true</bool>
@@ -355,7 +368,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="2">
+       <item row="10" column="2">
         <widget class="QSpinBox" name="spinBox_connectionspeed">
          <property name="enabled">
           <bool>true</bool>
@@ -374,7 +387,7 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="2">
+       <item row="15" column="2">
         <widget class="QSpinBox" name="spinBox_loglevel">
          <property name="enabled">
           <bool>true</bool>
@@ -390,20 +403,7 @@
          </property>
         </widget>
        </item>
-       <item row="21" column="1">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>127</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="17" column="2">
+       <item row="18" column="2">
         <widget class="QLineEdit" name="lineEdit_dvd">
          <property name="enabled">
           <bool>true</bool>
@@ -416,7 +416,7 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="15" column="0">
         <widget class="QLabel" name="label">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set the log level (0-4) with higher numbers displaying more information.&lt;/p&gt;&lt;p&gt;Default value is log level = 1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -429,7 +429,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="2">
+       <item row="10" column="0" colspan="2">
         <widget class="QLabel" name="label_4">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-c&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--connection-speed&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Connection speed in kbps. Connection speed 0 means &amp;quot;unknown&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -439,7 +439,7 @@
          </property>
         </widget>
        </item>
-       <item row="16" column="0">
+       <item row="17" column="0">
         <widget class="QLabel" name="label_2">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-C&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--CD&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Specify the audio cd drive. For example: &lt;span style=&quot; font-weight:600;&quot;&gt;/dev/sr0&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -452,7 +452,7 @@
          </property>
         </widget>
        </item>
-       <item row="17" column="0">
+       <item row="18" column="0">
         <widget class="QLabel" name="label_3">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-D&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--DVD&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Specify the audio cd drive. For example: &lt;span style=&quot; font-weight:600;&quot;&gt;/dev/sr1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -465,7 +465,7 @@
          </property>
         </widget>
        </item>
-       <item row="20" column="0">
+       <item row="21" column="0">
         <widget class="QLabel" name="label_5">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--blacklist [elements]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Specify GStreamer elements to be blacklisted. Blacklisted elements will never be used to create a pipeline. Elements should be entered as a comma separated list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -475,7 +475,7 @@
          </property>
         </widget>
        </item>
-       <item row="20" column="1" colspan="2">
+       <item row="21" column="1" colspan="2">
         <widget class="QLineEdit" name="lineEdit_blacklisted">
          <property name="enabled">
           <bool>true</bool>
@@ -488,7 +488,7 @@
          </property>
         </widget>
        </item>
-       <item row="19" column="0">
+       <item row="20" column="0">
         <widget class="QLabel" name="label_6">
          <property name="whatsThis">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--promote [elements]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Specify GStreamer elements to be promoted in rank. When more than one element can be used in a stream an element which has been promoted will be selected first. Elements should be entered as a comma separated list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -511,7 +511,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QCheckBox" name="checkBox_icontheme">
          <property name="enabled">
           <bool>true</bool>
@@ -527,7 +527,7 @@
          </property>
         </widget>
        </item>
-       <item row="19" column="1" colspan="2">
+       <item row="20" column="1" colspan="2">
         <widget class="QLineEdit" name="lineEdit_promoted">
          <property name="enabled">
           <bool>true</bool>
@@ -573,7 +573,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="2">
+       <item row="9" column="2">
         <widget class="QLineEdit" name="lineEdit_icontheme">
          <property name="enabled">
           <bool>false</bool>
@@ -593,6 +593,16 @@
          </property>
          <property name="text">
           <string>Start Shade Mode</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QCheckBox" name="checkBox_nohardwaredecoding">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-w&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--no-hardware-decoding&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Disable hardware decoding.  Default is to use hardware decoding.  Note that GStreamer developers often rank hardware decoders lower than software ones when the hardware decoders are defective.  This will restore that behavior. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Disable Hardware Decoding</string>
          </property>
         </widget>
        </item>

@@ -92,6 +92,9 @@ int main(int argc, char *argv[])
 
  	QCommandLineOption openShadeMode(QStringList() << "s" << "shademode", QCoreApplication::translate("main.cpp", "Start the player in shade mode (default is start in normal mode).") );
 	parser.addOption(openShadeMode);
+	
+	QCommandLineOption noHardwareDecoding(QStringList() << "w" << "no-hardware-decoding", QCoreApplication::translate("main.cpp", "Disable hardware decoding, (default is enabled).") );
+	parser.addOption(noHardwareDecoding);
  
   parser.addVersionOption();	  
     
