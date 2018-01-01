@@ -4,7 +4,7 @@ Code to manage the widget used to display album art. This includes
 creating and displaying an on screen display popup with song title
 and aritst at the beginning of each track.
 
-Copyright (C) 2018
+Copyright (C) 2017-2018
 by: Andrew J. Bibb
 License: MIT 
 

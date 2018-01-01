@@ -2,7 +2,7 @@
 
 
 
-Copyright (C) 2018
+Copyright (C) 2017-2018
 by: Andrew J. Bibb
 License: MIT 
 
