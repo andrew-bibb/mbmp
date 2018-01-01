@@ -6,7 +6,7 @@ really support creating multiple interfaces on one object.  Some of the
 broad outline for this layout came from the Amarok project, although I've
 geatly modified the internal workings. 
 
-Copyright (C) 2013-2017
+Copyright (C) 2013-2018
 by: Andrew J. Bibb
 License: MIT 
 
