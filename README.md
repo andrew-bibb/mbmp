@@ -1,4 +1,7 @@
 # mbmp
+
+NOTE: At the moment (December 2018) this program is for personal use only.  I had originally intended to release this under an MIT license.  I am not entirely sure that can be done between my stuff, the QT stuff, and the GStreamer stuff.  First two I think are okay because QT is LGPL and I only link to those libraries.  The third I am not sure on and quite honestly I do not intend to spend even one minute of my life researching this.  I won't (ever again) release anything under GPL so this program will probably never see the light of day.  If anyone wishes to build and use for personal use you should be fine, and I also think that anyone who wants to fork it and release under GPL would be fine, but I'm not a lawyer.  
+
 A QT5 and GStreamer 1.0 series Media Player
 
 MBMP is a fairly conventional media player using QT5 for the user interface and the GStreamer 1.0 series multi-media framework to do the heavy lifting.  MBMP interfaces directly with GStreamer so there is no need to have the QT Multi-Media packages.  
