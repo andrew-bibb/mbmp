@@ -3,7 +3,7 @@
 Header file that contains program #defines and information used across
 the program.
 
-Copyright (C) 2013-2018
+Copyright (C) 2013-2019
 by: Andrew J. Bibb
 License: MIT 
 
@@ -32,9 +32,9 @@ DEALINGS IN THE SOFTWARE.
 ///////////////////////////////// Program Values ///////////////////////
 //
 // Program Info (may be visible, but don't mark for tranalation) 
-#define VERSION "2018.01.01-2"
-#define RELEASE_DATE "2017.02.19"
-#define COPYRIGHT_DATE "2013-2018"
+#define VERSION "2019.01.05-1"
+#define RELEASE_DATE "2018.05.19"
+#define COPYRIGHT_DATE "2013-2019"
 
 // Program Values:
 //	QApplication (not user visible)

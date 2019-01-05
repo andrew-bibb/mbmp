@@ -2,7 +2,7 @@
 
 Code to manage the media playlist.
 
-Copyright (C) 2014-2018
+Copyright (C) 2014-2019
 by: Andrew J. Bibb
 License: MIT 
 
@@ -1113,7 +1113,7 @@ bool Playlist::readCDMetaFile(const QString& discid)
 					break;	
 				case QXmlStreamReader::Invalid:
 					#if QT_VERSION >= 0x050400 
-						qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
+						qCritical("XML stream reading error: %i %s", xml->error(), qUtf8Printable(xml->errorString()) );
 					# else	
 						qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
 					# endif

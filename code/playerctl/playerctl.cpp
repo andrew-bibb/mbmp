@@ -1,7 +1,7 @@
 /**************************** playerctl.cpp ****************************
 Main window which also handles all the controls.
 
-Copyright (C) 2014-2018
+Copyright (C) 2014-2019
 by: Andrew J. Bibb
 License: MIT \
 
@@ -1443,7 +1443,7 @@ void PlayerControl::processGstifaceMessages(int mtype, QString msg)
 			}	// loglevel if
 			break;
 		
-		// A TOC with new tracklist. We just log this, tracklist it sent to
+		// A TOC with new tracklist. We just log this, tracklist is sent to
 		// the playlist in the NewMBID case
 		case MBMP_GI::TOCTL: 
 			if (loglevel >= 3) {

@@ -326,7 +326,7 @@ void MusicBrainzManager::releaseDataFinished()
 				
 			case QXmlStreamReader::Invalid:
 				#if QT_VERSION >= 0x050400 
-					qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
+					qCritical("XML stream reading error: %i %s", xml->error(), qUtf8Printable(xml->errorString()) );
 				# else	
 					qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
 				# endif
@@ -467,7 +467,7 @@ void MusicBrainzManager::metaDataFinished()
 					break;	
 				case QXmlStreamReader::Invalid:
 					#if QT_VERSION >= 0x050400 
-						qCritical("XML stream reading error: %s %s", qUtf8Printable(xml->error()), qUtf8Printable(xml->errorString()) );
+						qCritical("XML stream reading error: %i %s", xml->error(), qUtf8Printable(xml->errorString()) );
 					# else	
 						qCritical("XML stream reading error: %s %s", qPrintable(xml->error()), qPrintable(xml->errorString()) );
 					# endif

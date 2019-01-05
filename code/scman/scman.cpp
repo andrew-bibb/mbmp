@@ -2,7 +2,7 @@
 
 Class to manage shortcuts and allow the user to provide substitutions
 
-Copyright (C) 2015-2018
+Copyright (C) 2015-2019
 by: Andrew J. Bibb
 License: MIT
 

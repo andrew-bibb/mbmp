@@ -3,7 +3,7 @@
 Code to interface from our QT widgets, mainly PlayerCtl and Gstreamer
 
 
-Copyright (C) 2014-2018
+Copyright (C) 2014-2019
 by: Andrew J. Bibb
 License: MIT 
 
@@ -62,7 +62,7 @@ static void sourceSetup(GstElement* bin, GstElement* src, QString* opticaldrive)
 	// if there is a device property set it 
   g_object_get(G_OBJECT (src), "device", &device, NULL);
   if (device != NULL) 
-    g_object_set(G_OBJECT (src), "device", qPrintable(opticaldrive->data()), NULL); 
+    g_object_set(G_OBJECT (src), "device", qUtf8Printable(*opticaldrive->data()), NULL); 
       
 	return;
 }

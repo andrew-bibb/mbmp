@@ -3,7 +3,7 @@
 
 Code to manage the media playlist.
 
-Copyright (C) 2014-2018
+Copyright (C) 2014-2019
 by: Andrew J. Bibb
 License: MIT 
 
