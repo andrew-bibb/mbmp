@@ -62,8 +62,7 @@ static void sourceSetup(GstElement* bin, GstElement* src, QString* opticaldrive)
 	// if there is a device property set it 
   g_object_get(G_OBJECT (src), "device", &device, NULL);
   if (device != NULL) 
-    g_object_set(G_OBJECT (src), "device", qUtf8Printable(*opticaldrive->data()), NULL); 
-      
+		g_object_set(G_OBJECT (src), "device", (opticaldrive->toUtf8()).data(), NULL); 
 	return;
 }
 
