@@ -1252,7 +1252,8 @@ void PlayerControl::aboutMBMP()
                   "<center>Andrew J. Bibb\n"
                   "<center>Vermont, USA"
 									"<br><center><b>Translations:</b>"
-                  "<center>Ilya Shestopalov (Russian)"                  
+                  "<center>Ilya Shestopalov (Russian)" 
+                  "<center>Heimen Stoffels (Dutch)"                
                   ).arg(QString(APP).toUpper()).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
 }
 

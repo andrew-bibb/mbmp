@@ -1,6 +1,10 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>In Progress</b>
+<ul>
+<li>Translation to Dutch by Heimen Stoffels.</li>
+</ul>
 <b>19 February 2017</b>
 <ul>
 <li>Moved playlist into main widget.</li>
