@@ -111,6 +111,7 @@ class GST_Interface : public QObject
     GST_Interface(QObject*);
     ~GST_Interface();
     
+    void setAudioSink(bool, const QString&);
     void rankElement(const QString&, bool);
     void hardwareDecoding(bool);  
     int checkCD(QString); 
@@ -168,6 +169,7 @@ class GST_Interface : public QObject
   private:
     // members
     GstElement* pipeline_playbin;
+    GstElement* alsa_sink;
     QTimer* dl_timer;
     QMap<QString, GstElementFactory*> vismap; 
     QMap<QString, int> streammap;

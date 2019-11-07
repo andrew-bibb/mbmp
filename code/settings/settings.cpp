@@ -69,7 +69,10 @@ Settings::Settings(QWidget *parent)
 	ui.checkBox_disableinternet->setChecked(settings->value("disable_internet").toBool() );
 	ui.checkBox_useyoutubedl->setChecked(settings->value("use_youtube-dl").toBool() );
 	ui.spinBox_youtubedl_timeout->setValue(settings->value("youtube-dl_timeout", 9).toInt() );
-	QDir res(":/stylesheets/stylesheets/");
+  ui.checkBox_alsasink->setChecked(settings->value("use_alsa_sink").toBool() );
+  ui.lineEdit_alsasink->setText(settings->value("alsa_device").toString() );
+
+  QDir res(":/stylesheets/stylesheets/");
 	QStringList styles = res.entryList(QDir::Files);
 	styles << tr("None");
 	QString str = settings->value("style").toString();
@@ -165,6 +168,8 @@ void Settings::writeSettings()
   settings->setValue("disable_internet", ui.checkBox_disableinternet->isChecked() );
   settings->setValue("use_youtube-dl", ui.checkBox_useyoutubedl->isChecked() );
   settings->setValue("youtube-dl_timeout", ui.spinBox_youtubedl_timeout->value() );
+  settings->setValue("use_alsa_sink", ui.checkBox_alsasink->isChecked() );
+  settings->setValue("alsa_device", ui.lineEdit_alsasink->text() );
   settings->endGroup();
   
   settings->beginGroup("Notifications");

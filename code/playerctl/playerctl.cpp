@@ -518,7 +518,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
   // connect signals to slots 
   connect (stackedwidget_group, SIGNAL (triggered(QAction*)), this, SLOT(advanceStackedWidget(QAction*)));	
   connect (ui.actionToggleStreamInfo, SIGNAL (triggered()), gstiface, SLOT(toggleStreamInfo()));
-	connect (ui.actionQuit, SIGNAL (triggered()), qApp, SLOT(quit()));
+  connect (ui.actionQuit, SIGNAL (triggered()), qApp, SLOT(quit()));
 	connect (ui.actionToggleGUI, SIGNAL (triggered()), this, SLOT(toggleGUI()));
 	connect (ui.actionToggleShade, SIGNAL (triggered()), this, SLOT(toggleShadeMode()));
 	connect (ui.actionToggleFullscreen, SIGNAL (triggered()), this, SLOT(toggleFullScreen()));
@@ -696,13 +696,13 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
 			gstiface->rankElement(el_list.at(i), false);
 		}
 	}	// if	
-	
-	// enable or disable hardware decoding
+	  
+  // enable or disable hardware decoding
 	b_01=true;
 	if (parser.isSet("no-hardware-decoding")) b_01=false;
 	else if (diag_settings->useStartOptions() && diag_settings->getSetting("StartOptions", "no_hardware_decoding").toBool() )  b_01=false;
-	gstiface->hardwareDecoding(b_01);	
-	
+	gstiface->hardwareDecoding(b_01);
+    
 	// wait 10ms (basically give the constructor time to end) and then
 	// start the media playback
 	QTimer::singleShot(10, this, SLOT(playMedia()));
@@ -859,7 +859,12 @@ void PlayerControl::initializeDVD()
 // the album art page, setting DPMS, etc) 
 void PlayerControl::playMedia(QAction* act)
 {
-	// Figure out which way we want to go in the playlist
+  // set custom audio sink if we requested it
+  gstiface->setAudioSink(
+    diag_settings->getSetting("Preferences", "use_alsa_sink").toBool(),
+    diag_settings->getSetting("Preferences", "alsa_device").toString() );
+  
+  // Figure out which way we want to go in the playlist
 	int direction = MBMP_PL::Current;
 	if (act == ui.actionPlaylistFirst)	direction = MBMP_PL::First;
 	else if (act == ui.actionPlaylistBack )	direction = MBMP_PL::Previous;

@@ -4,6 +4,7 @@
 <b>In Progress</b>
 <ul>
 <li>Translation to Dutch by Heimen Stoffels.</li>
+<li>Add option to force Alsa output instead of using the audio output automatically determined by GStreamer.</li> 
 </ul>
 <b>19 February 2017</b>
 <ul>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>604</width>
-    <height>523</height>
+    <width>633</width>
+    <height>549</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,39 +34,91 @@
        <string>Preferences</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="14" column="0">
-        <spacer name="verticalSpacer">
+       <item row="3" column="0">
+        <widget class="Line" name="line">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="checkBox_usestartoptions">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the start options at the right will be restored on start up.  Start options specified on the command line will govern over any option set here.&lt;/p&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;The settings file is: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;${HOME}/.config/mbmp/mbmp.conf  &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;&lt;br/&gt;This is a standard ini type text file.&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Use Start Options</string>
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="checkBox_retainstate">
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="checkBox_disablexscreensaver">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the state of various windows will be saved on exit and restored on next use. &lt;/p&gt;&lt;p&gt;A check in this box will override the -g (--gui), -f (--fullscreen) and -s (--shademode) command line options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked the &lt;span style=&quot; font-style:italic;&quot;&gt;XScreenSaver&lt;/span&gt; will not engage while MBMP is playing. This option will only be available if MBMP is able to detect &lt;span style=&quot; font-style:italic;&quot;&gt;XScreenSaver&lt;/span&gt; running on your system.&lt;/p&gt;&lt;p&gt;The option is a bit misnamed as &lt;span style=&quot; font-style:italic;&quot;&gt;XScreenSaver&lt;/span&gt; is not actually disabled, in fact just the opposite. If this option is checked MBMP will send a message periodically to XScreenSaver saying that the system is in use. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Retain State</string>
+          <string>Disable XScreenSaver</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="lineEdit_colorize">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_colorize">
+           <property name="text">
+            <string>...</string>
+           </property>
+           <property name="arrowType">
+            <enum>Qt::UpArrow</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label__colorize">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Internal icons are meant to be colorized.  Enter the color you want in the box at the left or select the button to open a color selection dialog box. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Colorize Icons</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="15" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QComboBox" name="comboBox_style">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_style">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a style for the GUI elements.&lt;/p&gt;&lt;p&gt;A style change will only take effect after MBMP is restarted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Style</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="checkBox_disabletooltips">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked display of tooltips (the popup yellow boxes when you hover the mouse over a control) will be disabled.&lt;/p&gt;&lt;p&gt;Tooltips for playlist entries (to display track information) will still be active even with this box checked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Disable Tooltips</string>
          </property>
         </widget>
        </item>
@@ -80,16 +132,6 @@
          </property>
          <property name="text">
           <string>Retain Playlist</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QCheckBox" name="checkBox_disabletooltips">
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked display of tooltips (the popup yellow boxes when you hover the mouse over a control) will be disabled.&lt;/p&gt;&lt;p&gt;Tooltips for playlist entries (to display track information) will still be active even with this box checked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Disable Tooltips</string>
          </property>
         </widget>
        </item>
@@ -126,93 +168,6 @@
          </item>
         </layout>
        </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="checkBox_disablexscreensaver">
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked the &lt;span style=&quot; font-style:italic;&quot;&gt;XScreenSaver&lt;/span&gt; will not engage while MBMP is playing. This option will only be available if MBMP is able to detect &lt;span style=&quot; font-style:italic;&quot;&gt;XScreenSaver&lt;/span&gt; running on your system.&lt;/p&gt;&lt;p&gt;The option is a bit misnamed as &lt;span style=&quot; font-style:italic;&quot;&gt;XScreenSaver&lt;/span&gt; is not actually disabled, in fact just the opposite. If this option is checked MBMP will send a message periodically to XScreenSaver saying that the system is in use. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Disable XScreenSaver</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="15" column="0">
-        <widget class="QGroupBox" name="groupBox_edit">
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the user copy of the &lt;span style=&quot; font-weight:600;&quot;&gt;mbmp.keys&lt;/span&gt; and&lt;span style=&quot; font-weight:600;&quot;&gt; mbmp.icon&lt;/span&gt; files. &lt;/p&gt;&lt;p&gt;This uses xdg-open and if there mime type for text/plain found the controls will be disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="title">
-          <string>Edit Configuration Files</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0">
-           <widget class="QPushButton" name="pushButton_editkeyfile">
-            <property name="text">
-             <string>Key Binds</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pushButton_editiconfile">
-            <property name="text">
-             <string>Icons</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBox_startfresh">
-            <property name="whatsThis">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked a fresh copy of the configuration file will be used when you click one of the edit buttons.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Warning: Checking this box will overwrite any customizations which you've already made.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string>Start Fresh</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="11" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLineEdit" name="lineEdit_colorize">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_colorize">
-           <property name="text">
-            <string>...</string>
-           </property>
-           <property name="arrowType">
-            <enum>Qt::UpArrow</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label__colorize">
-           <property name="whatsThis">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Internal icons are meant to be colorized.  Enter the color you want in the box at the left or select the button to open a color selection dialog box. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Colorize Icons</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="8" column="0">
         <widget class="QCheckBox" name="checkBox_disableinternet">
          <property name="whatsThis">
@@ -220,50 +175,6 @@
          </property>
          <property name="text">
           <string>Disable Internet</string>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QComboBox" name="comboBox_style">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>1</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="whatsThis">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_style">
-           <property name="whatsThis">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a style for the GUI elements.&lt;/p&gt;&lt;p&gt;A style change will only take effect after MBMP is restarted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-           <property name="text">
-            <string>Style</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="10" column="0">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QCheckBox" name="checkBox_disabledpms">
-         <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked DPMS (Display Power Management Signaling) and X11 screen blanking will be turned off while MBMP is playing media. This will disable screen blanking and any X11 screensaver.  This is the built in X11 screensaver, not the XScreenSaver program.&lt;/p&gt;&lt;p&gt;The XScreenSaver program should control DPMS and the X11 screensaver so when XScreenSaver is found this button is disabled. &lt;/p&gt;&lt;p/&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Disable DPMS</string>
          </property>
         </widget>
        </item>
@@ -301,6 +212,116 @@
            </property>
            <property name="value">
             <number>9</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="7" column="0">
+        <widget class="QCheckBox" name="checkBox_disabledpms">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When checked DPMS (Display Power Management Signaling) and X11 screen blanking will be turned off while MBMP is playing media. This will disable screen blanking and any X11 screensaver.  This is the built in X11 screensaver, not the XScreenSaver program.&lt;/p&gt;&lt;p&gt;The XScreenSaver program should control DPMS and the X11 screensaver so when XScreenSaver is found this button is disabled. &lt;/p&gt;&lt;p/&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Disable DPMS</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkBox_usestartoptions">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the start options at the right will be restored on start up.  Start options specified on the command line will govern over any option set here.&lt;/p&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;The settings file is: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;${HOME}/.config/mbmp/mbmp.conf  &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;&lt;br/&gt;This is a standard ini type text file.&lt;/span&gt;&lt;/pre&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Use Start Options</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="checkBox_retainstate">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked the state of various windows will be saved on exit and restored on next use. &lt;/p&gt;&lt;p&gt;A check in this box will override the -g (--gui), -f (--fullscreen) and -s (--shademode) command line options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Retain State</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="18" column="0">
+        <widget class="QGroupBox" name="groupBox_edit">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit the user copy of the &lt;span style=&quot; font-weight:600;&quot;&gt;mbmp.keys&lt;/span&gt; and&lt;span style=&quot; font-weight:600;&quot;&gt; mbmp.icon&lt;/span&gt; files. &lt;/p&gt;&lt;p&gt;This uses xdg-open and if there mime type for text/plain found the controls will be disabled.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="title">
+          <string>Edit Configuration Files</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="pushButton_editkeyfile">
+            <property name="text">
+             <string>Key Binds</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pushButton_editiconfile">
+            <property name="text">
+             <string>Icons</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="checkBox_startfresh">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked a fresh copy of the configuration file will be used when you click one of the edit buttons.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Warning: Checking this box will overwrite any customizations which you've already made.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Start Fresh</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QCheckBox" name="checkBox_alsasink">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gstreamer will automatically determine an audio device to output to. This is normally fine, but occasionally a different device will be wanted.&lt;/p&gt;&lt;p&gt;When checked audio output will be directed to the Alsa card and device specified in the box at the right. If the box is blank the default &lt;span style=&quot; font-weight:600;&quot;&gt;hw:0,0&lt;/span&gt; will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Alsa Sink</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_alsasink">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -432,7 +453,7 @@
        <item row="10" column="0" colspan="2">
         <widget class="QLabel" name="label_4">
          <property name="whatsThis">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-c&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--connection-speed&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Connection speed in kbps. Connection speed 0 means &amp;quot;unknown&amp;quot;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;pre style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;Command Line Option: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;-c&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-weight:600;&quot;&gt;--connection-speed&lt;/span&gt;&lt;/pre&gt;&lt;p&gt;Connection speed in kbps. Connection speed 0 means &amp;quot;unknown&amp;quot;. GStreamer uses this internally to make decisions regarding buffering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Connection Speed</string>
@@ -621,8 +642,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>448</x>
-     <y>495</y>
+     <x>457</x>
+     <y>524</y>
     </hint>
     <hint type="destinationlabel">
      <x>501</x>
@@ -637,8 +658,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>538</x>
-     <y>497</y>
+     <x>547</x>
+     <y>524</y>
     </hint>
     <hint type="destinationlabel">
      <x>525</x>
@@ -669,12 +690,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>409</x>
-     <y>240</y>
+     <x>429</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
-     <x>579</x>
-     <y>241</y>
+     <x>611</x>
+     <y>277</y>
     </hint>
    </hints>
   </connection>
@@ -691,6 +712,22 @@
     <hint type="destinationlabel">
      <x>165</x>
      <y>268</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_alsasink</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEdit_alsasink</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>128</x>
+     <y>314</y>
     </hint>
    </hints>
   </connection>

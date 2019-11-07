@@ -101,6 +101,9 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
   // Create the playbin pipeline, call it PLAYER_NAME defined in resource.h
   pipeline_playbin = gst_element_factory_make("playbin", PLAYER_NAME);
   
+  // Create an alsa sink
+  alsa_sink = gst_element_factory_make("alsasink", "alsa_sink");
+  
   // Create the playbin bus and add a watch
   GstBus* bus;
   bus = gst_pipeline_get_bus (GST_PIPELINE (pipeline_playbin));
@@ -187,7 +190,6 @@ GST_Interface::GST_Interface(QObject* parent) : QObject(parent)
 	s.append(temp_file.fileName());
 	g_object_set(G_OBJECT(pipeline_playbin), "uri", qPrintable(s), NULL);
 	gst_element_set_state (pipeline_playbin, GST_STATE_PAUSED);
-
 }
 
 // Destructor
@@ -195,10 +197,25 @@ GST_Interface::~GST_Interface()
 {
   gst_element_set_state (pipeline_playbin, GST_STATE_NULL);
   gst_object_unref (GST_OBJECT (pipeline_playbin));
-  
 }
 
 ///////////////////////////// Public Functions /////////////////////////
+//
+// Function to set and Alsa audio sink.
+// if alsa is false use the default autoaudiosink
+// if alsa is true ise the card:device in sink, or hw:0,0 as a default
+void GST_Interface::setAudioSink (bool alsa, const QString& sink)
+{
+  if (alsa) {
+    g_object_set (GST_OBJECT (alsa_sink), "device", qPrintable(sink.isEmpty() ? "hw:0,0": qPrintable(sink)), NULL);
+    g_object_set (GST_OBJECT (pipeline_playbin), "audio-sink", alsa_sink, NULL);
+  }
+  else
+     g_object_set (GST_OBJECT (pipeline_playbin), "audio-sink", NULL, NULL);
+  
+  return;
+}
+		
 //
 // Function to raise or lower the ranking of a GStreamer element
 // name is the GStreamer element to to operate on, if enable is true raise
