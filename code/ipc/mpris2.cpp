@@ -7,7 +7,7 @@ broad outline for this layout came from the Amarok project, although I've
 geatly modified the internal workings.
   
 
-Copyright (C) 2013-2019
+Copyright (C) 2013-2020
 by: Andrew J. Bibb
 License: MIT 
 
