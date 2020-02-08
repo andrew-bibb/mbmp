@@ -857,6 +857,7 @@ void PlayerControl::initializeDVD()
 // Use this slot to trigger notifications which have to happen even if
 // there are no tag information in the media stream (for instance changing
 // the album art page, setting DPMS, etc) 
+
 void PlayerControl::playMedia(QAction* act)
 {
   // set custom audio sink if we requested it
@@ -871,8 +872,8 @@ void PlayerControl::playMedia(QAction* act)
 		else if (act == ui.actionPlaylistNext ) 	direction = MBMP_PL::Next;
 			else if (act == ui.actionPlaylistLast )	direction = MBMP_PL::Last;
 	
-	// Return if the playlist item has not changed
-	if (! playlist->selectItem(direction) ) {
+	// Return if there is no item in the selected direction in the playlist
+  	if (! playlist->selectItem(direction) ) {
 		ui.actionPlayPause->setChecked(false);
 		this->stopPlaying();
 		return;

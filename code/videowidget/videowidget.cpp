@@ -1,6 +1,6 @@
  /**************************** videowidget.cpp **************************
 
-Code to manage the videowidget. Gstreamer renders a video stream on to
+Code to manage the videowidget. Gstreamer renders a video stream onto
 this widget
 
 Copyright (C) 2014-2020
