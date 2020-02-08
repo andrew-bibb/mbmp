@@ -256,7 +256,7 @@ void GST_Interface::hardwareDecoding(bool enable)
 {
 	// list of known hardware decoders
 	QStringList hdwr_decoders;
-	hdwr_decoders << "vdpaumpegdec" << "vaapidecodebin" ;
+	hdwr_decoders << "vaapidecodebin" ;
 	
 	// look for hardware decoders in the dec_map
   GstElementFactory *factory;
