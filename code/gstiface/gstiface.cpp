@@ -212,7 +212,7 @@ void GST_Interface::setAudioSink (bool alsa, const QString& sink)
   }
   else
      g_object_set (GST_OBJECT (pipeline_playbin), "audio-sink", NULL, NULL);
-  
+
   return;
 }
 		
@@ -256,7 +256,7 @@ void GST_Interface::hardwareDecoding(bool enable)
 {
 	// list of known hardware decoders
 	QStringList hdwr_decoders;
-	hdwr_decoders << "vaapidecodebin" ;
+	hdwr_decoders << "vaapidecode";
 	
 	// look for hardware decoders in the dec_map
   GstElementFactory *factory;
@@ -1189,8 +1189,7 @@ void GST_Interface::seekToPosition(int position)
   
   // seek flags
   const int seekflags =  GST_SEEK_FLAG_FLUSH    | // flush the pipeline_playbin
-                          GST_SEEK_FLAG_SKIP     | // allow skipping frames
-                          GST_SEEK_FLAG_KEY_UNIT ; // seek to the nearest keyframe, faster but maybe not as accurate
+                         GST_SEEK_FLAG_KEY_UNIT ; // seek to the nearest keyframe, faster but maybe not as accurate
                          	 
   // now do the seek
   gst_element_seek_simple(pipeline_playbin, GST_FORMAT_TIME, (GstSeekFlags)(seekflags) , position * GST_SECOND);

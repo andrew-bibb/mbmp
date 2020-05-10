@@ -5,6 +5,7 @@
 <ul>
 <li>Translation to Dutch by Heimen Stoffels.</li>
 <li>Add option to force Alsa output instead of using the audio output automatically determined by GStreamer.</li> 
+<li>Fixed accelerated playback dropping to cpu decoding on seek events.</li>
 </ul>
 <b>19 February 2017</b>
 <ul>
@@ -44,16 +45,16 @@
 </ul>
 <b>15 September 2015</b>
 <ul>
-<li>Option to disable XScreenSaver while playing if it is present.<li>
+<li>Option to disable XScreenSaver while playing if it is present.</li>
 <li>-v (--version) command line option now works.</li>
 <li>Added wrap, consume and random modes to IPC, keybinds and as menu actions.</li>
 </ul>
 <b>6 September 2015</b>
 <ul>
-<li>Added Russian Translation (by Ilya Shestopalov).<li>
+<li>Added Russian Translation (by Ilya Shestopalov).</li>
 <li>Added option to send track changes to a notification daemon.</li>
 <li>Added DBus based IPC mechanism.</li>
-<li>Major rework of internal communication lines from GstBus to our code.<li>
+<li>Major rework of internal communication lines from GstBus to our code.</li>
 <li>Better handling for Audio CD's and DVD's.</li>
 </ul>
 <b>2 June 2015</b>
@@ -74,10 +75,10 @@
 <ul>
 <li>Added command line option to specify network connection speed</li>
 <li>Audio CD playback working</li>
-<li>DVD playback with navigation menus is working<li>
+<li>DVD playback with navigation menus is working</li>
 <li>Can select the CD and DVD devices from ComboBoxes in the GUI</li>
 <li>Added CD and DVD device selection from the command line</li>
-<li>Chapterlist (DVD) and Tracklist (CD) properly disable and reenable UI controls<li>
+<li>Chapterlist (DVD) and Tracklist (CD) properly disable and reenable UI controls</li>
 <li>DVD keyboard navigation</li>
 <li>Fixed escape of &lt; character when making the cheatsheet and improved the readability</li>
 <li>Check to make sure file names supplied on the command line exist before they are added to the playlist, and convert names (which may be relative) to full canonical path names</li>
