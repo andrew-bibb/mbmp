@@ -1,7 +1,7 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
-<b>In Progress</b>
+<b>11 May 2020</b>
 <ul>
 <li>Translation to Dutch by Heimen Stoffels.</li>
 <li>Add option to force Alsa output instead of using the audio output automatically determined by GStreamer.</li> 
