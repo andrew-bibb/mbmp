@@ -4,26 +4,26 @@ Dialog to select program settings
 
 Copyright (C) 2015-2021
 by: Andrew J. Bibb
-License: MIT 
+License: MIT
 
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"),to deal 
-in the Software without restriction, including without limitation the rights 
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
-copies of the Software, and to permit persons to whom the Software is 
-furnished to do so, subject to the following conditions: 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"),to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included 
+The above copyright notice and this permission notice shall be included
 in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
-***********************************************************************/ 
+***********************************************************************/
 
 # include <QtCore/QDebug>
 # include <QProcess>
@@ -46,17 +46,17 @@ DEALINGS IN THE SOFTWARE.
 //
 Settings::Settings(QWidget *parent)
     : QDialog(parent)
-{	
+{
   // setup the user interface
-  ui.setupUi(this);	
-  
+  ui.setupUi(this);
+
   // data members
   editor_string = QString();
-    
+
   // read the settings
   settings = new QSettings(ORG, APP, this);
-  
-  // preferences 
+
+  // preferences
 	settings->beginGroup("Preferences");
 	ui.checkBox_usestartoptions->setChecked(settings->value("use_startoptions").toBool() );
 	ui.groupBox_startoptions->setEnabled(settings->value("use_startoptions").toBool() );
@@ -83,12 +83,12 @@ Settings::Settings(QWidget *parent)
 	ui.comboBox_style->addItems(styles);
 	ui.comboBox_style->setCurrentText(str);
 	settings->endGroup();
-	
+
 	// notification settings
 	settings->beginGroup("Notifications");
 	ui.checkBox_notifydaemon->setChecked(settings->value("use_notifications").toBool() );
 	settings->endGroup();
-	
+
 	// start options
 	settings->beginGroup("StartOptions");
 	ui.checkBox_fullscreen->setChecked(settings->value("start_fullscreen").toBool() );
@@ -109,23 +109,23 @@ Settings::Settings(QWidget *parent)
 	ui.lineEdit_promoted->setText(settings->value("promoted-elements").toString() );
 	ui.lineEdit_blacklisted->setText(settings->value("blacklisted-elements").toString() );
 	settings->endGroup();
-	
+
 	// external programs
 	settings->beginGroup("ExternalPrograms");
 	editor_string = settings->value("text_editor").toString();
 	settings->endGroup();
-	
+
 	// Set up the buttonGroup for the editing buttons
 	bg01 = new QButtonGroup(this);
 	bg01->addButton(ui.pushButton_editiconfile);
 	bg01->addButton(ui.pushButton_editkeyfile);
-	
+
 	// Connect signals and slots
 	connect(bg01, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(openEditor(QAbstractButton*)));
 	connect(ui.toolButton_colorize, SIGNAL(clicked()), this, SLOT(callColorDialog()));
 	connect(ui.lineEdit_colorize, SIGNAL(textChanged(const QString&)), this, SLOT(iconColorChanged(const QString&)));
 	connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(writeSettings()));
-	
+
 	// See if we can find XScreenSaver and enable or disable controls
 	// based on what we can find.  If XScreenSaver is running it controls
 	// blanking and powersaving.
@@ -134,7 +134,7 @@ Settings::Settings(QWidget *parent)
 		ui.checkBox_disabledpms->setEnabled(false);
 	}
 	else {
-		ui.checkBox_disablexscreensaver->setEnabled(false);	
+		ui.checkBox_disablexscreensaver->setEnabled(false);
 		ui.checkBox_disabledpms->setEnabled(true);
 	}	// else
 
@@ -145,13 +145,13 @@ Settings::Settings(QWidget *parent)
 	else {
 		ui.checkBox_useyoutubedl->setEnabled(false);
 	}
-	
+
 	// We may have changed settings finding XScreensaver and youtube-dl so
 	// make sure everything is in sync.
 	this->writeSettings();
-		
-	return;  
-}  
+
+	return;
+}
 
 // Function to save GUI start options and preferences
 void Settings::writeSettings()
@@ -171,7 +171,7 @@ void Settings::writeSettings()
   settings->setValue("use_alsa_sink", ui.checkBox_alsasink->isChecked() );
   settings->setValue("alsa_device", ui.lineEdit_alsasink->text() );
   settings->endGroup();
-  
+
   settings->beginGroup("Notifications");
   settings->setValue("use_notifications", ui.checkBox_notifydaemon->isChecked() );
   settings->endGroup();
@@ -179,7 +179,7 @@ void Settings::writeSettings()
   settings->beginGroup("StartOptions");
   settings->setValue("start_fullscreen", ui.checkBox_fullscreen->isChecked() );
   settings->setValue("start_shademode", ui.checkBox_shademode->isChecked() );
-	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );  
+	settings->setValue("start_gui", ui.checkBox_gui->isChecked() );
   settings->setValue("use_icon_theme", ui.checkBox_icontheme->isChecked() );
   settings->setValue("icon_theme_name", ui.lineEdit_icontheme->text()  );
   settings->setValue("log_level", ui.spinBox_loglevel->value() );
@@ -194,11 +194,11 @@ void Settings::writeSettings()
   settings->setValue("promoted-elements", ui.lineEdit_promoted->text() );
   settings->setValue("blacklisted-elements", ui.lineEdit_blacklisted->text() );
   settings->endGroup();
-  
+
  	settings->beginGroup("ExternalPrograms");
 	settings->setValue("text_editor", editor_string);
 	settings->endGroup();
-  
+
   return;
 }
 
@@ -220,7 +220,7 @@ void Settings::saveElementState(const QString& elem, const QString& key, const Q
 	settings->beginGroup("State");
 	settings->setValue(QString("%1_%2").arg(elem).arg(key), val);
 	settings->endGroup();
-	
+
 	return;
 }
 
@@ -228,7 +228,7 @@ void Settings::saveElementState(const QString& elem, const QString& key, const Q
 // Function to restore the geometry of a window
 void Settings::restoreElementGeometry(const QString& elem, QWidget* win)
 {
-	settings->beginGroup("State");	
+	settings->beginGroup("State");
 	if (settings->value(QString("%1_vis").arg(elem)).toBool() ) {
 		win->show();
 		win->resize(settings->value(QString("%1_size").arg(elem)).toSize() );
@@ -243,21 +243,21 @@ QVariant Settings::getSetting(const QString& group, const QString& elem)
 {
 	QVariant v;
 	v.clear();
-	
+
 	settings->beginGroup(group);
 	v = settings->value(elem);
 	settings->endGroup();
-	
-	return v;	
+
+	return v;
 }
- 
+
 //
 // Function to set ui elements while trying to connect to a notification daemon
 void Settings::setNotificationsTrying(const QString& s)
 {
 	ui.label_serverstatus->setText(s);
 	ui.checkBox_notifydaemon->setToolTip("");
-	
+
 	return;
 }
 
@@ -276,7 +276,7 @@ void Settings::setNotificationsConnected(const QString& ttip)
 void Settings::setNotificationsFailed()
 {
   ui.checkBox_notifydaemon->setEnabled(false);
-	
+
 	return;
 }
 
@@ -287,11 +287,11 @@ QStringList Settings::getPlaylist()
 	// string list to return
 	QStringList sl;
 	sl.clear();
-	
+
 	settings->beginGroup("Playlist");
 	sl = settings->value("entries").toStringList();
 	settings->endGroup();
-	
+
 	return sl;
 }
 
@@ -301,45 +301,45 @@ void Settings::openEditor(QAbstractButton* button)
 {
 	QString filename;
 	QString qrc;
-	
+
 	if (button == ui.pushButton_editiconfile) {
 		filename = "mbmp.icon";
-		qrc = QString(":/text/text/icon_def.txt");	
+		qrc = QString(":/text/text/icon_def.txt");
 	}
 	else if (button == ui.pushButton_editkeyfile) {
 		filename = "mbmp.keys";
 		qrc = QString(":/text/text/sc_def.txt");
 	}
-	
+
 	// Convert filename to full path and name
 	filename = QString(QDir::homePath() + "/.config/mbmp/" + filename);
-		
+
 	// Initialize the text file if requested
 	if (ui.checkBox_startfresh->isChecked() ) {
 		ui.checkBox_startfresh->setChecked(false);
-	
+
 		// The target directory must already exist since that is checked when
 		// the iconmanager and scmanager are initialized so no need to check here.
-		QFile s(qrc);	
+		QFile s(qrc);
 
-		if (s.remove(filename) ) {	
-			if (s.copy(filename) ) 
+		if (s.remove(filename) ) {
+			if (s.copy(filename) )
 				QFile::setPermissions(filename, QFileDevice::ReadOwner | QFileDevice::WriteOwner);
-			else	
-			#if QT_VERSION >= 0x050400 
+			else
+			#if QT_VERSION >= 0x050400
 				qCritical("Failed copying %s to %s", qUtf8Printable(qrc), qUtf8Printable(filename) );
-			#else	
-				qCritical("Failed copying %s to %s", qPrintable(qrc), qPrintable(filename) );		
+			#else
+				qCritical("Failed copying %s to %s", qPrintable(qrc), qPrintable(filename) );
 			#endif
 		}	// if s.copy
-		else 
-		#if QT_VERSION >= 0x050400 
+		else
+		#if QT_VERSION >= 0x050400
 			qCritical("Failed removing: %s", qUtf8Printable(filename) );
-		#else	
-			qCritical("Failed removing: %s", qPrintable(filename) );		
-		#endif	
+		#else
+			qCritical("Failed removing: %s", qPrintable(filename) );
+		#endif
 	}	// if startfresh
-	 
+
 	// Prompt for an editor to use.
 		bool ok;
 		QString text = QInputDialog::getText(this, tr("Supply Text Editor Command"),
@@ -348,7 +348,7 @@ void Settings::openEditor(QAbstractButton* button)
 				"<br>If you want a console editor enter the terminal command<br>which you wish to run the editor in. (example: xterm -e vi)"
 				"<p>Please enter editor start command below."),
 				QLineEdit::Normal, editor_string, &ok);
-	
+
 		if (ok && ! text.isEmpty() ) {
 			text = text.simplified();
 			editor_string = text;	// save for future use
@@ -357,21 +357,21 @@ void Settings::openEditor(QAbstractButton* button)
 			args.removeFirst();
 			args << filename;
 			QProcess* proc = new QProcess(this);
-			proc->startDetached(editor, args);			  
+			proc->startDetached(editor, args);
 		}	// if ok and text not empty
-	
+
 	return;
 }
 
-// 
+//
 // Slot to open the color selection dialog and request input.
 void Settings::callColorDialog()
 {
 	QColor color = QColorDialog::getColor(QColor(ui.lineEdit_colorize->text()), this, tr("Colorize Icons"));
 	if (color.isValid() ) ui.lineEdit_colorize->setText(color.name() );
-	
+
 	return;
-}	
+}
 
 //
 // Slot to process things when the user changes the icon color
@@ -387,10 +387,10 @@ void Settings::iconColorChanged(const QString& col)
 bool Settings::isProcessRunning(const QByteArray& str)
 {
 	QProcess prss;
-	prss.start("ps -e");
+	prss.start("ps -e", QStringList() );
 	prss.waitForFinished();
 	QByteArray ba = prss.readAllStandardOutput();
-	
+
 	return ba.contains(QByteArray(" " + str + "\n"));
 }
 
@@ -401,12 +401,12 @@ bool Settings::isProgramAvailable(const QString& prog_name)
 	// get search paths
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QStringList sl_dirs = env.value("PATH").split(':');
-	
-	// return false if there are no paths to search	
+
+	// return false if there are no paths to search
 	if (sl_dirs.size() < 1) return false;
-	
-	// iterate over the search paths 
-	for (int i = 0; i < sl_dirs.size(); ++i) { 
+
+	// iterate over the search paths
+	for (int i = 0; i < sl_dirs.size(); ++i) {
 		QDirIterator dit(QString(sl_dirs.at(i) ), QDirIterator::Subdirectories);
 		while (dit.hasNext()) {
 			QFileInfo fi(dit.next());

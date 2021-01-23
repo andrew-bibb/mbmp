@@ -1,10 +1,14 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>32 January 2021</b>
+<ul>
+<li>Fixed compiler warnings on depreciated QT functions (for QT 5.15).</li>
+</ul>
 <b>11 May 2020</b>
 <ul>
 <li>Translation to Dutch by Heimen Stoffels.</li>
-<li>Add option to force Alsa output instead of using the audio output automatically determined by GStreamer.</li> 
+<li>Add option to force Alsa output instead of using the audio output automatically determined by GStreamer.</li>
 <li>Fixed accelerated playback dropping to cpu decoding on seek events.</li>
 </ul>
 <b>19 February 2017</b>
@@ -69,7 +73,7 @@
 <ul>
 <li>Created PlaylistItems that contain data, major rework on the playlist itself to deal with them.</li>
 <li>Playlists (*.m3u) can be saved and read.</li>
-<li>Fixed (really hard to find) bug where playlist would not automatically advance to next track</li>  
+<li>Fixed (really hard to find) bug where playlist would not automatically advance to next track</li>
 </ul>
 <b>14 April 2014 - Initial Release on GitHub</b>
 <ul>
