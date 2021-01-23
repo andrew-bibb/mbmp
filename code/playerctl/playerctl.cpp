@@ -902,9 +902,12 @@ void PlayerControl::playMedia(QAction* act)
 	else if (playlist->currentItemType() == MBMP_PL::Url) {
 		if (diag_settings->useYouTubeDL() && QUrl::fromUserInput(playlist->getCurrentUri()).port() == -1 ) {
 			QProcess p;
-			p.start(QString("youtube-dl"), QStringList() << QString("-g") << QString("-f") << QString("--best") << playlist->getCurrentUri() );
-			if (p.waitForFinished(diag_settings->getYouTubeDLTimeout() * 1000) )	// timeout from settings
-				gstiface->playMedia(videowidget->winId(), p.readAll());
+			p.start(QString("youtube-dl"), QStringList() << QString("--get-url") << QString("--format") << QString(" best") << playlist->getCurrentUri() );
+			if (p.waitForFinished(diag_settings->getYouTubeDLTimeout() * 1000) ) {// timeout from settings
+                               // qDebug() <<  "output " << p.readAllStandardOutput();
+                               // qDebug() <<  "error" << p.readAllStandardError();
+				gstiface->playMedia(videowidget->winId(), p.readAllStandardOutput());
+                        }
 			else {
 				this->processGstifaceMessages(MBMP_GI::Info, tr("Failed processing %1 through youtube-dl. Skipping URL").arg(playlist->getCurrentUri()) );
 				return;
