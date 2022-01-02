@@ -1,0 +1,98 @@
+<b><center>Monkey Business Media Player (MBMP)</center></b>
+<b><center>Change Log</center></b>
+<br>
+<b>23 January 2021</b>
+<ul>
+<li>Fixed compiler warnings on depreciated QT functions (for QT 5.15).</li>
+</ul>
+<b>11 May 2020</b>
+<ul>
+<li>Translation to Dutch by Heimen Stoffels.</li>
+<li>Add option to force Alsa output instead of using the audio output automatically determined by GStreamer.</li>
+<li>Fixed accelerated playback dropping to cpu decoding on seek events.</li>
+</ul>
+<b>19 February 2017</b>
+<ul>
+<li>Moved playlist into main widget.</li>
+<li>Showing album art in playlist as small thumbnail.</li>
+<li>Added a widget to display album art with an OSD popup to show title and artist.</li>
+<li>Added a user-agent to Musicbrainz GET requests to make them work better.</li>
+<li>Musicbrainz database search is now more robust.</li>
+<li>Youtube-dl timeout can now be set by the user.</li>
+</ul>
+<b> 8 January 2017</b>
+<ul>
+<li>IPC replaced with an MPRIS2.2 compatible system.</li>
+</ul>
+<b>27 November 2016</b>
+<ul>
+<li>Fixed malformed XDG paths</li>
+<li>Can parse URL's through youtube-dl if that program is installed.</li>
+<li>Can read Shoutcast (.pls) playlists.</li>
+<li>Fixed an uninitialized pointer which was causing occasional segfaults.</li>
+<li>The IPC now includes tracks and track changes in addition to titles.  Useful for streaming media.</li>
+<li>Can disable DPMS and X11 screen blanking from preferences if there is no xscreensaver program found.</li>
+</ul>
+<b>2 January 2016</b>
+<ul>
+<li>Album art can be downloaded for media files and audio CD's if it can be found.</li>
+<li>Playlist can display album art if it exists and can be found.</li>
+<li>Added details checkbox to playlist to display art and media details.</li>
+<li>Playlist tooltips are automatically turned off when playlist details are active.</li>
+<li>Playlist checkboxes now restored from settings.</li>
+<li>Added shade mode to the GUI.</li>
+</ul>
+<b>19 November 2015</b>
+<ul>
+<li>Internal icon set changed to Awoken set.</li>
+<li>Ability to colorize internal icons.</li>
+</ul>
+<b>15 September 2015</b>
+<ul>
+<li>Option to disable XScreenSaver while playing if it is present.</li>
+<li>-v (--version) command line option now works.</li>
+<li>Added wrap, consume and random modes to IPC, keybinds and as menu actions.</li>
+</ul>
+<b>6 September 2015</b>
+<ul>
+<li>Added Russian Translation (by Ilya Shestopalov).</li>
+<li>Added option to send track changes to a notification daemon.</li>
+<li>Added DBus based IPC mechanism.</li>
+<li>Major rework of internal communication lines from GstBus to our code.</li>
+<li>Better handling for Audio CD's and DVD's.</li>
+</ul>
+<b>2 June 2015</b>
+<ul>
+<li>Fixed visualizer menu not activating when visualizer option is toggled</li>
+<li>Stream and Download buffering (100% download, not progressive) enabled with command line options.</li>
+<li>Added scrolling message box for the ChangeLog and the Cheatsheet.</li>
+<li>Option to save settings and window state to disk.</li>
+<li>Stream position slider works.</li>
+</ul>
+<b>27 April 2014 - Playlist reworked</b>
+<ul>
+<li>Created PlaylistItems that contain data, major rework on the playlist itself to deal with them.</li>
+<li>Playlists (*.m3u) can be saved and read.</li>
+<li>Fixed (really hard to find) bug where playlist would not automatically advance to next track</li>
+</ul>
+<b>14 April 2014 - Initial Release on GitHub</b>
+<ul>
+<li>Added command line option to specify network connection speed</li>
+<li>Audio CD playback working</li>
+<li>DVD playback with navigation menus is working</li>
+<li>Can select the CD and DVD devices from ComboBoxes in the GUI</li>
+<li>Added CD and DVD device selection from the command line</li>
+<li>Chapterlist (DVD) and Tracklist (CD) properly disable and reenable UI controls</li>
+<li>DVD keyboard navigation</li>
+<li>Fixed escape of &lt; character when making the cheatsheet and improved the readability</li>
+<li>Check to make sure file names supplied on the command line exist before they are added to the playlist, and convert names (which may be relative) to full canonical path names</li>
+<li>Create a config file in the user's home directory</li>
+<li>Added options menu for subtitles and visualizer</li>
+</ul>
+<b>9 March 2014 - Initial Version</b>
+<ul>
+<li>Basic media playback and controls are functional</li>
+<li>Playlist is functional</li>
+<li>Visualizers and visualizer menus are functional</li>
+<li>StreamInfo to select audio, video and subtitle streams is functional</li>
+</ul>

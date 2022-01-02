@@ -1,0 +1,64 @@
+<RCC>
+  <qresource prefix="text">
+    <file>text/icon_def.txt</file>
+    <file>text/sc_def.txt</file>
+    <file>text/changelog.txt</file>
+    <file>text/license.txt</file>
+  </qresource>
+  <qresource prefix="stylesheets">
+    <file>stylesheets/stainless_steel.qss</file>
+  </qresource>
+  <qresource prefix="media">
+    <file>media/silence.ogg</file>
+  </qresource>
+  <qresource prefix="images">
+    <file>images/128x128/mbmp.png</file>
+    <file>images/24x24/raw_art/gtk-zoom-fit.png</file>
+    <file>images/24x24/raw_art/mbmp.png</file>
+    <file>images/24x24/raw_art/view-restore.png</file>
+    <file>images/24x24/raw_art/emblem-remote.png</file>
+    <file>images/24x24/raw_art/view-list-column.png</file>
+    <file>images/24x24/raw_art/sonata.png</file>
+    <file>images/24x24/raw_art/pacman.png</file>
+    <file>images/24x24/raw_art/configure.png</file>
+    <file>images/24x24/raw_art/document-save.png</file>
+    <file>images/24x24/raw_art/vol-down.png</file>
+    <file>images/24x24/raw_art/vol-up.png</file>
+    <file>images/24x24/raw_art/applications-system.png</file>
+    <file>images/24x24/raw_art/bmp.png</file>
+    <file>images/24x24/raw_art/media-playback-pause.png</file>
+    <file>images/24x24/raw_art/media-playback-start.png</file>
+    <file>images/24x24/raw_art/info2.png</file>
+    <file>images/24x24/raw_art/go-up.png</file>
+    <file>images/24x24/raw_art/go-down.png</file>
+    <file>images/24x24/raw_art/edit-delete.png</file>
+    <file>images/24x24/raw_art/remove2.png</file>
+    <file>images/24x24/raw_art/media-playlist-repeat.png</file>
+    <file>images/24x24/raw_art/add2.png</file>
+    <file>images/24x24/raw_art/media-playlist-shuffle.png</file>
+    <file>images/24x24/raw_art/go-first.png</file>
+    <file>images/24x24/raw_art/go-last.png</file>
+    <file>images/24x24/raw_art/go-next.png</file>
+    <file>images/24x24/raw_art/go-previous.png</file>
+    <file>images/24x24/raw_art/audio-volume-zero.png</file>
+    <file>images/24x24/raw_art/media-playback-stop.png</file>
+    <file>images/24x24/raw_art/audio-volume-muted.png</file>
+    <file>images/24x24/overlay/mute.png</file>
+    <file>images/24x24/raw_art/application-exit2.png</file>
+    <file>images/24x24/raw_art/media-optical-cd1.png</file>
+    <file>images/24x24/raw_art/darktable1.png</file>
+    <file>images/24x24/raw_art/media-optical-video1.png</file>
+    <file>images/24x24/raw_art/av-sync.png</file>
+    <file>images/24x24/raw_art/r10.png</file>
+    <file>images/24x24/raw_art/r60.png</file>
+    <file>images/24x24/raw_art/r600.png</file>
+    <file>images/24x24/raw_art/video-x-generic2.png</file>
+    <file>images/24x24/raw_art/preferences-color.png</file>
+    <file>images/24x24/raw_art/folder.png</file>
+    <file>images/24x24/raw_art/view-fullscreen.png</file>
+    <file>images/24x24/raw_art/user-desktop6.png</file>
+    <file>images/24x24/raw_art/f10.png</file>
+    <file>images/24x24/raw_art/f60.png</file>
+    <file>images/24x24/raw_art/f600.png</file>
+  </qresource>
+</RCC>

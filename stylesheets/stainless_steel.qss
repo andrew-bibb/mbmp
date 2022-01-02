@@ -1,0 +1,95 @@
+QDialog {
+	background:
+		qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:1, stop:0 #E0DFDB, stop:1 #CCCBC7 );
+	}
+
+QToolButton {
+	border-radius: 9px;	
+	}
+
+QToolButton:hover {
+	background-color: #F7F6F2;
+	}
+
+QSlider::groove:horizontal {
+  height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+  background-color: #F7F6F2; 
+  margin: 2px 0px;
+	}
+
+QSlider::handle:horizontal {
+  background-color: #807F6D;
+  width: 8px;
+  margin-top: -6px;
+  margin-bottom: -6px;
+  border-radius: 3px;
+	}	
+
+QSlider::add-page:horizontal {
+  background-color: #F7F6F2;
+	}
+
+QSlider::sub-page:horizontal {
+  background-color: #57698c;
+	}
+
+QLabel {
+ background-color: transparent;
+	}
+
+QListWidget {
+	background-color: #E0DFDB;
+	}
+
+QListWidget::item:hover {
+  background-color: #CCCBC7; 
+	}
+
+QListWidget::item:selected {
+  background-color: #57698C;
+  border: 1px;
+	}
+
+QPushButton {
+	background-color: #CCCBC7;
+	}
+
+QComboBox {
+	background-color: #CCCBC7;
+  selection-background-color: #57698C;
+	}
+
+QComboBox:On {
+  padding-top: 3px;
+  padding-left: 4px;
+	}
+
+QComboBox QAbstractItemView {
+  background-color: #E0DFDB;
+	}
+
+QLineEdit {
+	background-color: #E0DFDB;
+	}
+
+QSpinBox {
+	background-color: #E0DFDB;
+	}
+
+QMenu {
+    background-color: #E0DFDB;
+    margin: 2px; 
+	}
+
+QMenu::item {
+  padding: 2px 25px 2px 20px;
+  border: 1px solid transparent;
+	background-color: transparent;
+	}
+
+QMenu::item:selected { 
+	border: 1px solid #57698C;
+	border-style: outset;
+	background-color: #F7F6F2;
+	}
+

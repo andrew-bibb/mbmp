@@ -1,0 +1,11 @@
+*.swp
+moc_*.cpp
+moc_*.h
+*.o
+*.qm
+Makefile
+ui_*.h
+*.gz
+*.sh
+*.stash
+*.save
