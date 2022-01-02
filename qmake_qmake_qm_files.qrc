@@ -1,7 +1,0 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource prefix="i18n">
-<file alias="mbmp_en_US.qm">/home/andy/Documents/programming/git local/mbmp/.qm/mbmp_en_US.qm</file>
-<file alias="mbmp_ru_RU.qm">/home/andy/Documents/programming/git local/mbmp/.qm/mbmp_ru_RU.qm</file>
-<file alias="mbmp_nl_NL.qm">/home/andy/Documents/programming/git local/mbmp/.qm/mbmp_nl_NL.qm</file>
-</qresource>
-</RCC>
