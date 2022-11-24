@@ -182,7 +182,7 @@
     <message>
         <location filename="../code/playerctl/ui/playerctl.ui" line="14"/>
         <source>MBMP Player</source>
-        <translation>Reprodutor de MBMP</translation>
+        <translation>Reprodutor de Multimídia MBMP</translation>
     </message>
     <message>
         <location filename="../code/playerctl/ui/playerctl.ui" line="35"/>
@@ -288,7 +288,7 @@
         <location filename="../code/playerctl/ui/playerctl.ui" line="502"/>
         <location filename="../code/playerctl/ui/playerctl.ui" line="505"/>
         <source>About MBMP</source>
-        <translation>Sobre o MBMP</translation>
+        <translation>Sobre o Reprodutor de Multimídia MBMP</translation>
     </message>
     <message>
         <location filename="../code/playerctl/ui/playerctl.ui" line="513"/>
