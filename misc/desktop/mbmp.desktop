@@ -1,11 +1,41 @@
 [Desktop Entry]
+Categories=Qt;Audio;Video;AudioVideo;
+Exec=mbmp
+Icon=mbmp
+StartupNotify=false
+Terminal=false
 Type=Application
 Version=2015.11.22
+
 Name=MBMP
+Name[de]=Medienwiedergabe »MBMP«
+Name[fr]=MBMP Lecteur multimédia
+Name[fr_BE]=MBMP Lecteur multimédia
+Name[it]=Lettore multimediale MBMP
+Name[pt]=Leitor de multimédia MBMP
+Name[pt_BR]=Reprodutor de Multimídia MBMP
+
 GenericName=Multi-Media Player
+GenericName[de]=Multimedia-Wiedergabeprogramm
+GenericName[fr]=Lecteur multimédia
+GenericName[fr_BE]=Lecteur multimédia
+GenericName[it]=Lettore multimediale
+GenericName[pt]=Leitor de multimédia
+GenericName[pt_BR]=Reprodutor ou Tocador de Multimídia MBMP
+
 Comment=GStreamer based multi-media player 
-Categories=Qt;Audio,Video,AudioVideo
-Icon=mbmp
-Terminal=false
-Exec=mbmp
-StartupNotify=false
+Comment[de]=GStreamer-basierter Filme und Musik abspielen
+Comment[fr]=Lecteur multimédia basé sur GStreamer
+Comment[fr_BE]=Lecteur multimédia basé sur GStreamer
+Comment[it]=Lettore multimediale basato su GStreamer
+Comment[pt]=Ver vídeos e ouvir músicas baseado no GStreamer
+Comment[pt_BR]=Reproduzir ou tocar filmes e músicas baseado no GStreamer
+
+# Dear volunteer translators, please add your language abbreviation and name here in alphabetical order.
+#
+# de: Robin.antiX
+# fr: Wallon
+# fr_BE: Wallon
+# it: Spartak77, Daddylibre, madibi
+# pt: PPC
+# pt_BR: marcelocripe
