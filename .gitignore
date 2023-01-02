@@ -9,3 +9,6 @@ ui_*.h
 *.sh
 *.stash
 *.save
+mbmp
+qrc_*.cpp
+qmake_qmake*

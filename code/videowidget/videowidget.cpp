@@ -3,7 +3,7 @@
 Code to manage the videowidget. Gstreamer renders a video stream onto
 this widget
 
-Copyright (C) 2014-2022
+Copyright (C) 2014-2023
 by: Andrew J. Bibb
 License: MIT 
 

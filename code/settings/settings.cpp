@@ -2,7 +2,7 @@
 
 Dialog to select program settings
 
-Copyright (C) 2015-2022
+Copyright (C) 2015-2023
 by: Andrew J. Bibb
 License: MIT
 

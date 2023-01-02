@@ -2,7 +2,7 @@
 
 Main program to parse command line arguments and start the event loop
 
-Copyright (C) 2013-2022
+Copyright (C) 2013-2023
 by: Andrew J. Bibb
 License: MIT
 
