@@ -81,7 +81,7 @@
         <source>INFOMATION MESSAGE from element %1: %2
   Debugging information: %3</source>
         <translation>MENSAGEM DE INFORMAÇÃO do elemento %1: %2
-  Informações de depuração: %3</source></translation>
+  Informações de depuração: %3</translation>
     </message>
     <message>
         <location filename="../code/gstiface/gstiface.cpp" line="770"/>

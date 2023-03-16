@@ -1265,6 +1265,7 @@ void PlayerControl::aboutMBMP()
                            "<br><center><b>Translations:</b>"
         "<center>Ilya Shestopalov (Russian)"
         "<center>Heimen Stoffels (Dutch)"
+        "<center>Macrolo Cripe (Portuguese - Brazil)"
         ).arg(QString(APP).toUpper()).arg(VERSION).arg(RELEASE_DATE).arg(COPYRIGHT_DATE) );
 }
 

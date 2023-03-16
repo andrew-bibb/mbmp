@@ -120,6 +120,7 @@ PKGCONFIG += xext
 TRANSLATIONS += ./translations/mbmp_en_US.ts
 TRANSLATIONS += ./translations/mbmp_ru_RU.ts
 TRANSLATIONS += ./translations/mbmp_nl_NL.ts
+TRANSLATIONS += ./translations/mbmp_pt_BR.ts
 CONFIG += lrelease
 CONFIG += embed_translations
 

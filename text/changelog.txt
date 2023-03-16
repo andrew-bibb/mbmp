@@ -1,6 +1,10 @@
 <b><center>Monkey Business Media Player (MBMP)</center></b>
 <b><center>Change Log</center></b>
 <br>
+<b>16 March 2023</b>
+<ul>
+<li>Merget PR #11, pt_BR.ts translation by marcelocripe</li>
+</ul>
 <b>23 January 2021</b>
 <ul>
 <li>Fixed compiler warnings on depreciated QT functions (for QT 5.15).</li>
