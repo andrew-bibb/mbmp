@@ -28,7 +28,7 @@ DEALINGS IN THE SOFTWARE.
 # include <QFile>
 # include <QTextStream>
 # include <QFile>
-# include <QRegExp>
+# include <QRegularExpression>
 # include <QTime>
 # include <QFileInfo>
 # include <QProcess>
@@ -345,7 +345,7 @@ PlayerControl::PlayerControl(const QCommandLineParser& parser, QWidget* parent)
       act->setCheckable(true);
       vis_group->addAction(act);
       if (i == 0 ) act->setChecked(true);
-      else if (act->text().contains(QRegExp("^GOOM: what a GOOM!$")) ) act->setChecked(true);
+      else if (act->text().contains(QRegularExpression("^GOOM: what a GOOM!$")) ) act->setChecked(true);
    }
 
    // create the advanced menu
@@ -1722,7 +1722,11 @@ bool PlayerControl::eventFilter(QObject* watched, QEvent* event)
          ui.horizontalSlider_position->setValue(QStyle::sliderValueFromPosition(
             ui.horizontalSlider_position->minimum(),
             ui.horizontalSlider_position->maximum(),
+            # if QT_VERSION < 0x060000
             mouseEvent->x(),
+            # else
+            mouseEvent->position().x(),
+            #endif
             ui.horizontalSlider_position->width()));
             gstiface->seekToPosition(ui.horizontalSlider_position->value() );
          return true;

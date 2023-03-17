@@ -113,11 +113,16 @@ int main(int argc, char *argv[])
 
 	parser.addPositionalArgument("filename", QCoreApplication::translate("main.cpp", "Media file to play."));
 
-  // Setup translations
-  QTranslator qtTranslator;
-  qtTranslator.load("qt_" + QLocale::system().name(),
-  QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-  app.installTranslator(&qtTranslator);
+   // Setup translations
+   QTranslator qtTranslator;
+   # if QT_VERSION < 0x060000
+      qtTranslator.load("qt_" + QLocale::system().name(),
+      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+   # else
+      (void) qtTranslator.load("qt_" + QLocale::system().name(),
+      QLibraryInfo::path(QLibraryInfo::TranslationsPath));
+   # endif
+   app.installTranslator(&qtTranslator);
 
   QTranslator mbmpTranslator;
   if (mbmpTranslator.load(":/i18n/mbmp_" + QLocale::system().name()) ) {

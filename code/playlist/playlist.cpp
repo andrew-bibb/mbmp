@@ -772,7 +772,7 @@ void Playlist::seedPlaylist(const QStringList& sl_seed)
 		}	// if
 
 		else {
-			QFileInfo fi = sl_seed.at(i);
+			QFileInfo fi = QFileInfo(sl_seed.at(i));
 			if (fi.exists()) {
 				if (sl_seed.at(i).endsWith(".m3u", Qt::CaseInsensitive) )
 					this->processM3U(sl_seed.at(i));
@@ -1095,7 +1095,7 @@ bool Playlist::readCDMetaFile(const QString& discid)
 									}
 									break;
 								case QXmlStreamReader::EndElement:
-									if (xml->name() == "track") {
+									if (xml->name() == QString ("track")) {
 										cdmetadata->setTrack(track);
 									}
 									//qDebug() << pos.join(',');
@@ -1104,7 +1104,7 @@ bool Playlist::readCDMetaFile(const QString& discid)
 								default:
 									continue;
 							}	// switch
-							if (xml->tokenType() == QXmlStreamReader::EndElement && xml->name() == "tracklist") break;
+							if (xml->tokenType() == QXmlStreamReader::EndElement && xml->name() == QString("tracklist")) break;
 						}	// while
 					}	// if track-list,track
 					break;
